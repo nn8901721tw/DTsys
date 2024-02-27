@@ -85,11 +85,11 @@ export default function HomePage() {
   return (
     <div  className='min-w-full min-h-screen h-screen overflow-hidden overflow-x-scroll'>
       <TopBar />
-      
-      <div className='flex flex-col my-5 pl-20 pr-5 sm:px-20 py-16 w-full h-screen justify-start items-center'>
-      <h5>設計思考活動列表</h5>
-        <div className=' flex flex-row justify-between items-center w-full sm:w-2/3 mb-5'>
-          <div className='flex'>
+
+      <div className='flex flex-col my-5 sm:px-10 md:px-6  py-16 w-full h-screen items-center'>
+        <h5 className='font-semibold text-2xl'>設計思考活動列表</h5>
+        <div className=' flex flex-row justify-between items-center w-full sm:w-2/3 my-5'>
+          <div className='flex  '>
             
             <button onClick={()=>setCreateProjectModalOpen(true)} className=" bg-customgreen hover:bg-customgreen/80 text-white font-semibold rounded-2xl p-1 mr-1 sm:px-4 sm:mr-4 sm:py-1 text-base">建立專案</button>
             <button onClick={()=>setInviteProjectModalOpen(true)} className=" bg-customgreen hover:bg-customgreen/80 text-white font-semibold rounded-2xl p-1 sm:px-4 sm:py-1 text-base">加入專案</button>
@@ -102,25 +102,25 @@ export default function HomePage() {
           </div>
         </div>
         {/* item */}
-        <div className='grid gap-4 grid-cols-3 items-center w-full h-screen overflow-hidden overflow-y-scroll scrollbar-thin scrollbar-thumb-slate-400/70 scrollbar-track-slate-200 scrollbar-thumb-rounded-full scrollbar-track-rounded-full'>
+        <div className=' w-[75%] 2xl:w-[80%] grid gap-x-4 gap-y-4 sm:gap-x-6 sm:gap-y-4  lg:gap-x-8 lg:gap-y-8  grid-cols-3 2xl:grid-cols-4 mx-auto  h-screen overflow-y-scroll scrollbar-none  scrollbar-thumb-slate-400/70 scrollbar-thumb-rounded-full scrollbar-track-rounded-full'>
           {
             isLoading ? <Loader /> : 
             isError ? <p className='font-bold text-2xl'>{error.message}</p> : 
             projectData.map((projectItem, index) => {
               return (
-                <div key={index} className='rounded-lg border-2 w-full sm:w-2/3 min-h-[150px]  bg-white shadow-md'>
-                  <div className='flex flex-row w-full h-full'>
-                    <div className='flex-1 text-lg font-bold text-center py-3'>{projectItem?.name}</div> 
-                    <div className='flex-1 text-lg font-bold text-center py-3'>{projectItem?.describe}</div>
-                    <div className='flex-1 flex justify-center items-center py-3'>
-                      <BsBoxArrowInRight size={30} className='cursor-pointer text-blue-500 hover:text-blue-700' onClick={() => {navigate(`/project/${projectItem.id}/kanban`)}}/>
-                    </div> 
+                <div key={index} className='rounded-lg w-full max-h-[150px] min-h-[150px]  bg-white shadow-md hover:scale-105 duration-150'>
+                  <div  className='flex  w-full h-full justify-center items-center' onClick={() => {navigate(`/project/${projectItem.id}/kanban`)} }>
+                    <div className='flex-1 text-base md:text-lg font-bold text-center py-3  truncate ...'>{projectItem?.name}</div> 
+                    <div className='flex-1 text-base md:text-lg font-bold text-center py-3  truncate ...'>{projectItem?.describe}</div>
+                    {/* <div className='flex-1 py-3 '>
+                      <BsBoxArrowInRight size={30} className='ml-[35%] cursor-pointer text-blue-500 hover:text-blue-700' onClick={() => {navigate(`/project/${projectItem.id}/kanban`)}}/>
+                    </div>  */}
                   </div>
                 </div>
               )
             })
           }
-          <div className='flex justify-center items-center rounded-lg border-[5px] w-full sm:w-2/3 min-h-[100px] mt-3 bg-white text-slate-400 text-xl font-bold shadow-md'>
+          <div className='flex justify-center items-center rounded-lg border-[5px] sm:w-2/3 max-h-[150px] min-h-[150px]  bg-white text-slate-400 text-xl font-bold shadow-md'>
             建立新專案
           </div>
         </div>

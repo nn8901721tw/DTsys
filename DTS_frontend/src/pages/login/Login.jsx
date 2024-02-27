@@ -32,7 +32,7 @@ export default function Login() {
         id: res.data.id,
         accessToken: res.data.accessToken,
       }));
-      // navigate("/homepage");
+      navigate("/homepage");
       // 成功登錄時彈出 SweetAlert 提示
       Swal.fire({
         icon: 'success',
