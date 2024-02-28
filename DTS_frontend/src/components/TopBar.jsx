@@ -45,8 +45,8 @@ export default function TopBar() {
   }
 
   return (
-    <div className='fixed  h-16 w-full pl-20 bg-[#83A7A9] flex items-center justify-between pr-5 border-b-2'>
-        <Link to="/homepage" onClick={cleanStage} className="">
+    <div className='fixed  h-16 w-full pl-20 bg-[#99bdbe] flex items-center justify-between pr-5 border-b-2 text-slate-100'>
+        <Link to="/lobypage" onClick={cleanStage} className="">
           <img src="/images/DTlabel.png" className="w-40 mt-1" />
         </Link>
         <div className="flex items-center">

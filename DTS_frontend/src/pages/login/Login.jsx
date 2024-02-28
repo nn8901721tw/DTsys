@@ -32,7 +32,7 @@ export default function Login() {
         id: res.data.id,
         accessToken: res.data.accessToken,
       }));
-      navigate("/homepage");
+      navigate("/lobypage");
       // 成功登錄時彈出 SweetAlert 提示
       Swal.fire({
         icon: 'success',
@@ -81,7 +81,7 @@ export default function Login() {
             repeat={Infinity}
             style={{ fontSize: '2em', display: 'inline-block' }}
           />      */}
-          {/* <h1 className='text-white text-2xl font-press-start mt-2'>self-directed Learning</h1> */}
+
 
           <img src="/images/design-thinking_2.png"className="w-48 mx-auto mt-10" />
         </div>

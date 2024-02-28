@@ -4,7 +4,7 @@ import { ProtectedLogin, ProtectedRoute } from "./utils/ProtectedRoute";
 import { AuthProvider } from "./utils/AuthContext";
 
 import HomePage from "./pages/home/HomePage";
-import Loby from "./pages/home/Loby";
+import LobyPage from "./pages/home/LobyPage";
 import Login from "./pages/login/Login";
 import Register from "./pages/login/Register";
 import Kanban from "./pages/Kanban/Kanban";
@@ -31,7 +31,7 @@ export default function App() {
         </Route>
         <Route element={<ProtectedRoute />}>
           <Route path="homepage" element={<HomePage />} />
-          <Route path="Loby" element={<Loby />} />
+          <Route path="lobypage" element={<LobyPage />} />
           <Route path="bulletin" element={<Bulletin />} />
           <Route path="List" element={<List />} />
           <Route path="project/:projectId" element={<ProjectLayout />}>
