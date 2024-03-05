@@ -13,7 +13,7 @@ export default function SideBar() {
     const [ chatRoomOpen, setChatRoomOpen ] = useState(false);
     const { projectId } = useParams();
     const menus = [
-        { name: "排程模組", link: `/project/${projectId}/kanban`, icon: AiOutlineProject, margin:"true"},
+        { name: "專案", link: `/project/${projectId}/kanban`, icon: AiOutlineProject, margin:"true"},
         { name: "想法牆", link: `/project/${projectId}/ideaWall`, icon: IoBulbOutline },
         { name: "管理階段", link: `/project/${projectId}/managePhase`, icon: BsBezier2 },
         { name: "繳交任務", link: `/project/${projectId}/submitTask`, icon: GrCompliance },
@@ -23,7 +23,7 @@ export default function SideBar() {
 
     return (
         <>
-            <div className={` bg-[#FFF] fixed inset-y-16 left-0 min-h-screen duration-500 border-r-2 ${open ? "w-44" : "w-16"}  `}>
+            <div className={` bg-[#FFF] absolute inset-y-16 left-0 min-h-screen duration-500 border-r-2 ${open ? "w-40" : "w-16"}`}>
                 <div className='mt-2 py-3 pl-3 flex justify-start'>
                     <FaBars size={26} className='cursor-pointer' onClick={()=>setOpen(!open)}/>
                 </div>

@@ -6,6 +6,7 @@ import { getProjectUser } from '../../../api/users';
 import { useParams } from 'react-router-dom';
 import { useQuery } from 'react-query';
 
+import { BsArrowRight } from "react-icons/bs"; // 使用進入的圖標
 import { GrFormClose } from "react-icons/gr";
 import { FiEdit } from "react-icons/fi";
 import { AiOutlineTag } from "react-icons/ai";
@@ -28,6 +29,11 @@ export default function Carditem({ data, index, columnIndex }) {
   })
   const [ menberData, setMenberData ] = useState([]);
   const [ labelData, setLabelData ] = useState([]);
+  const [clickedCardIndex, setClickedCardIndex] = useState(null);
+
+  const handleClick = () => {
+    setClickedCardIndex(index);
+  };
 
   const getProjectUserQuery = useQuery( "getProjectUser", () => getProjectUser(projectId), 
     {
@@ -57,53 +63,55 @@ export default function Carditem({ data, index, columnIndex }) {
     setOpen(false);
   }
   
+
+
+
   return (
     <>
     <Draggable index={index} draggableId={data?.id.toString()}>
-    {(provided, snapshot) => (
-      <div 
-        ref={provided.innerRef}
-        {...provided.draggableProps}
-        {...provided.dragHandleProps}
-        className={`${snapshot.isDragging ? 'border-2 border-black/50 bg-sky-300' : 'border-0 bg-white'}  rounded-md p-3 mt-3 truncate min-h-[80px] max-w-full`}
-      >
-        <div className='flex justify-between'>
-          <span className='flex text-lg'>{data.title}</span>
-          <FiEdit onClick={() => {
-            setOpen(true);
-          }} className='w-5 h-5 cursor-pointer'/>
-        </div>  
-        <span className=' text-md my-3 text-base leading-6'>{data.content}</span>
-        
-        <div className='flex flex-row justify-between items-center'>
-          <div className='flex justify-start'>
-            {
-              data.labels &&
-              data?.labels.map((label, index) =>{
-                return(
-                  <div key={index} className={` ${label.bgcolor} p-2 rounded-full ${label.textcolor} text-xs font-bold text-center flex items-center h-[20px]`}>
-                    {label.content}
-                  </div> 
-                )
-              }) 
-            }
+      {(provided, snapshot) => (
+        <div 
+          ref={provided.innerRef}
+          {...provided.draggableProps}
+          {...provided.dragHandleProps}
+          className={`${
+            snapshot.isDragging ? 'border-2 border-emerald-700 bg-sky-300' : 'border-0 bg-white'
+          } rounded-md p-3 mt-3 truncate min-h-[80px] max-w-full shadow-md`}
+        >
+          <div>
+            <span className=' text-md my-3 text-base leading-6'>{data.content}</span>
+            <div className='flex justify-between '>
+              <span className='flex text-lg text-zinc-700'>{data.title}</span>
+              <div className="flex items-center">
+                <FiEdit onClick={() => setOpen(true)} className='w-5 h-5 cursor-pointer mr-2'/>
+                <BsArrowRight onClick={() => setOpen(true)} className='w-5 h-5 cursor-pointer'/>
+              </div>
+            </div>  
+            
+            
+            <div className='flex flex-row justify-between items-center'>
+              <div className='flex justify-start'>
+                {data.labels &&
+                  data?.labels.map((label, index) => (
+                    <div key={index} className={` ${label.bgcolor} p-2 rounded-full ${label.textcolor} text-xs font-bold text-center flex items-center h-[20px]`}>
+                      {label.content}
+                    </div> 
+                  ))}
+              </div>
+              <div className="flex justify-end items-center space-x-1">
+                {data.assignees &&
+                  data?.assignees.map((assignee, index) => (
+                    <div key={index} className={`w-8 h-8 bg-slate-100 border-[1px] border-slate-400 rounded-full flex items-center text-center p-2 shadow-xl text-xs overflow-hidden cursor-default`}>
+                      {assignee.username}
+                    </div>
+                  ))}
+              </div>
+            </div> 
           </div>
-          <div className=" flex justify-end items-center space-x-1">
-            {
-              data.assignees &&
-              data?.assignees.map((assignee, index) => {
-                return(
-                  <div key={index} className={`w-8 h-8 bg-slate-100 border-[1px] border-slate-400 rounded-full flex items-center text-center p-2 shadow-xl text-xs overflow-hidden cursor-default`}>
-                    {assignee.username}
-                  </div>
-                )
-              })
-            }
-          </div>
-        </div> 
-      </div>
-    )}
-    </Draggable>
+        </div>
+      )}
+  </Draggable>
+
     {/* edit card modal */}
     {
       cardData &&
@@ -175,7 +183,7 @@ export default function Carditem({ data, index, columnIndex }) {
             }}>
             取消
           </button>
-          <button className="flex justify-center items-center w-full h-7 mb-2 bg-customgreen rounded font-bold text-xs sm:text-sm text-white"
+          <button className="flex justify-center items-center w-full h-7 mb-2 bg-[#A2C4C6] rounded font-bold text-xs sm:text-sm text-white"
             onClick={cardHandleSubmit}
             >
             儲存

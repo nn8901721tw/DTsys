@@ -21,8 +21,8 @@ const User = sequelize.define('user', {
 });
 
 
-User.belongsToMany(Project, {through:"User_Project"});
-Project.belongsToMany(User, {through:"User_Project"});
+User.belongsToMany(Project, {through:"User_Projects"});
+Project.belongsToMany(User, {through:"User_Projects"});
 
 User.hasMany(Threads_Message);
 User.hasMany(Threads);

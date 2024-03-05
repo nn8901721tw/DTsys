@@ -207,12 +207,15 @@ export default function Kanban() {
   }
   return (
     <DragDropContext onDragEnd={onDragEnd}>
-
-    <div className='grid grid-cols-4 gap-5 my-5 px-20 pt-16 min-w-[1200px] h-screen'>
+    <div className=''>
+      <h1 className='absolute top-0 left-0 right-0 text-center mt-[4.5rem] 2xl:mt-[6.0rem] text-2xl 2xl:text-3xl font-bold text-stone-700'>設計思考歷程導引</h1>
+    </div>
+    <div className='grid grid-cols-4 gap-5 my-5 px-28 pt-24 2xl:pt-36 min-w-[1200px] h-screen overflow-hidden bg-slate-100  '>
+      
       <TaskHint stageInfo={stageInfo} />
     {
       kanbanIsLoading  ? <Loader /> :  
-      kanbansIsError ? <p className=' font-bold text-2xl'>{kanbansIsError.message}</p> : 
+      kanbansIsError ? <p className=' font-bold text-4xl'>{kanbansIsError.message}</p> : 
       kanbanData.map(( column, columnIndex ) =>{
           return(
             <div key={column.name}>
@@ -221,20 +224,22 @@ export default function Kanban() {
                   <div 
                     {...provided.droppableProps}
                     ref={provided.innerRef}
+                    className='shadow-xl'
                   >  
-                    <div className= {`${snapshot.isDraggingOver ? ' bg-rose-100/70' : 'bg-gray-100'} p-3 rounded-md shadow-md flex flex-col  w-full max-h-[80vh] overflow-y-scroll scrollbar-thin scrollbar-thumb-slate-400/70 scrollbar-track-slate-200 scrollbar-thumb-rounded-full scrollbar-track-rounded-full`}>
-                      <h4 className=' flex justify-between items-center mb-2'>
-                        <span className=' text-xl text-gray-600'>{ column.name }</span>
+                    <div className= {`${snapshot.isDraggingOver ? ' bg-rose-100/70' : 'bg-gray-100'} p-3 rounded-md shadow-xl flex flex-col  w-full max-h-[70vh] overflow-y-scroll scrollbar-none`}>
+                    {/* <div className= {`${snapshot.isDraggingOver ? ' bg-rose-100/70' : 'bg-gray-100'} p-3 rounded-md shadow-md flex flex-col  w-full max-h-[70vh] overflow-y-scroll scrollbar-thin scrollbar-thumb-slate-400/70 scrollbar-track-slate-200 scrollbar-thumb-rounded-full scrollbar-track-rounded-full`}> */}
+                      <h4 className=' flex justify-between items-center mb-2 '>
+                        <span className=' text-xl font-semibold text-gray-600 '>{ column.name }</span>
                       </h4>
                       {
                         showForm && selectedcolumn === columnIndex ? (
-                          <div>
+                          <div >
                             <textarea className="border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-customgreen w-full p-1" 
                             rows={3} 
                             placeholder="Task info" 
                             onChange={handleChange}
                             />
-                            <div className=' flex justify-evenly'>
+                            <div className=' flex justify-evenly '>
                               <button
                               className="flex justify-center items-center w-1/2 my-1 mr-1 p-1 bg-white rounded-md font-bold text-sm"
                               onClick={handleSubmit}
@@ -252,7 +257,7 @@ export default function Kanban() {
                           
                         ): (
                           <button
-                            className="flex justify-center items-center my-1 py-1 bg-white rounded-md text-lg"
+                            className="flex justify-center items-center my-1 py-1 bg-white rounded-md text-lg  "
                             onClick={() => {setSelectedcolumn(columnIndex); setShowForm(true);}}
                           >
                             <FiPlus className="w-5 h-5" />
@@ -262,11 +267,12 @@ export default function Kanban() {
                       {
                         column.task.length > 0  && 
                           column.task.map((item, index) => {
-                            return <Carditem 
+                            return <Carditem
                                     key={item.id} 
                                     index={index} 
                                     data={item} 
                                     columnIndex={columnIndex} 
+                                 
                                     />
                           })
                       }

@@ -7,7 +7,7 @@ export default function ProjectLayout() {
     const location = useLocation();
     const { projectId } = useParams();
     return (
-        <div className='min-w-full min-h-screen h-screen overflow-hidden overflow-x-scroll'>
+        <div className='min-w-full min-h-screen h-screen overflow-hidden overflow-x-scroll scrollbar-thin'>
             {
                 location.pathname === `/project/:${projectId}/ideaWall` ?(
                     <></>

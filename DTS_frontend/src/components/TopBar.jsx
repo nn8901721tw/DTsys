@@ -56,7 +56,7 @@ export default function TopBar() {
             getProjectUserQuery.isError ? <p className=' font-bold text-2xl'>{kanbansIsError.message}</p> : 
             projectUsers.map((projectUser, index) => {
               return(
-                <li key={index} className={`w-8 h-8 bg-slate-100 border-[1px] border-slate-400 rounded-full flex items-center text-center p-2 shadow-xl text-xs overflow-hidden cursor-default`}>
+                <li key={index} className={`w-8 h-8 bg-customgreen border-[1px] border-slate-400 rounded-full flex items-center text-center p-2 shadow-xl text-xs overflow-hidden cursor-default`}>
                   {projectUser.username}
                 </li>
               )
@@ -78,7 +78,7 @@ export default function TopBar() {
           <h3 className="font-bold cursor-pointer p-1 mr-2 rounded-lg">
             {localStorage.getItem("username")}
           </h3>
-          <h3 className="font-bold cursor-pointer p-1 mr-2 hover:bg-slate-100 rounded-lg" onClick={handleLogout}>
+          <h3 className="font-bold cursor-pointer p-1 mr-2 hover:bg-slate-900 rounded-lg" onClick={handleLogout}>
             登出
           </h3>
         </div>
@@ -87,8 +87,8 @@ export default function TopBar() {
             <GrFormClose  className=' w-6 h-6'/>
           </button> 
           <div className='flex flex-col p-3'>
-                <h3 className=' font-bold text-base mb-3'>專案邀請碼:</h3>
-                <h3 className=' text-center font-bold text-lg py-1 bg-slate-200/70 rounded-md'>
+                <h3 className=' font-bold text-base mb-3 text-stone-800'>專案邀請碼:</h3>
+                <h3 className=' text-center font-bold text-lg py-1 bg-emerald-400 rounded-md'>
                   {projectInfo.referral_code}
                 </h3>
           </div> 

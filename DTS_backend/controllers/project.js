@@ -7,6 +7,7 @@ const Idea_wall = require('../models/idea_wall');
 const Process = require('../models/process');
 const Stage = require('../models/stage');
 const Sub_stage = require('../models/sub_stage');
+const User_project = require('../models/userproject');
 
 exports.getProject = async(req, res) =>{
     const projectId = req.params.projectId;
@@ -50,7 +51,7 @@ exports.createProject = async(req, res) => {
     const projectMentor = req.body.projectMentor;
     const referral_code = shortid.generate();
     if(!projectName || !projectdescribe){
-        return res.status(404).send({message: 'please enter project Name or project describe!'})
+        return res.status(404).send({message: '請輸入資料!'})
     }
     const createdProject = await Project.create({
         name: projectName,
@@ -82,7 +83,7 @@ exports.createProject = async(req, res) => {
         stage:`${createdProject.currentStage}-${createdProject.currentSubStage}`
     })
     .then(() =>{
-        res.status(200).send({message: 'create success!'})
+        res.status(200).send({message: '活動創建成功!'})
     })
     .catch(err => console.log(err));
 
@@ -278,29 +279,95 @@ exports.createProject = async(req, res) => {
     
 }
 
-exports.inviteForProject = async( req, res) => {
+
+exports.inviteForProject = async (req, res) => {
     const referral_Code = req.body.referral_Code;
     const userId = req.body.userId;
-    console.log(userId);
-    if(!referral_Code){
-        return res.status(404).send({message: 'please enter referral code!'})
-    }
-    const referralProject = await Project.findOne({
-        where:{
-            referral_code:referral_Code
-        }
-    })
-    const invited = await User.findByPk(userId);
-    const userProjectAssociations = await referralProject.addUser(invited)
-    .then(() => {
-            return res.status(200).send({message: 'invite success!'})
-    })
-    .catch(err => {
-        console.log(err);
-        return res.status(500).send({message: 'invite failed!'})
-    });
 
-}
+    console.log('Referral Code:', referral_Code);
+    console.log('User ID:', userId);
+
+    if (!referral_Code) {
+        console.log('Referral code is missing!');
+        return res.status(400).json({ message: '請輸入邀請碼!' });
+    }
+
+    try {
+        // 查找具有给定邀请码的项目
+        const referralProject = await Project.findOne({
+            where: {
+                referral_code: referral_Code
+            }
+        });
+
+        // 检查是否找到了项目
+        if (!referralProject) {
+            console.log('Project not found for referral code:', referral_Code);
+            return res.status(404).json({ message: '邀請碼不存在!' });
+        }
+        console.log("projectId:", referralProject.id); // 添加日志输出
+        console.log("userId:", userId); // 添加日志输出
+        // 检查用户是否已经存在于项目中
+        const userProject = await User_project.findOne({
+            where: {
+                projectId: referralProject.id,
+                userId: userId
+            }
+            
+        });
+        console.log("userProject:", userProject); // 添加日志输出
+
+        if (userProject) {
+            console.log('User already exists in project!');
+            return res.status(400).json({ message: '你已經是此活動的其中一員!' });
+        } 
+
+        // 找到用户
+        const invitedUser = await User.findByPk(userId);
+        if (!invitedUser) {
+            console.log('User not found:', userId);
+            return res.status(404).json({ message: 'User not found!' });
+        }
+
+        // 将用户加入项目
+        await referralProject.addUser(invitedUser);
+
+        console.log('Successfully invited user to project!');
+        // 成功邀请用户加入项目
+        return res.status(200).json({ message: '成功加入活動!' });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: 'Internal server error!' });
+    }
+};
+
+// exports.inviteForProject = async( req, res) => {
+//     const referral_Code = req.body.referral_Code;
+//     const userId = req.body.userId;
+//     console.log(userId);
+//     if(!referral_Code){
+//         return res.status(404).send({message: 'please enter referral code!'})
+//     }
+//     const referralProject = await Project.findOne({
+//         where:{
+//             referral_code:referral_Code
+//         }
+//     })
+//     const invited = await User.findByPk(userId);
+//     const userProjectAssociations = await referralProject.addUser(invited)
+//     .then(() => {
+//             return res.status(200).send({message: 'invite success!'})
+//     })
+//     .catch(err => {
+//         console.log(err);
+//         return res.status(500).send({message: 'invite failed!'})
+//     });
+
+// }
+
+
+
+
 
 // exports.updateProject = async(req, res) => {
 //     const projectId = req.body.projectId;

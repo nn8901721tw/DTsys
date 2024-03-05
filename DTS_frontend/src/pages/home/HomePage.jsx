@@ -5,6 +5,8 @@ import Modal from '../../components/Modal';
 import toast, { Toaster } from 'react-hot-toast';
 import { GrFormClose } from "react-icons/gr";
 import { FaSortDown } from "react-icons/fa";
+import Swal from 'sweetalert2';
+
 
 import Loader from '../../components/Loader';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
@@ -87,6 +89,24 @@ export default function HomePage() {
     navigate('/lobypage');
 }
 
+const handleClick = (projectItem) => {
+  Swal.fire({
+    title: `確定要進入 ${projectItem.name} 活動?`,
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#3085d6',
+    cancelButtonColor: '#d33',
+    cancelButtonText: '取消',
+    confirmButtonText: '確定',
+    reverseButtons: true // 將取消在左側，確定在右側
+  }).then((result) => {
+    if (result.isConfirmed) {
+      navigate(`/project/${projectItem.id}/kanban`);
+    }
+  });
+};
+
+
   return (
     <div  className='min-w-full min-h-screen h-screen overflow-hidden overflow-x-scroll'>
 
@@ -108,16 +128,16 @@ export default function HomePage() {
           </div>
         </div>
         {/* item */}
-        <div className=' w-[75%] 2xl:w-[80%] grid gap-x-4 gap-y-4 sm:gap-x-6 sm:gap-y-4  lg:gap-x-8 lg:gap-y-8  grid-cols-3 2xl:grid-cols-4 mx-auto  content-start h-screen overflow-y-scroll scrollbar-none  scrollbar-thumb-slate-400/70 scrollbar-thumb-rounded-full scrollbar-track-rounded-full'>
+        <div className='mt-10  w-[75%] 2xl:w-[80%] grid gap-x-4 gap-y-4 sm:gap-x-6 sm:gap-y-4  lg:gap-x-8 lg:gap-y-8  grid-cols-3 2xl:grid-cols-4 mx-auto  content-start h-screen overflow-y-scroll scrollbar-none  scrollbar-thumb-slate-400/70 scrollbar-thumb-rounded-full scrollbar-track-rounded-full'>
           {
             isLoading ? <Loader /> : 
             isError ? <p className='font-bold text-2xl'>{error.message}</p> : 
             projectData.map((projectItem, index) => {
               return (
                 <div key={index} className='rounded-lg w-full max-h-[150px] min-h-[150px]  bg-white shadow-md hover:scale-105 duration-150'>
-                  <div  className='flex  w-full h-full justify-center items-center' onClick={() => {navigate(`/project/${projectItem.id}/kanban`)} }>
+                  <div  className='flex  w-full h-full justify-center items-center' onClick={() => handleClick(projectItem)}>
                     <div className='flex-1 text-base md:text-lg font-bold text-center py-3  truncate ...'>{projectItem?.name}</div> 
-                    <div className='flex-1 text-base md:text-lg font-bold text-center py-3  truncate ...'>{projectItem?.describe}</div>
+                    {/* <div className='flex-1 text-base md:text-lg font-bold text-center py-3  truncate ...'>{projectItem?.describe}</div> */}
                     {/* <div className='flex-1 py-3 '>
                       <BsBoxArrowInRight size={30} className='ml-[35%] cursor-pointer text-blue-500 hover:text-blue-700' onClick={() => {navigate(`/project/${projectItem.id}/kanban`)}}/>
                     </div>  */}
