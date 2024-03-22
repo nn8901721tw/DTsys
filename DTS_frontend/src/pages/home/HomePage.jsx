@@ -94,8 +94,8 @@ const handleClick = (projectItem) => {
     title: `確定要進入 ${projectItem.name} 活動?`,
     icon: 'warning',
     showCancelButton: true,
-    confirmButtonColor: '#3085d6',
-    cancelButtonColor: '#d33',
+    confirmButtonColor: 'bg-[#7fd4d8]',
+    cancelButtonColor: 'bg-[#F7F6F6]',
     cancelButtonText: '取消',
     confirmButtonText: '確定',
     reverseButtons: true // 將取消在左側，確定在右側
@@ -114,7 +114,7 @@ const handleClick = (projectItem) => {
       
       <div className='flex flex-col my-5 sm:px-10 md:px-6  py-16 w-full h-screen items-center'>
         <h5 className='font-bold  text-3xl'>設計思考活動列表</h5>
-        <div className=' flex flex-row justify-between items-center w-full sm:w-2/3 my-5'>
+        {/* <div className=' flex flex-row justify-between items-center w-full sm:w-2/3 my-5'>
           <div className='flex  '>
             
             <button onClick={()=>setCreateProjectModalOpen(true)} className=" bg-customgreen hover:bg-customgreen/80 text-white font-semibold rounded-2xl p-1 mr-1 sm:px-4 sm:mr-4 sm:py-1 text-base">建立專案</button>
@@ -126,9 +126,9 @@ const handleClick = (projectItem) => {
             <span className=' text-sm font-bold cursor-pointer'>日期</span>
             <FaSortDown size={15} className=' cursor-pointer'/>
           </div>
-        </div>
+        </div> */}
         {/* item */}
-        <div className='mt-10  w-[75%] 2xl:w-[80%] grid gap-x-4 gap-y-4 sm:gap-x-6 sm:gap-y-4  lg:gap-x-8 lg:gap-y-8  grid-cols-3 2xl:grid-cols-4 mx-auto  content-start h-screen overflow-y-scroll scrollbar-none  scrollbar-thumb-slate-400/70 scrollbar-thumb-rounded-full scrollbar-track-rounded-full'>
+        <div className='mt-10  w-[75%] 2xl:w-[65%] grid gap-x-4 gap-y-4 sm:gap-x-6 sm:gap-y-4  lg:gap-x-8 lg:gap-y-8  grid-cols-3  mx-auto  content-start h-screen overflow-y-scroll scrollbar-none  scrollbar-thumb-slate-400/70 scrollbar-thumb-rounded-full scrollbar-track-rounded-full'>
           {
             isLoading ? <Loader /> : 
             isError ? <p className='font-bold text-2xl'>{error.message}</p> : 

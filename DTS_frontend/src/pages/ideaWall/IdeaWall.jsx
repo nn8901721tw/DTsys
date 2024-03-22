@@ -31,7 +31,8 @@ export default function IdeaWall() {
 
     const ideaWallInfoQuery = useQuery( 
         'ideaWallInfo', 
-        () => getIdeaWall(projectId, `${currentStage}-${currentSubStage}`),
+        // () => getIdeaWall(projectId, `${currentStage}-${currentSubStage}`),
+        () => getIdeaWall(projectId, "1-1"),
         {
             onSuccess:(data)=>{
                 

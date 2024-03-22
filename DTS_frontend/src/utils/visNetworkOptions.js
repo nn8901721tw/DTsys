@@ -1,34 +1,44 @@
 export const visNetworkOptions = {
-    nodes:{
-        borderWidth: 10,
-        borderWidthSelected: 1,
-        labelHighlightBold: true,
-        color:{
-            border: '#000'
-        }, 
-        shadow:{
-            enabled: true,
-            color: 'rgba(0,0,0,0.5)',
-            size:10,
-            x:0,
-            y:5
-        },     
-    },
-    edges:{
+    edges: {
         arrows: {
-            middle: {
+            to: {
                 enabled: true,
-                scaleFactor: 1,
+                scaleFactor: 0.5,
                 type: "arrow"
             },
         },
-        hoverWidth: 0,
-        selectionWidth: 1,
+        smooth: {
+            enabled: true,
+            type: 'dynamic',
+        },
+        color: {
+            color: '#4d4c4c',
+            highlight: '#5BA491',
+            hover: '#81c7b5',
+        },
     },
-    interaction:{
-        hover:true,
+    physics: {
+        enabled: true,
+        barnesHut: {
+            // gravitationalConstant: -20000,
+            // centralGravity: 0.3,
+            // springLength: 300,
+            // springConstant: 0.04,
+            // damping: 0.09,
+            avoidOverlap: 0.5 // 这个参数可以帮助控制节点之间的间距
+        }
     },
-    // layout:{
-    //     randomSeed:
-    // }
+    // nodes: {
+    //     widthConstraint:{
+    //         minimum:500
+    //     },
+    //     heightConstraint:{
+    //         minimum:150
+    //     }
+
+    // },
+    interaction: { hover: true },
+    manipulation: {
+        enabled: true,
+    },
 };

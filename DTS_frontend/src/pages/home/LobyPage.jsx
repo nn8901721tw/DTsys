@@ -50,6 +50,10 @@ const Cards = () => {
           icon: 'success',
           title: '成功',
           text: res.message,
+          customClass: {
+            backdrop: 'bg-red-500', // 背景颜色
+            popup: 'bg-[#F7F6F6]', // 弹出框背景颜色
+          },
       });
       },
       onError : (error) =>{
@@ -59,6 +63,10 @@ const Cards = () => {
           icon: 'error',
           title: '失敗',
           text: error.response.data.message,
+          customClass: {
+            backdrop: 'bg-red-500', // 背景颜色
+            popup: 'bg-[#F7F6F6]', // 弹出框背景颜色
+          },
       });
       }
     })
@@ -82,7 +90,11 @@ const Cards = () => {
           Swal.fire({
               icon: 'success',
               title: '成功',
-              text: res.data.message,
+              text: res.message,
+              customClass: {
+                backdrop: 'bg-red-500', // 背景颜色
+                popup: 'bg-[#F7F6F6]', // 弹出框背景颜色
+              },
           });
       },
       onError: (error) => {
@@ -92,6 +104,10 @@ const Cards = () => {
               icon: 'error',
               title: '失敗',
               text: error.response.data.message,
+              customClass: {
+                backdrop: 'bg-red-500', // 背景颜色
+                popup: 'bg-[#F7F6F6]', // 弹出框背景颜色
+              },
           });
       },
   });
