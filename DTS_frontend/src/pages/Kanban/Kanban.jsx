@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { FiPlus } from "react-icons/fi";
+import { FiChevronDown, FiChevronUp } from "react-icons/fi"; // 引入 react-icons 的 Chevron 圖示
+import { CSSTransition } from "react-transition-group";
 import { v4 as uuidv4 } from "uuid";
 import Carditem from "./components/Carditem";
 import TaskHint from "./components/TaskHint";
 import Loader from "../../components/Loader";
+import { motion } from "framer-motion";
 
 import { DragDropContext } from "react-beautiful-dnd";
 import { StrictModeDroppable as Droppable } from "../../utils/StrictModeDroppable";
@@ -27,6 +30,7 @@ export default function Kanban() {
   const [stageInfo, setStageInfo] = useState({ name: "", description: "" });
   const queryClient = useQueryClient();
   const navigate = useNavigate();
+  const [showContainer, setShowContainer] = useState(false);
 
   const {
     isLoading: kanbanIsLoading,
@@ -215,34 +219,182 @@ export default function Kanban() {
       setNewCard("");
     }
   };
+  const containerVariants = {
+    hidden: { opacity: 0, y: -50 },
+    visible: { opacity: 1, y: 0 },
+    exit: { opacity: 0, y: 50 }, // 定義退出時的動畫效果
+  };
+
   return (
     <DragDropContext onDragEnd={onDragEnd}>
-      {/* <div className=''>
-      <h1 className='absolute top-0 left-0 right-0 text-center mt-[4.5rem] 2xl:mt-[6.0rem] text-2xl 2xl:text-3xl font-bold text-stone-700'>設計思考歷程導引</h1>
-    </div> */}
+      <motion.div
+       initial="hidden"
+       animate={showContainer ? "visible" : "hidden"}
+       exit="exit"
+       variants={containerVariants}
+       transition={{ duration: 0.8 }}
+       className="fixed top-16 left-0 right-0 z-10"
+       style={{
+         opacity: showContainer ? 1 : 0,
+         y: showContainer ? 0 : 50,
+         visibility: showContainer ? "visible" : "hidden",
+       }}
+      >
+        <div className="transition-all duration-500 transform flex flex-col items-center bg-slate-200 mx-56 2xl:mx-96 rounded-2xl opacity-100 scale-y-100">
+          <div className="wrapper">
+            <div className="flex text-base font-bold  ">階段</div>
+          </div>
+
+          <div className="wrapper">
+            <div className="flex justify-center px-24 pt-4 2xl:pt-10">
+              <div className="px-3 w-32 2xl:w-48 2xl:text-3xl rounded-md bg-[#63999F] h-14 2xl:h-20 text-xl font-bold text-white text-center flex items-center justify-center">
+                同理
+              </div>
+              <hr className="border-[#C4D8D9] border-solid border-t-8 w-6 items-center justify-center my-auto" />
+
+              <div className=" px-3 w-32 2xl:w-48 2xl:text-3xl rounded-md bg-[#C4D8D9] h-14 2xl:h-20 text-xl font-bold text-white text-center flex items-center justify-center">
+                定義
+              </div>
+
+              <hr className="border-[#C4D8D9] border-solid border-t-8 w-6 items-center justify-center my-auto" />
+              <div className="px-3 w-32 2xl:w-48 2xl:text-3xl rounded-md bg-[#C4D8D9] h-14 2xl:h-20 text-xl font-bold text-white text-center flex items-center justify-center">
+                發想
+              </div>
+              <hr className="border-[#C4D8D9] border-solid border-t-8 w-6 items-center justify-center my-auto" />
+              <div className="px-3 w-32 2xl:w-48 2xl:text-3xl rounded-md bg-[#C4D8D9] h-14 2xl:h-20 text-xl font-bold text-white text-center flex items-center justify-center">
+                原型
+              </div>
+              <hr className="border-[#C4D8D9] border-solid border-t-8 w-6 items-center justify-center my-auto" />
+              <div className="px-3 w-32 2xl:w-48 2xl:text-3xl rounded-md bg-[#C4D8D9] h-14 2xl:h-20 text-xl font-bold text-white text-center flex items-center justify-center">
+                測試
+              </div>
+            </div>
+          </div>
+          <div className="flex text-base font-bold">子階段</div>
+          <div className="wrapper">
+            <div className="flex justify-center px-24 pt-2 2xl:pt-10">
+              <div className="px-3 w-32 2xl:w-48 2xl:text-3xl rounded-md bg-[#C4D8D9] h-10 2xl:h-14 text-xl font-bold text-white text-center flex items-center justify-center">
+                同理
+              </div>
+              <hr className="border-[#E2E8F0] border-solid border-t-8 w-6 items-center justify-center my-auto" />
+              <div className="px-3 w-32 2xl:w-48 2xl:text-3xl rounded-md bg-[#C4D8D9] h-10 2xl:h-14 text-xl font-bold text-white text-center flex items-center justify-center">
+                定義
+              </div>
+              <hr className="border-[#E2E8F0] border-solid border-t-8 w-6 items-center justify-center my-auto" />
+              <div className="px-3 w-32 2xl:w-48 2xl:text-3xl rounded-md bg-[#C4D8D9] h-10 2xl:h-14 text-xl font-bold text-white text-center flex items-center justify-center">
+                發想
+              </div>
+              <hr className="border-[#E2E8F0] border-solid border-t-8 w-6 items-center justify-center my-auto" />
+              <div className="px-3 w-32 2xl:w-48 2xl:text-3xl rounded-md bg-[#C4D8D9] h-10 2xl:h-14 text-xl font-bold text-white text-center flex items-center justify-center">
+                原型
+              </div>
+              <hr className="border-[#E2E8F0] border-solid border-t-8 w-6 items-center justify-center my-auto" />
+              <div className="px-3 w-32 2xl:w-48 2xl:text-3xl rounded-md bg-[#C4D8D9] h-10 2xl:h-14 text-xl font-bold text-white text-center flex items-center justify-center">
+                測試
+              </div>
+            </div>
+          </div>
+          <div className="wrapper">
+            <div className="flex justify-center px-24 pt-4 2xl:pt-10">
+              <div className="px-3 w-32 2xl:w-48 2xl:text-3xl rounded-md bg-[#C4D8D9] h-10 2xl:h-14 text-xl font-bold text-white text-center flex items-center justify-center">
+                同理
+              </div>
+              <hr className="border-[#E2E8F0] border-solid border-t-8 w-6 items-center justify-center my-auto" />
+              <div className="px-3 w-32 2xl:w-48 2xl:text-3xl rounded-md bg-[#C4D8D9] h-10 2xl:h-14 text-xl font-bold text-white text-center flex items-center justify-center">
+                定義
+              </div>
+              <hr className="border-[#E2E8F0] border-solid border-t-8 w-6 items-center justify-center my-auto" />
+              <div className="px-3 w-32 2xl:w-48 2xl:text-3xl rounded-md bg-[#C4D8D9] h-10 2xl:h-14 text-xl font-bold text-white text-center flex items-center justify-center">
+                發想
+              </div>
+              <hr className="border-[#E2E8F0] border-solid border-t-8 w-6 items-center justify-center my-auto" />
+              <div className="px-3 w-32 2xl:w-48 2xl:text-3xl rounded-md bg-slate-200 h-10 2xl:h-14 text-xl font-bold text-white text-center flex items-center justify-center"></div>
+              <hr className="border-[#E2E8F0] border-solid border-t-8 w-6 items-center justify-center my-auto" />
+              <div className="px-3 w-32 2xl:w-48 2xl:text-3xl rounded-md bg-[#C4D8D9] h-10 2xl:h-14 text-xl font-bold text-white text-center flex items-center justify-center">
+                測試
+              </div>
+            </div>
+          </div>
+          <div className="wrapper">
+            <div className="flex justify-center px-24 pt-4 2xl:pt-10">
+              <div className="px-3 w-32 2xl:w-48 2xl:text-3xl rounded-md bg-[#C4D8D9] h-10 2xl:h-14 text-xl font-bold text-white text-center flex items-center justify-center">
+                同理
+              </div>
+              <hr className="border-[#E2E8F0] border-solid border-t-8 w-6 items-center justify-center my-auto" />
+              <div className="px-3 w-32 2xl:w-48 2xl:text-3xl rounded-md bg-slate-200 h-10 2xl:h-14 text-xl font-bold text-white text-center flex items-center justify-center"></div>
+              <hr className="border-[#E2E8F0] border-solid border-t-8 w-6 items-center justify-center my-auto" />
+              <div className="px-3 w-32 2xl:w-48 2xl:text-3xl rounded-md bg-slate-200 h-10 2xl:h-14 text-xl font-bold text-white text-center flex items-center justify-center"></div>
+              <hr className="border-[#E2E8F0] border-solid border-t-8 w-6 items-center justify-center my-auto" />
+              <div className="px-3 w-32 2xl:w-48 2xl:text-3xl rounded-md bg-slate-200 h-10 2xl:h-14 text-xl font-bold text-white text-center flex items-center justify-center"></div>
+              <hr className="border-[#E2E8F0] border-solid border-t-8 w-6 items-center justify-center my-auto" />
+              <div className="px-3 w-32 2xl:w-48 2xl:text-3xl rounded-md bg-slate-200 h-10 2xl:h-14 text-xl font-bold text-white text-center flex items-center justify-center"></div>
+            </div>
+          </div>
+          <div className="wrapper">
+            <div className="flex justify-center px-24 pt-4 2xl:pt-10">
+              <div className="px-3 w-32 2xl:w-48 2xl:text-3xl rounded-md bg-[#C4D8D9] h-10 2xl:h-14 text-xl font-bold text-white text-center flex items-center justify-center">
+                同理
+              </div>
+              <hr className="border-[#E2E8F0] border-solid border-t-8 w-6 items-center justify-center my-auto" />
+              <div className="px-3 w-32 2xl:w-48 2xl:text-3xl rounded-md bg-slate-200 h-10 2xl:h-14 text-xl font-bold text-white text-center flex items-center justify-center"></div>
+              <hr className="border-[#E2E8F0] border-solid border-t-8 w-6 items-center justify-center my-auto" />
+              <div className="px-3 w-32 2xl:w-48 2xl:text-3xl rounded-md bg-slate-200 h-10 2xl:h-14 text-xl font-bold text-white text-center flex items-center justify-center"></div>
+              <hr className="border-[#E2E8F0] border-solid border-t-8 w-6 items-center justify-center my-auto" />
+              <div className="px-3 w-32 2xl:w-48 2xl:text-3xl rounded-md bg-slate-200 h-10 2xl:h-14 text-xl font-bold text-white text-center flex items-center justify-center"></div>
+              <hr className="border-[#E2E8F0] border-solid border-t-8 w-6 items-center justify-center my-auto" />
+              <div className="px-3 w-32 2xl:w-48 2xl:text-3xl rounded-md bg-slate-200 h-10 2xl:h-14 text-xl font-bold text-white text-center flex items-center justify-center"></div>
+            </div>
+          </div>
+
+          <div className="wrapper">
+            <div className="bg-slate-200 flex justify-center w-full">
+              <button
+                className="ml-2 hover:text-gray-700 focus:outline-none transition ease-in-out delay-150 hover:-translate-y-3 hover:scale-150  duration-300"
+                onClick={() => setShowContainer(!showContainer)}
+              >
+                <FiChevronUp className="w-5 h-5 2xl:w-8 2xl:h-8" />
+              </button>
+            </div>
+          </div>
+        </div>
+      </motion.div>
+
+    
+
       <div className="flex flex-row justify-center mx-auto bg-slate-100 px-24 pt-20 2xl:pt-24">
-        <div className="px-3 w-32 2xl:w-48 rounded-lg bg-[#63999F] mx-1 2xl:mx-7 h-14 2xl:h-20 text-xl font-bold text-white text-center flex items-center justify-center">
+        <div className="px-3 w-32 2xl:w-48 2xl:text-3xl rounded-md bg-[#63999F] h-14 2xl:h-20 text-xl font-bold text-white text-center flex items-center justify-center">
           同理
         </div>
-        <hr className="border-gray-700 border-solid border-t-2 w-6  my-7 2xl:my-4" />
-        <div className="px-3 w-32 2xl:w-48 rounded-lg bg-[#63999F] mx-1 2xl:mx-7 h-14 2xl:h-20 text-xl font-bold text-white text-center flex items-center justify-center">
+        <hr className="border-[#C4D8D9] border-solid border-t-8 w-6 items-center justify-center my-auto" />
+        <div className="px-3 w-32 2xl:w-48 2xl:text-3xl rounded-md bg-[#C4D8D9] h-14 2xl:h-20 text-xl font-bold text-white text-center flex items-center justify-center">
           定義
         </div>
-        <hr className="border-gray-700 border-solid border-t-2 w-6  my-7 2xl:my-4" />
-        <div className="px-3 w-32 2xl:w-48 rounded-lg bg-[#63999F] mx-1 2xl:mx-7 h-14 2xl:h-20 text-xl font-bold text-white text-center flex items-center justify-center">
+        <hr className="border-[#C4D8D9] border-solid border-t-8 w-6 items-center justify-center my-auto" />
+        <div className="px-3 w-32 2xl:w-48 2xl:text-3xl rounded-md bg-[#C4D8D9] h-14 2xl:h-20 text-xl font-bold text-white text-center flex items-center justify-center">
           發想
         </div>
-        <hr className="border-gray-700 border-solid border-t-2 w-6  my-7 2xl:my-4" />
-        <div className="px-3 w-32 2xl:w-48 rounded-lg bg-[#63999F] mx-1 2xl:mx-7 h-14 2xl:h-20 text-xl font-bold text-white text-center flex items-center justify-center">
+        <hr className="border-[#C4D8D9] border-solid border-t-8 w-6 items-center justify-center my-auto" />
+        <div className="px-3 w-32 2xl:w-48 2xl:text-3xl rounded-md bg-[#C4D8D9] h-14 2xl:h-20 text-xl font-bold text-white text-center flex items-center justify-center">
           原型
         </div>
-        <hr className="border-gray-700 border-solid border-t-2 w-6  my-7 2xl:my-4" />
-        <div className="px-3 w-32 2xl:w-48 rounded-lg bg-[#63999F] mx-1 2xl:mx-7 h-14 2xl:h-20 text-xl font-bold text-white text-center flex items-center justify-center">
+        <hr className="border-[#C4D8D9] border-solid border-t-8 w-6 items-center justify-center my-auto" />
+        <div className="px-3 w-32 2xl:w-48 2xl:text-3xl rounded-md bg-[#C4D8D9] h-14 2xl:h-20 text-xl font-bold text-white text-center flex items-center justify-center">
           測試
         </div>
       </div>
 
-      <div className="grid grid-cols-4 gap-5  px-28 pt-8 2xl:pt-16 min-w-[800px] h-screen overflow-hidden bg-slate-100  ">
+      <div className="bg-slate-100 flex items-center justify-center">
+        <button
+          className="text-lg transition ease-in-out delay-150 hover:translate-y-2 hover:scale-125  duration-300"
+          onClick={() => {
+            setShowContainer(true); // 新增的部分
+          }}
+        >
+          <FiChevronDown className="w-5 h-5  2xl:w-8 2xl:h-8" />
+        </button>
+      </div>
+
+      <div className="grid grid-cols-4 gap-5  px-28 pt-2 2xl:pt-12 min-w-[800px] h-screen overflow-hidden bg-slate-100  ">
         <TaskHint stageInfo={stageInfo} />
         {kanbanIsLoading ? (
           <Loader />
@@ -305,7 +457,7 @@ export default function Kanban() {
                               setShowForm(true);
                             }}
                           >
-                            <FiPlus className="w-5 h-5" />
+                            <FiPlus className="w-5  h-5" />
                           </button>
                         )}
                         {column.task.length > 0 &&
