@@ -16,9 +16,9 @@ exports.createSubmit = async(req, res) => {
             const filename = item.filename
             Submit.create({
                 stage: `${currentStageInt}-${currentSubStageInt}`,
-                content: content,
+                content: "content",
                 projectId: projectId,
-                filename:filename
+                // filename:filename
             })
             .catch(err => {
                 console.log(err)
@@ -28,7 +28,7 @@ exports.createSubmit = async(req, res) => {
     }else{
         await Submit.create({
             stage: `${currentStageInt}-${currentSubStageInt}`,
-            content: content,
+            content: "content",
             projectId: projectId,
         })
     }

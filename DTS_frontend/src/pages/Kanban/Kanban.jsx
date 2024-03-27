@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { FiPlus } from "react-icons/fi";
-import { FiChevronDown, FiChevronUp } from "react-icons/fi"; // 引入 react-icons 的 Chevron 圖示
+import { FiChevronDown, FiChevronUp, FiCheckCircle } from "react-icons/fi"; // 引入 react-icons 的 Chevron 圖示
 import { CSSTransition } from "react-transition-group";
 import { v4 as uuidv4 } from "uuid";
 import Carditem from "./components/Carditem";
 import TaskHint from "./components/TaskHint";
 import Loader from "../../components/Loader";
 import { motion } from "framer-motion";
+import { submitTask } from "../../api/submit";
+import Swal from "sweetalert2";
 
 import { DragDropContext } from "react-beautiful-dnd";
 import { StrictModeDroppable as Droppable } from "../../utils/StrictModeDroppable";
@@ -27,7 +29,16 @@ export default function Kanban() {
   const [showForm, setShowForm] = useState(false);
   const [selectedcolumn, setSelectedcolumn] = useState(0);
   const { projectId } = useParams();
-  const [stageInfo, setStageInfo] = useState({ name: "", description: "" });
+
+  const [isStagecomplete, setIsStagecomplete] = useState(false);
+  const [isPreviousStageIncomplete, setIsPreviousStageIncomplete] =
+    useState(false);
+  const [isStageIncomplete, setIsStageIncomplete] = useState(false);
+  const [stageInfo, setStageInfo] = useState({
+    name: "",
+    description: "",
+  });
+
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const [showContainer, setShowContainer] = useState(false);
@@ -57,90 +68,11 @@ export default function Kanban() {
           currentStage: localStorage.getItem("currentStage"),
           currentSubStage: localStorage.getItem("currentSubStage"),
         }));
+        // setcstage()
       },
       enabled: !!localStorage.getItem("currentStage"),
     }
   );
-
-  //to do multiple usequery or custom hook
-  //frist column query
-  // const {
-  //   isLoading : columnLoading1,
-  //   isError : columnIsError1,
-  //   error : columnError1,
-  //   data : columnData1
-  // } = useQuery(
-  //     ['kanbanDatas', kanbanData?.kanban[0]?.id],
-  //     () => getKanbanTasks(kanbanData?.kanban[0]?.id),
-  //     {
-  //         onSuccess: () => {
-
-  //           if(columnData1 !== undefined){
-  //             const temp = [...kanbanData.kanban];
-  //             setKanbanTask(temp, kanbanData?.kanban[0]?.id, columnData1)
-  //           }
-  //         },
-  //         enabled: !!kanbanData?.kanban[0]?.id,
-  //     }
-  // );
-  // second column query
-  // const {
-  //   isLoading : columnLoading2,
-  //   isError : columnIsError2,
-  //   error : columnError2,
-  //   data : columnData2
-  // } = useQuery(
-  //     ['kanbanDatas', kanbanData?.kanban[1]?.id],
-  //     () => getKanbanTasks(kanbanData?.kanban[1]?.id),
-  //     {
-  //         onSuccess: () => {
-  //           if(columnData2 !== undefined && columnData.kanban){
-  //             const temp = [...columnData.kanban];
-  //             console.log(temp);
-  //             setKanbanTask(temp, kanbanData?.kanban[1]?.id, columnData2)
-  //           }
-  //         },
-  //         enabled: !!kanbanData?.kanban[1]?.id,
-  //     }
-  // );
-
-  //Third column query
-  // const {
-  //   isLoading : columnLoading3,
-  //   isError : columnIsError3,
-  //   error : columnError3,
-  //   data : columnData3
-  // } = useQuery(
-  //     ['kanbanDatas', kanbanData?.kanban[2]?.id],
-  //     () => getKanbanTasks(kanbanData?.kanban[2]?.id),
-  //     {
-  //         onSuccess: () => {
-  //           if(columnData3 !== undefined && columnData.kanban){
-  //             const temp = [...columnData.kanban];
-  //             setKanbanTask(temp, kanbanData?.kanban[2]?.id, columnData3)
-  //           }
-  //         },
-  //         enabled: !!kanbanData?.kanban[2]?.id,
-  //     }
-  // );
-
-  // set column query into useState [columnData, setColumnData]
-  // to do move to utils
-  // const setKanbanTask = (temp, itemId, data ) =>{
-  //   let index = temp.findIndex( item => item.id === itemId);
-  //   console.log(index);
-
-  //   if( index !== -1){
-  //     temp[index] = {
-  //       ...temp[index],
-  //       task : data
-  //     }
-  //   }
-  //   console.log(temp);
-  //   setColumnData({...columnData,kanban:temp})
-  //   // setKanbanData({ ...kanbanData, kanban: temp })
-  //   // maybe conflict with useQuery ['kanbanDatas', projectId]
-  // }
 
   useEffect(() => {
     function KanbanUpdateEvent(data) {
@@ -225,125 +157,228 @@ export default function Kanban() {
     exit: { opacity: 0, y: 50 }, // 定義退出時的動畫效果
   };
 
+  const stages1 = ["同理", "定義", "發想", "原型", "測試"];
+
+  const stages2 = [
+    ["經驗分享與同理", "定義問題", "問題聚焦", "原型製作", "原型測試與分析"],
+    ["定義利害關係人", "投票", "篩選與整合方法", "", "開始修正"],
+    ["進場域前的同理", "", "", "", ""],
+    ["歸類需求與問題", "", "", "", ""],
+  ];
+  const stages3 = [
+    ["分享", "問題", "聚焦", "原型", "分析"],
+    ["關係人", "投票", "篩選", "", "修正"],
+    ["場域前同理", "", "", "", ""],
+    ["歸類", "", "", "", ""],
+  ];
+  // 檢查是否有當前的階段和子階段
+  if (stageInfo.currentStage && stageInfo.currentSubStage) {
+    console.log("Current stage:", stageInfo.currentStage);
+    console.log("Current substage:", stageInfo.currentSubStage);
+
+    // 在這裡執行根據當前階段和子階段的相應操作
+  } else {
+    console.log("No current stage or substage found.");
+  }
+  const handleSubStageClick = (subStageName, stageIndex, subStageIndex) => {
+    // 將 stageIndex 和 subStageIndex 進行交換，並對 stageIndex 和 subStageIndex 進行調整
+    const correctedStageIndex = subStageIndex + 1;
+    const correctedSubStageIndex = stageIndex + 1;
+
+    // 更新 stageInfo 狀態
+    setStageInfo((prev) => ({
+      ...prev,
+      name: subStageName,
+      currentStage: `${correctedStageIndex}`,
+      currentSubStage: `${correctedSubStageIndex}`,
+      description: stages3[stageIndex][subStageIndex],
+    }));
+
+    // 提示用戶子階段的編號和敘述已經被更新
+    console.log(`子階段編號：${correctedStageIndex}-${correctedSubStageIndex}`);
+    console.log(`子階段敘述：${stages3[stageIndex][subStageIndex]}`);
+
+    // 添加以下 console.log 語句
+    console.log("currentLocalStorageStage:", currentLocalStorageStage);
+    console.log("currentLocalStorageSubStage:", currentLocalStorageSubStage);
+    console.log("stageInfocurrentStage:", correctedStageIndex);
+    console.log("stageInfo.currentSubStage:", correctedSubStageIndex);
+
+    // 檢查是否 currentStage 等於 correctedStageIndex 並且 currentSubStage 大於 correctedSubStageIndex
+    const sic =
+      correctedStageIndex === currentLocalStorageStage &&
+      correctedSubStageIndex > currentLocalStorageSubStage;
+
+    // 檢查是否 correctedStageIndex 大於 currentStage
+    const sic2 = parseInt(correctedStageIndex) > currentLocalStorageStage;
+
+    const sic3 =
+    (correctedStageIndex < currentLocalStorageStage) ||
+    (correctedStageIndex === currentLocalStorageStage && correctedSubStageIndex < currentLocalStorageSubStage);
+  
+  // 設置狀態
+
+    // 設置狀態
+    setIsPreviousStageIncomplete(sic2);
+    setIsStageIncomplete(sic);
+    setIsStagecomplete(sic3);
+
+    console.log("isStageIncomplete:", isStageIncomplete);
+    console.log("isPreviousStageIncomplete:", isPreviousStageIncomplete);
+  };
+
+  const { mutate } = useMutation(submitTask, {
+    onSuccess: (res) => {
+      if (res.message === "done") {
+        // sucesssNotify("全部階段已完成")
+        localStorage.setItem("stageEnd", "true");
+      }
+      // sucesssNotify(res.message)
+      localStorage.removeItem("currentStage");
+      localStorage.removeItem("currentSubStage");
+      navigate(`/project/${projectId}/kanban`);
+    },
+    onError: (error) => {
+      console.log(error);
+      errorNotify(error.response.data.message);
+    },
+  });
+
+  const handleSubmitTask = async (e) => {
+    e.preventDefault();
+
+    // 使用 SweetAlert2 彈出對話框
+    const result = await Swal.fire({
+      title: "是否完成？",
+      text: "確定提交此任務嗎？",
+      icon: "question",
+      showCancelButton: true,
+      cancelButtonText: "取消",
+      confirmButtonText: "確定",
+    });
+
+    // 如果用戶確定，執行提交操作
+    if (result.isConfirmed) {
+      const formData = new FormData();
+      formData.append("projectId", projectId);
+      formData.append("currentStage", stageInfo.currentStage);
+      formData.append("currentSubStage", stageInfo.currentSubStage);
+      formData.append("content", "123");
+
+      // 執行提交操作
+      mutate(formData);
+    }
+  };
+
+  // 從 localStorage 中獲取當前的階段和子階段
+  const currentLocalStorageStage = parseInt(
+    localStorage.getItem("currentStage")
+  );
+  const currentLocalStorageSubStage = parseInt(
+    localStorage.getItem("currentSubStage")
+  );
+
   return (
     <DragDropContext onDragEnd={onDragEnd}>
       <motion.div
-       initial="hidden"
-       animate={showContainer ? "visible" : "hidden"}
-       exit="exit"
-       variants={containerVariants}
-       transition={{ duration: 0.8 }}
-       className="fixed top-16 left-0 right-0 z-10"
-       style={{
-         opacity: showContainer ? 1 : 0,
-         y: showContainer ? 0 : 50,
-         visibility: showContainer ? "visible" : "hidden",
-       }}
+        initial="hidden"
+        animate={showContainer ? "visible" : "hidden"}
+        exit="exit"
+        variants={containerVariants}
+        transition={{ duration: 0.5 }}
+        className="fixed top-16 left-0 right-0 z-10"
+        style={{
+          opacity: showContainer ? 1 : 0,
+          y: showContainer ? 0 : 50,
+          visibility: showContainer ? "visible" : "hidden",
+        }}
       >
-        <div className="transition-all duration-500 transform flex flex-col items-center bg-slate-200 mx-56 2xl:mx-96 rounded-2xl opacity-100 scale-y-100">
+        <div className="transition-all duration-500 transform flex flex-col items-center bg-slate-200 mx-56 2xl:mx-96 rounded-2xl opacity-100 scale-y-100 text-gray-700">
           <div className="wrapper">
-            <div className="flex text-base font-bold  ">階段</div>
+            <div className="flex font-bold text-lg pt-1 2xl:text-2xl 2xl:pt-5 2xl:font-extrabold">
+              階段
+            </div>
           </div>
 
-          <div className="wrapper">
-            <div className="flex justify-center px-24 pt-4 2xl:pt-10">
-              <div className="px-3 w-32 2xl:w-48 2xl:text-3xl rounded-md bg-[#63999F] h-14 2xl:h-20 text-xl font-bold text-white text-center flex items-center justify-center">
-                同理
+          <div className="wrapper flex flex-row">
+            {stages1.map((subStage, index) => (
+              <div key={index} className="flex justify-center pt-1 2xl:pt-5">
+                <React.Fragment>
+                  {index !== 0 && (
+                    <hr className="border-solid border-t-8 w-6 items-center justify-center my-auto border-[#C4D8D9]" />
+                  )}
+                  <div
+                    className={`relative px-3 w-32 2xl:w-48 2xl:text-3xl rounded-md h-14 2xl:h-20 text-xl font-bold text-center flex items-center justify-center ${
+                      parseInt(stageInfo.currentStage) === index + 1
+                        ? "bg-[#5698a0] animate-none text-white"
+                        : currentLocalStorageStage > index + 1
+                        ? "bg-[#5d92a7] text-white"
+                        : "bg-[#c4cfcf]"
+                    }`}
+                  >
+                    {currentLocalStorageStage > index + 1 && (
+                      <FiCheckCircle className="absolute top-1 right-1 text-sky-100" />
+                    )}
+                    {subStage}
+                  </div>
+                </React.Fragment>
               </div>
-              <hr className="border-[#C4D8D9] border-solid border-t-8 w-6 items-center justify-center my-auto" />
-
-              <div className=" px-3 w-32 2xl:w-48 2xl:text-3xl rounded-md bg-[#C4D8D9] h-14 2xl:h-20 text-xl font-bold text-white text-center flex items-center justify-center">
-                定義
-              </div>
-
-              <hr className="border-[#C4D8D9] border-solid border-t-8 w-6 items-center justify-center my-auto" />
-              <div className="px-3 w-32 2xl:w-48 2xl:text-3xl rounded-md bg-[#C4D8D9] h-14 2xl:h-20 text-xl font-bold text-white text-center flex items-center justify-center">
-                發想
-              </div>
-              <hr className="border-[#C4D8D9] border-solid border-t-8 w-6 items-center justify-center my-auto" />
-              <div className="px-3 w-32 2xl:w-48 2xl:text-3xl rounded-md bg-[#C4D8D9] h-14 2xl:h-20 text-xl font-bold text-white text-center flex items-center justify-center">
-                原型
-              </div>
-              <hr className="border-[#C4D8D9] border-solid border-t-8 w-6 items-center justify-center my-auto" />
-              <div className="px-3 w-32 2xl:w-48 2xl:text-3xl rounded-md bg-[#C4D8D9] h-14 2xl:h-20 text-xl font-bold text-white text-center flex items-center justify-center">
-                測試
-              </div>
-            </div>
-          </div>
-          <div className="flex text-base font-bold">子階段</div>
-          <div className="wrapper">
-            <div className="flex justify-center px-24 pt-2 2xl:pt-10">
-              <div className="px-3 w-32 2xl:w-48 2xl:text-3xl rounded-md bg-[#C4D8D9] h-10 2xl:h-14 text-xl font-bold text-white text-center flex items-center justify-center">
-                同理
-              </div>
-              <hr className="border-[#E2E8F0] border-solid border-t-8 w-6 items-center justify-center my-auto" />
-              <div className="px-3 w-32 2xl:w-48 2xl:text-3xl rounded-md bg-[#C4D8D9] h-10 2xl:h-14 text-xl font-bold text-white text-center flex items-center justify-center">
-                定義
-              </div>
-              <hr className="border-[#E2E8F0] border-solid border-t-8 w-6 items-center justify-center my-auto" />
-              <div className="px-3 w-32 2xl:w-48 2xl:text-3xl rounded-md bg-[#C4D8D9] h-10 2xl:h-14 text-xl font-bold text-white text-center flex items-center justify-center">
-                發想
-              </div>
-              <hr className="border-[#E2E8F0] border-solid border-t-8 w-6 items-center justify-center my-auto" />
-              <div className="px-3 w-32 2xl:w-48 2xl:text-3xl rounded-md bg-[#C4D8D9] h-10 2xl:h-14 text-xl font-bold text-white text-center flex items-center justify-center">
-                原型
-              </div>
-              <hr className="border-[#E2E8F0] border-solid border-t-8 w-6 items-center justify-center my-auto" />
-              <div className="px-3 w-32 2xl:w-48 2xl:text-3xl rounded-md bg-[#C4D8D9] h-10 2xl:h-14 text-xl font-bold text-white text-center flex items-center justify-center">
-                測試
-              </div>
-            </div>
+            ))}
           </div>
           <div className="wrapper">
-            <div className="flex justify-center px-24 pt-4 2xl:pt-10">
-              <div className="px-3 w-32 2xl:w-48 2xl:text-3xl rounded-md bg-[#C4D8D9] h-10 2xl:h-14 text-xl font-bold text-white text-center flex items-center justify-center">
-                同理
-              </div>
-              <hr className="border-[#E2E8F0] border-solid border-t-8 w-6 items-center justify-center my-auto" />
-              <div className="px-3 w-32 2xl:w-48 2xl:text-3xl rounded-md bg-[#C4D8D9] h-10 2xl:h-14 text-xl font-bold text-white text-center flex items-center justify-center">
-                定義
-              </div>
-              <hr className="border-[#E2E8F0] border-solid border-t-8 w-6 items-center justify-center my-auto" />
-              <div className="px-3 w-32 2xl:w-48 2xl:text-3xl rounded-md bg-[#C4D8D9] h-10 2xl:h-14 text-xl font-bold text-white text-center flex items-center justify-center">
-                發想
-              </div>
-              <hr className="border-[#E2E8F0] border-solid border-t-8 w-6 items-center justify-center my-auto" />
-              <div className="px-3 w-32 2xl:w-48 2xl:text-3xl rounded-md bg-slate-200 h-10 2xl:h-14 text-xl font-bold text-white text-center flex items-center justify-center"></div>
-              <hr className="border-[#E2E8F0] border-solid border-t-8 w-6 items-center justify-center my-auto" />
-              <div className="px-3 w-32 2xl:w-48 2xl:text-3xl rounded-md bg-[#C4D8D9] h-10 2xl:h-14 text-xl font-bold text-white text-center flex items-center justify-center">
-                測試
-              </div>
+            <div className="flex font-bold text-lg pt-1 2xl:text-2xl 2xl:pt-5 2xl:font-extrabold">
+              子階段
             </div>
           </div>
-          <div className="wrapper">
-            <div className="flex justify-center px-24 pt-4 2xl:pt-10">
-              <div className="px-3 w-32 2xl:w-48 2xl:text-3xl rounded-md bg-[#C4D8D9] h-10 2xl:h-14 text-xl font-bold text-white text-center flex items-center justify-center">
-                同理
+          <div className="wrapper flex flex-col">
+            {stages2.map((stage, stageIndex) => (
+              <div
+                key={stageIndex}
+                className="flex flex-row justify-center pt-1 2xl:pt-5"
+              >
+                {stage.map((subStage, subStageIndex) => (
+                  <React.Fragment key={subStageIndex}>
+                    {subStageIndex !== 0 && (
+                      <hr className="border-solid border-t-8 w-6 items-center justify-center my-auto border-[#E2E8F0]" />
+                    )}
+                    {subStage ? (
+                      <div
+                        className={`relative px-3 w-32 2xl:w-48 2xl:text-xl rounded-md h-12 2xl:h-16 text-sm font-bold text-gray-700 text-center flex items-center justify-center cursor-pointer ${
+                          stageInfo.name === subStage
+                            ? "bg-[#5698a0] animate-bounce text-white"
+                            : currentLocalStorageStage > subStageIndex + 1 ||
+                              (currentLocalStorageStage === subStageIndex + 1 &&
+                                currentLocalStorageSubStage > stageIndex &&
+                                currentLocalStorageSubStage !== stageIndex + 1)
+                            ? "bg-[#5d92a7] text-white"
+                            : "bg-[#c4cfcf]"
+                        }`}
+                        onClick={() =>
+                          handleSubStageClick(
+                            subStage,
+                            stageIndex,
+                            subStageIndex
+                          )
+                        }
+                      >
+                        {(currentLocalStorageStage > subStageIndex + 1 ||
+                          (currentLocalStorageStage === subStageIndex + 1 &&
+                            currentLocalStorageSubStage > stageIndex &&
+                            currentLocalStorageSubStage !==
+                              stageIndex + 1)) && (
+                          <FiCheckCircle className="absolute top-1 right-1 text-sky-100" />
+                        )}
+                        {subStage}
+                      </div>
+                    ) : (
+                      <div className=" px-3 w-32 2xl:w-48 2xl:text-2xl rounded-md h-12 2xl:h-16 text-sm font-bold text-white text-center flex items-center justify-center bg-[#E2E8F0] cursor-default ">
+                        {subStage}
+                      </div>
+                    )}
+                  </React.Fragment>
+                ))}
               </div>
-              <hr className="border-[#E2E8F0] border-solid border-t-8 w-6 items-center justify-center my-auto" />
-              <div className="px-3 w-32 2xl:w-48 2xl:text-3xl rounded-md bg-slate-200 h-10 2xl:h-14 text-xl font-bold text-white text-center flex items-center justify-center"></div>
-              <hr className="border-[#E2E8F0] border-solid border-t-8 w-6 items-center justify-center my-auto" />
-              <div className="px-3 w-32 2xl:w-48 2xl:text-3xl rounded-md bg-slate-200 h-10 2xl:h-14 text-xl font-bold text-white text-center flex items-center justify-center"></div>
-              <hr className="border-[#E2E8F0] border-solid border-t-8 w-6 items-center justify-center my-auto" />
-              <div className="px-3 w-32 2xl:w-48 2xl:text-3xl rounded-md bg-slate-200 h-10 2xl:h-14 text-xl font-bold text-white text-center flex items-center justify-center"></div>
-              <hr className="border-[#E2E8F0] border-solid border-t-8 w-6 items-center justify-center my-auto" />
-              <div className="px-3 w-32 2xl:w-48 2xl:text-3xl rounded-md bg-slate-200 h-10 2xl:h-14 text-xl font-bold text-white text-center flex items-center justify-center"></div>
-            </div>
-          </div>
-          <div className="wrapper">
-            <div className="flex justify-center px-24 pt-4 2xl:pt-10">
-              <div className="px-3 w-32 2xl:w-48 2xl:text-3xl rounded-md bg-[#C4D8D9] h-10 2xl:h-14 text-xl font-bold text-white text-center flex items-center justify-center">
-                同理
-              </div>
-              <hr className="border-[#E2E8F0] border-solid border-t-8 w-6 items-center justify-center my-auto" />
-              <div className="px-3 w-32 2xl:w-48 2xl:text-3xl rounded-md bg-slate-200 h-10 2xl:h-14 text-xl font-bold text-white text-center flex items-center justify-center"></div>
-              <hr className="border-[#E2E8F0] border-solid border-t-8 w-6 items-center justify-center my-auto" />
-              <div className="px-3 w-32 2xl:w-48 2xl:text-3xl rounded-md bg-slate-200 h-10 2xl:h-14 text-xl font-bold text-white text-center flex items-center justify-center"></div>
-              <hr className="border-[#E2E8F0] border-solid border-t-8 w-6 items-center justify-center my-auto" />
-              <div className="px-3 w-32 2xl:w-48 2xl:text-3xl rounded-md bg-slate-200 h-10 2xl:h-14 text-xl font-bold text-white text-center flex items-center justify-center"></div>
-              <hr className="border-[#E2E8F0] border-solid border-t-8 w-6 items-center justify-center my-auto" />
-              <div className="px-3 w-32 2xl:w-48 2xl:text-3xl rounded-md bg-slate-200 h-10 2xl:h-14 text-xl font-bold text-white text-center flex items-center justify-center"></div>
-            </div>
+            ))}
           </div>
 
           <div className="wrapper">
@@ -352,50 +387,69 @@ export default function Kanban() {
                 className="ml-2 hover:text-gray-700 focus:outline-none transition ease-in-out delay-150 hover:-translate-y-3 hover:scale-150  duration-300"
                 onClick={() => setShowContainer(!showContainer)}
               >
-                <FiChevronUp className="w-5 h-5 2xl:w-8 2xl:h-8" />
+                <FiChevronUp className=" animate-bounce w-5 h-5 2xl:w-8 2xl:h-8" />
               </button>
             </div>
           </div>
         </div>
       </motion.div>
 
-    
-
       <div className="flex flex-row justify-center mx-auto bg-slate-100 px-24 pt-20 2xl:pt-24">
-        <div className="px-3 w-32 2xl:w-48 2xl:text-3xl rounded-md bg-[#63999F] h-14 2xl:h-20 text-xl font-bold text-white text-center flex items-center justify-center">
-          同理
-        </div>
-        <hr className="border-[#C4D8D9] border-solid border-t-8 w-6 items-center justify-center my-auto" />
-        <div className="px-3 w-32 2xl:w-48 2xl:text-3xl rounded-md bg-[#C4D8D9] h-14 2xl:h-20 text-xl font-bold text-white text-center flex items-center justify-center">
-          定義
-        </div>
-        <hr className="border-[#C4D8D9] border-solid border-t-8 w-6 items-center justify-center my-auto" />
-        <div className="px-3 w-32 2xl:w-48 2xl:text-3xl rounded-md bg-[#C4D8D9] h-14 2xl:h-20 text-xl font-bold text-white text-center flex items-center justify-center">
-          發想
-        </div>
-        <hr className="border-[#C4D8D9] border-solid border-t-8 w-6 items-center justify-center my-auto" />
-        <div className="px-3 w-32 2xl:w-48 2xl:text-3xl rounded-md bg-[#C4D8D9] h-14 2xl:h-20 text-xl font-bold text-white text-center flex items-center justify-center">
-          原型
-        </div>
-        <hr className="border-[#C4D8D9] border-solid border-t-8 w-6 items-center justify-center my-auto" />
-        <div className="px-3 w-32 2xl:w-48 2xl:text-3xl rounded-md bg-[#C4D8D9] h-14 2xl:h-20 text-xl font-bold text-white text-center flex items-center justify-center">
-          測試
+        <div className="wrapper flex flex-row">
+          {stages1.map((subStage, index) => (
+            <div key={index} className="flex justify-center pt-1 2xl:pt-5">
+              <React.Fragment>
+                {index !== 0 && (
+                  <hr className="border-solid border-t-8 w-6 items-center justify-center my-auto border-[#C4D8D9]" />
+                )}
+                <div
+                  className={`px-3 w-32 2xl:w-48 2xl:text-3xl rounded-md h-14 2xl:h-20 text-xl font-bold text-white text-center flex items-center justify-center ${
+                    parseInt(stageInfo.currentStage) === index + 1
+                      ? "bg-[#5698a0] animate-pulse"
+                      : "bg-[#c4cfcf]"
+                  }`}
+                >
+                  {subStage}
+                </div>
+              </React.Fragment>
+            </div>
+          ))}
         </div>
       </div>
 
       <div className="bg-slate-100 flex items-center justify-center">
         <button
-          className="text-lg transition ease-in-out delay-150 hover:translate-y-2 hover:scale-125  duration-300"
+          className=" 2xl:text-lg transition ease-in-out delay-150 hover:translate-y-2 hover:scale-125  duration-300"
           onClick={() => {
             setShowContainer(true); // 新增的部分
           }}
         >
-          <FiChevronDown className="w-5 h-5  2xl:w-8 2xl:h-8" />
+          <FiChevronDown className="animate-bounce w-5 h-5  2xl:w-8 2xl:h-8" />
+        </button>
+      </div>
+      <div className="flex justify-end bg-slate-100 pr-28 -mt-7">
+        <button
+          className={`text-sm font-bold transition delay-150 duration-300 px-4 py-2 2xl:px-4 2xl:py-2 rounded-md ${
+            isPreviousStageIncomplete || isStageIncomplete || isStagecomplete // 新增 isStagecomplete 到條件中
+              ? "bg-gray-300 cursor-not-allowed"
+              : "bg-teal-500 hover:-translate-y-1 hover:scale-110 hover:bg-teal-500 text-white"
+          }`}
+          onClick={handleSubmitTask}
+          disabled={
+            isPreviousStageIncomplete || isStageIncomplete || isStagecomplete
+          } // 根據 isStagecomplete 設置 disabled
+        >
+          {isPreviousStageIncomplete || isStageIncomplete
+            ? "請完成先前階段"
+            : isStagecomplete
+            ? "已完成"
+            : "完成此階段"}
         </button>
       </div>
 
       <div className="grid grid-cols-4 gap-5  px-28 pt-2 2xl:pt-12 min-w-[800px] h-screen overflow-hidden bg-slate-100  ">
         <TaskHint stageInfo={stageInfo} />
+
         {kanbanIsLoading ? (
           <Loader />
         ) : kanbansIsError ? (

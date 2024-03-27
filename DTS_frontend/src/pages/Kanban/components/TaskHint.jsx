@@ -1,7 +1,7 @@
 import React, {useEffect} from 'react'
 
 export default function TaskHint({stageInfo}) {
-    const {name, description, currentStage, currentSubStage} = stageInfo;
+    const {name, description, currentStage, currentSubStage,clicknumber ,clickdescription} = stageInfo;
 
     return (
         (name && description && currentStage && currentSubStage) ?
