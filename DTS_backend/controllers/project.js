@@ -8,6 +8,7 @@ const Process = require('../models/process');
 const Stage = require('../models/stage');
 const Sub_stage = require('../models/sub_stage');
 const User_project = require('../models/userproject');
+const Kanban_scaffolding = require('../models/kanban_scaffolding');
 
 exports.getProject = async(req, res) =>{
     const projectId = req.params.projectId;
@@ -67,14 +68,18 @@ exports.createProject = async(req, res) => {
 
     //initailize kanban
     const kanban = await Kanban.create({column:[], projectId:createdProject.id});
-    const todo = await Column.create({name:"待處理", task:[], kanbanId:kanban.id});
+    // const todo = await Column.create({name:"思考歷程鷹架", task:[], kanbanId:kanban.id});
     const inProgress = await Column.create({name:"進行中", task:[], kanbanId:kanban.id});
     const Completed = await Column.create({name:"完成", task:[], kanbanId:kanban.id});
     await Kanban.findByPk(kanban.id)
     .then(kanban =>{
-        kanban.column = [todo.id, inProgress.id, Completed.id ];
+        kanban.column = [inProgress.id, Completed.id ];
         return kanban.save();
     })
+    // .then(kanban =>{
+    //     kanban.column = [todo.id, inProgress.id, Completed.id ];
+    //     return kanban.save();
+    // })
     .catch(err => console.log(err));
 
     await Idea_wall.create({
@@ -306,6 +311,7 @@ exports.createProject = async(req, res) => {
         return stage5.save();
     })
     .catch(err => console.log(err));
+      
     
 }
 

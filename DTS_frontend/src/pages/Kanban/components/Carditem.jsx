@@ -68,7 +68,7 @@ export default function Carditem({ data, index, columnIndex }) {
 
   return (
     <>
-    <Draggable index={index} draggableId={data?.id.toString()}>
+    <Draggable  index={index} draggableId={data && data.id ? data.id.toString() : " "}>
       {(provided, snapshot) => (
         <div 
           ref={provided.innerRef}

@@ -13,7 +13,9 @@ const Task = require('./models/task');
 const Column = require('./models/column');
 const Node = require('./models/node');
 const Node_relation = require('./models/node_relation');
+
 const { rm } = require('fs');
+const controller = require('./controllers/kanban');
 
 const io = new Server(server, {
     cors:{
@@ -160,6 +162,8 @@ app.use('/node', require('./routes/node'))
 app.use('/daily', require('./routes/daily'))
 app.use('/submit', require('./routes/submit'))
 app.use('/stage', require('./routes/stage'))
+app.use('/getScaffoldingTemplate', require('./routes/getScaffoldingTemplate'))
+app.use('/task', require('./routes/task'))
 
 //error handling
 app.use((error, req, res, next) => {
@@ -169,9 +173,11 @@ app.use((error, req, res, next) => {
     res.status(status).json({ message: message });
 });
 
+
 // sync database
-sequelize.sync({alter:true})  //{force:true} {alter:true}
-    .then(result => {
+sequelize.sync({ alter: true})  //{force:true} {alter:true}
+    .then( result => {
+        controller.initializeData(); // 如果還沒有初始化過資料，則執行初始化資料的函式
     console.log("Database connected");
     server.listen(3000);
     })

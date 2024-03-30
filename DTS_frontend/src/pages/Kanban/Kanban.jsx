@@ -5,6 +5,7 @@ import { FiChevronDown, FiChevronUp, FiCheckCircle } from "react-icons/fi"; // �
 import { CSSTransition } from "react-transition-group";
 import { v4 as uuidv4 } from "uuid";
 import Carditem from "./components/Carditem";
+import Carditemtemplate from "./components/Carditem_template";
 import TaskHint from "./components/TaskHint";
 import Loader from "../../components/Loader";
 import { motion } from "framer-motion";
@@ -21,6 +22,8 @@ import {
   addCardItem,
 } from "../../api/kanban";
 import { getSubStage } from "../../api/stage";
+import { createTask } from "../../api/task";
+import { getScaffoldingTemplate } from "../../api/scaffoldingtemplate";
 import { socket } from "../../utils/socket";
 
 export default function Kanban() {
@@ -42,14 +45,31 @@ export default function Kanban() {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const [showContainer, setShowContainer] = useState(false);
+  const [template, setTemplate] = useState([]);
+  // 假设上述数据已经是一个状态或从props获取
+  const [doingColumnId, setDoingColumnId] = useState(null);
 
+  // const {
+  //   isLoading: kanbanIsLoading,
+  //   isError: kanbansIsError,
+  //   error: KanbansError,
+  //   data: KanbansData,
+  // } = useQuery(["kanbanDatas", projectId], () => getKanbanColumns(projectId), {
+  //   onSuccess: setKanbanData,
+  // });
   const {
     isLoading: kanbanIsLoading,
     isError: kanbansIsError,
     error: KanbansError,
     data: KanbansData,
   } = useQuery(["kanbanDatas", projectId], () => getKanbanColumns(projectId), {
-    onSuccess: setKanbanData,
+    onSuccess: (data) => {
+      setKanbanData(data);
+      // 假设数据结构是 [{id: 1, ...}, {id: 2, ...}]
+      if (data.length > 0) {
+        setDoingColumnId(data[0].id);
+      }
+    },
   });
 
   const getSubStageQuery = useQuery(
@@ -73,6 +93,32 @@ export default function Kanban() {
       enabled: !!localStorage.getItem("currentStage"),
     }
   );
+
+  const { data: templateData, isLoading: isLoadingTemplate, isError: isErrorTemplate } = useQuery(
+    ["scaffoldingTemplate", stageInfo.currentStage, stageInfo.currentSubStage],
+    () => getScaffoldingTemplate({
+      stage: stageInfo.currentStage,
+      subStage: stageInfo.currentSubStage,
+    }), {
+      enabled: !!stageInfo.currentStage && !!stageInfo.currentSubStage,
+    }
+  );
+  
+  // 当从后端获取到新的数据时，更新 template 状态
+  useEffect(() => {
+    if (templateData) {
+      setTemplate(templateData); // 将从后端获取到的数据存入 template 状态中
+    }
+  }, [templateData]);
+
+  // 当 stageInfo 更新时，重新触发查询
+  useEffect(() => {
+    queryClient.invalidateQueries([
+      "scaffoldingTemplate",
+      stageInfo.currentStage,
+      stageInfo.currentSubStage,
+    ]);
+  }, [stageInfo.currentStage, stageInfo.currentSubStage, queryClient]);
 
   useEffect(() => {
     function KanbanUpdateEvent(data) {
@@ -201,8 +247,8 @@ export default function Kanban() {
     // 添加以下 console.log 語句
     console.log("currentLocalStorageStage:", currentLocalStorageStage);
     console.log("currentLocalStorageSubStage:", currentLocalStorageSubStage);
-    console.log("stageInfocurrentStage:", correctedStageIndex);
-    console.log("stageInfo.currentSubStage:", correctedSubStageIndex);
+    // console.log("stageInfocurrentStage:", correctedStageIndex);
+    // console.log("stageInfo.currentSubStage:", correctedSubStageIndex);
 
     // 檢查是否 currentStage 等於 correctedStageIndex 並且 currentSubStage 大於 correctedSubStageIndex
     const sic =
@@ -213,10 +259,11 @@ export default function Kanban() {
     const sic2 = parseInt(correctedStageIndex) > currentLocalStorageStage;
 
     const sic3 =
-    (correctedStageIndex < currentLocalStorageStage) ||
-    (correctedStageIndex === currentLocalStorageStage && correctedSubStageIndex < currentLocalStorageSubStage);
-  
-  // 設置狀態
+      correctedStageIndex < currentLocalStorageStage ||
+      (correctedStageIndex === currentLocalStorageStage &&
+        correctedSubStageIndex < currentLocalStorageSubStage);
+
+    // 設置狀態
 
     // 設置狀態
     setIsPreviousStageIncomplete(sic2);
@@ -277,6 +324,49 @@ export default function Kanban() {
   const currentLocalStorageSubStage = parseInt(
     localStorage.getItem("currentSubStage")
   );
+
+  console.log("kanbanData:", kanbanData);
+  // console.log("template:", template[0].scaffolding_template);
+  console.log("doingColumnId:", doingColumnId);
+
+
+  const handleOneClickUse = async () => {
+    // 确保有进行中的列 ID
+    if (!doingColumnId) {
+      console.error("No doingColumnId set");
+      return;
+    }
+  
+    // 确保模板数据已加载
+    if (!template || template.length === 0) {
+      console.error("Template data is not loaded yet");
+      return;
+    }
+  
+    try {
+      // 遍历所有模板，为每个模板创建一个新的任务
+      const tasksCreationPromises = template.map(scaffoldingItem => {
+        if (!scaffoldingItem || !scaffoldingItem.scaffolding_template) {
+          throw new Error("Invalid scaffolding item"); // 或者可以选择跳过这个项目
+        }
+        const newTask = {
+          content: scaffoldingItem.scaffolding_template,
+          columnId: doingColumnId, // 使用之前找到的进行中的列 ID
+        };
+        return createTask(newTask); // 假设 createTask 是用来调用 API 创建任务的函数
+      });
+  
+      // 等待所有任务创建操作完成
+      const responses = await Promise.all(tasksCreationPromises);
+      console.log("All tasks created:", responses.map(res => res.data));
+  
+      // 更新前端状态或提示用户
+    } catch (error) {
+      console.error('Error creating tasks:', error);
+    }
+  };
+  
+
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>
@@ -453,32 +543,33 @@ export default function Kanban() {
         {kanbanIsLoading ? (
           <Loader />
         ) : kanbansIsError ? (
-          <p className=" font-bold text-4xl">{kanbansIsError.message}</p>
+          <p className="font-bold text-4xl">{kanbansIsError.message}</p>
         ) : (
-          kanbanData.map((column, columnIndex) => {
-            return (
-              <div key={column.name}>
-                <Droppable droppableId={columnIndex.toString()}>
-                  {(provided, snapshot) => (
+          <>
+            <div>
+              <Droppable droppableId="5">
+                {(provided, snapshot) => (
+                  <div
+                    {...provided.droppableProps}
+                    ref={provided.innerRef}
+                    className="shadow-xl"
+                  >
                     <div
-                      {...provided.droppableProps}
-                      ref={provided.innerRef}
-                      className="shadow-xl"
+                      className={`${
+                        snapshot.isDraggingOver
+                          ? "bg-rose-100/70"
+                          : "bg-gray-300"
+                      } p-3 rounded-md shadow-xl flex flex-col w-full max-h-[65vh] 2xl:max-h-[70vh] overflow-y-scroll scrollbar-none`}
                     >
-                      <div
-                        className={`${
-                          snapshot.isDraggingOver
-                            ? " bg-rose-100/70"
-                            : "bg-gray-100"
-                        } p-3 rounded-md shadow-xl flex flex-col  w-full max-h-[65vh] 2xl:max-h-[70vh] overflow-y-scroll scrollbar-none`}
-                      >
-                        {/* <div className= {`${snapshot.isDraggingOver ? ' bg-rose-100/70' : 'bg-gray-100'} p-3 rounded-md shadow-md flex flex-col  w-full max-h-[70vh] overflow-y-scroll scrollbar-thin scrollbar-thumb-slate-400/70 scrollbar-track-slate-200 scrollbar-thumb-rounded-full scrollbar-track-rounded-full`}> */}
-                        <h4 className=" flex justify-between items-center mb-2 ">
-                          <span className=" text-xl font-semibold text-gray-600 ">
-                            {column.name}
-                          </span>
-                        </h4>
-                        {showForm && selectedcolumn === columnIndex ? (
+                      <button onClick={handleOneClickUse}> 一鍵使用</button>
+                      <h4 className="flex justify-between items-center mb-2">
+                        <span className="text-xl font-semibold text-gray-600">
+                          思考歷程模板
+                        </span>
+                      </h4>
+
+                      <React.Fragment>
+                        {/* {showForm && selectedcolumn === columnIndex ? (
                           <div>
                             <textarea
                               className="border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-customgreen w-full p-1"
@@ -486,7 +577,7 @@ export default function Kanban() {
                               placeholder="Task info"
                               onChange={handleChange}
                             />
-                            <div className=" flex justify-evenly ">
+                            <div className="flex justify-evenly">
                               <button
                                 className="flex justify-center items-center w-1/2 my-1 mr-1 p-1 bg-white rounded-md font-bold text-sm"
                                 onClick={handleSubmit}
@@ -505,34 +596,116 @@ export default function Kanban() {
                           </div>
                         ) : (
                           <button
-                            className="flex justify-center items-center my-1 py-1 bg-white rounded-md text-lg  "
+                            className="flex justify-center items-center my-1 py-1 bg-white rounded-md text-lg"
                             onClick={() => {
                               setSelectedcolumn(columnIndex);
                               setShowForm(true);
                             }}
                           >
-                            <FiPlus className="w-5  h-5" />
+                            <FiPlus className="w-5 h-5" />
                           </button>
-                        )}
-                        {column.task.length > 0 &&
-                          column.task.map((item, index) => {
-                            return (
-                              <Carditem
-                                key={item.id}
-                                index={index}
-                                data={item}
-                                columnIndex={columnIndex}
-                              />
-                            );
-                          })}
-                        {provided.placeholder}
-                      </div>
+                        )} */}
+                      </React.Fragment>
+
+                      {template.length > 0 &&
+                        template.map((scaffoldingItem, index) => {
+                          const keyId = scaffoldingItem.id || index;
+                          return (
+                            <Carditemtemplate
+                              key={keyId}
+                              index={index}
+                              data={scaffoldingItem} // 传递整个对象而不是 scaffolding_template 字符串
+                            />
+                          );
+                        })}
                     </div>
-                  )}
-                </Droppable>
-              </div>
-            );
-          })
+                  </div>
+                )}
+              </Droppable>
+            </div>
+
+            {kanbanData.map((column, columnIndex) => {
+              return (
+                <div key={column.name}>
+                  <Droppable droppableId={columnIndex.toString()}>
+                    {(provided, snapshot) => (
+                      <div
+                        {...provided.droppableProps}
+                        ref={provided.innerRef}
+                        className="shadow-xl"
+                      >
+                        <div
+                          className={`${
+                            snapshot.isDraggingOver
+                              ? "bg-rose-100/70"
+                              : "bg-gray-100"
+                          } p-3 rounded-md shadow-xl flex flex-col w-full max-h-[65vh] 2xl:max-h-[70vh] overflow-y-scroll scrollbar-none`}
+                        >
+                          <h4 className="flex justify-between items-center mb-2">
+                            <span className="text-xl font-semibold text-gray-600">
+                              {column.name}
+                            </span>
+                          </h4>
+
+                          <React.Fragment>
+                            {showForm && selectedcolumn === columnIndex ? (
+                              <div>
+                                <textarea
+                                  className="border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-customgreen w-full p-1"
+                                  rows={3}
+                                  placeholder="Task info"
+                                  onChange={handleChange}
+                                />
+                                <div className="flex justify-evenly">
+                                  <button
+                                    className="flex justify-center items-center w-1/2 my-1 mr-1 p-1 bg-white rounded-md font-bold text-sm"
+                                    onClick={handleSubmit}
+                                  >
+                                    新增
+                                  </button>
+                                  <button
+                                    className="flex justify-center items-center w-1/2 my-1 ml-1 p-1 bg-white rounded-md font-bold text-sm"
+                                    onClick={() => {
+                                      setShowForm(false);
+                                    }}
+                                  >
+                                    取消
+                                  </button>
+                                </div>
+                              </div>
+                            ) : (
+                              <button
+                                className="flex justify-center items-center my-1 py-1 bg-white rounded-md text-lg"
+                                onClick={() => {
+                                  setSelectedcolumn(columnIndex);
+                                  setShowForm(true);
+                                }}
+                              >
+                                <FiPlus className="w-5 h-5" />
+                              </button>
+                            )}
+                          </React.Fragment>
+
+                          {column.task.length > 0 &&
+                            column.task.map((item, index) => {
+                              return (
+                                <Carditem
+                                  key={item.id}
+                                  index={index}
+                                  data={item}
+                                  columnIndex={columnIndex}
+                                />
+                              );
+                            })}
+                          {provided.placeholder}
+                        </div>
+                      </div>
+                    )}
+                  </Droppable>
+                </div>
+              );
+            })}
+          </>
         )}
       </div>
     </DragDropContext>
