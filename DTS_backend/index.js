@@ -24,6 +24,8 @@ const io = new Server(server, {
         credentials: true
     },
 });
+// 將 io 實例附加到 app 上
+app.set('io', io);
 
 app.use(cors({
     origin: "http://localhost:5173",
@@ -71,6 +73,7 @@ io.on("connection", (socket) => {
             }
         });
         io.sockets.emit("taskItem", updateTask);
+   
     })
     //drag card
     socket.on("cardItemDragged", async(data) => { 
@@ -103,6 +106,15 @@ io.on("connection", (socket) => {
             }
         });
     });
+
+    socket.on('tasksCreated', async (data) => {
+        const { columnId, newTasksIds } = data;
+        // 更新column中的tasks
+        // ...
+        // 发送更新后的column给所有客户端
+        const updatedColumn = await Column.findByPk(columnId);
+        io.sockets.emit('columnUpdated', updatedColumn);
+      });
     //create nodes
     socket.on("nodeCreate", async(data) =>{
         const { title, content, ideaWallId, owner, from_id } = data;

@@ -22,7 +22,7 @@ import {
   addCardItem,
 } from "../../api/kanban";
 import { getSubStage } from "../../api/stage";
-import { createTask } from "../../api/task";
+import { createTaskAndUpdateColumn } from "../../api/task";
 import { getScaffoldingTemplate } from "../../api/scaffoldingtemplate";
 import { socket } from "../../utils/socket";
 
@@ -94,16 +94,22 @@ export default function Kanban() {
     }
   );
 
-  const { data: templateData, isLoading: isLoadingTemplate, isError: isErrorTemplate } = useQuery(
+  const {
+    data: templateData,
+    isLoading: isLoadingTemplate,
+    isError: isErrorTemplate,
+  } = useQuery(
     ["scaffoldingTemplate", stageInfo.currentStage, stageInfo.currentSubStage],
-    () => getScaffoldingTemplate({
-      stage: stageInfo.currentStage,
-      subStage: stageInfo.currentSubStage,
-    }), {
+    () =>
+      getScaffoldingTemplate({
+        stage: stageInfo.currentStage,
+        subStage: stageInfo.currentSubStage,
+      }),
+    {
       enabled: !!stageInfo.currentStage && !!stageInfo.currentSubStage,
     }
   );
-  
+
   // 当从后端获取到新的数据时，更新 template 状态
   useEffect(() => {
     if (templateData) {
@@ -226,6 +232,7 @@ export default function Kanban() {
   } else {
     console.log("No current stage or substage found.");
   }
+
   const handleSubStageClick = (subStageName, stageIndex, subStageIndex) => {
     // 將 stageIndex 和 subStageIndex 進行交換，並對 stageIndex 和 subStageIndex 進行調整
     const correctedStageIndex = subStageIndex + 1;
@@ -329,44 +336,61 @@ export default function Kanban() {
   // console.log("template:", template[0].scaffolding_template);
   console.log("doingColumnId:", doingColumnId);
 
-
   const handleOneClickUse = async () => {
     // 确保有进行中的列 ID
     if (!doingColumnId) {
       console.error("No doingColumnId set");
       return;
     }
-  
+
     // 确保模板数据已加载
     if (!template || template.length === 0) {
       console.error("Template data is not loaded yet");
       return;
     }
-  
+
     try {
-      // 遍历所有模板，为每个模板创建一个新的任务
-      const tasksCreationPromises = template.map(scaffoldingItem => {
+      // 遍歷所有模板，為每個模板創建一個新的任務
+      const tasksCreationPromises = template.map((scaffoldingItem) => {
         if (!scaffoldingItem || !scaffoldingItem.scaffolding_template) {
-          throw new Error("Invalid scaffolding item"); // 或者可以选择跳过这个项目
+          throw new Error("Invalid scaffolding item");
         }
         const newTask = {
           content: scaffoldingItem.scaffolding_template,
-          columnId: doingColumnId, // 使用之前找到的进行中的列 ID
+          columnId: doingColumnId, // 使用之前找到的進行中的列ID
         };
-        return createTask(newTask); // 假设 createTask 是用来调用 API 创建任务的函数
+        // 使用 createTaskAndUpdateColumn 函數發起請求
+        return createTaskAndUpdateColumn(newTask);
       });
-  
-      // 等待所有任务创建操作完成
+
+      // 等待所有任務創建操作完成
       const responses = await Promise.all(tasksCreationPromises);
-      console.log("All tasks created:", responses.map(res => res.data));
-  
-      // 更新前端状态或提示用户
+      console.log(
+        "All tasks created and column updated:",
+        responses.map((res) => res.data)
+      );
+      const newTasksIds = responses.map((res) => res.data.taskId);
+      // 你可能需要在这里通知服务器，比如发送一个socket事件来告知新创建的任务ID
+      socket.emit("tasksCreated", { columnId: doingColumnId, newTasksIds });
+
+      // 更新前端狀態或提示用戶
+      // ... 這裡可能需要更新前端的 column 狀態，取決於您的實際需求 ...
     } catch (error) {
-      console.error('Error creating tasks:', error);
+      console.error("Error creating tasks:", error);
     }
   };
-  
 
+  useEffect(() => {
+    const handleColumnUpdate = (updatedColumn) => {
+      queryClient.invalidateQueries(["kanbanDatas", projectId]);
+    };
+
+    socket.on("columnUpdated", handleColumnUpdate);
+
+    return () => {
+      socket.off("columnUpdated", handleColumnUpdate);
+    };
+  }, [socket, queryClient, projectId]);
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>

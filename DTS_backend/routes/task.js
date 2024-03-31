@@ -3,6 +3,6 @@ const router = express.Router();
 const Controller = require('../controllers/task');
 
 // 定义创建新 Task 的路由
-router.post('/', Controller.createTask);
+router.post('/', Controller.createTaskAndUpdateColumn);
 
 module.exports = router;

@@ -7,6 +7,9 @@ const scaffoldingTemplateApi = axios.create({
     },
 })
 
-export const createTask = (newTask) => {
+
+
+  // 創建任務並更新 column 的API函數
+export const createTaskAndUpdateColumn = (newTask) => {
     return scaffoldingTemplateApi.post('/', newTask);
-  };
+};
