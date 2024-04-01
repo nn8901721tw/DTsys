@@ -175,8 +175,8 @@ export default function IdeaWall() {
 
     return (
         <div>
-            <TopBar />
-            <IdeaWallSideBar />
+            {/* <TopBar />
+            <IdeaWallSideBar /> */}
             { 
                 //to do ? :
                 <div ref={container} className=' h-screen w-full pl-[70px] pt-[70px]' />

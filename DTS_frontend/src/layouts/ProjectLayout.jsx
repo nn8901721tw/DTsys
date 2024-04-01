@@ -9,14 +9,14 @@ export default function ProjectLayout() {
     return (
         <div className='min-w-full min-h-screen h-screen overflow-hidden overflow-x-scroll scrollbar-thin'>
             {
-                location.pathname === `/project/:${projectId}/ideaWall` ?(
-                    <></>
-                ):(
+                // location.pathname === `/project/:${projectId}/ideaWall` ?(
+                //     <></>
+                // ):(
                     <>
                         <TopBar />
                         <SideBar /> 
                     </>
-                )
+                // )
             } 
             <Outlet />
         </div>

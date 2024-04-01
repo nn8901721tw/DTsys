@@ -15,10 +15,10 @@ export default function SideBar() {
     const menus = [
         { name: "排程模組", link: `/project/${projectId}/kanban`, icon: AiOutlineProject, margin:"true"},
         { name: "想法牆", link: `/project/${projectId}/ideaWall`, icon: IoBulbOutline },
-        { name: "管理階段", link: `/project/${projectId}/managePhase`, icon: BsBezier2 },
-        { name: "繳交任務", link: `/project/${projectId}/submitTask`, icon: GrCompliance },
-        { name: "撰寫日誌", link: `/project/${projectId}/reflection`, icon: BsJournalText },
-        { name: "學習歷程", link:`/project/${projectId}/protfolio`, icon:BsFolder}
+        // { name: "管理階段", link: `/project/${projectId}/managePhase`, icon: BsBezier2 },
+        // { name: "繳交任務", link: `/project/${projectId}/submitTask`, icon: GrCompliance },
+        // { name: "撰寫日誌", link: `/project/${projectId}/reflection`, icon: BsJournalText },
+        // { name: "學習歷程", link:`/project/${projectId}/protfolio`, icon:BsFolder}
     ]
 
     return (

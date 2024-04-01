@@ -31,8 +31,6 @@ exports.createTaskAndUpdateColumn = async (req, res) => {
         // 獲取更新後的 column 數據
         const updatedColumn = await Column.findByPk(columnId);
 
-        // // 使用 io 發送消息
-        // io.sockets.emit('columnUpdated', updatedColumn);
 
         // 回應前端創建成功
         return res.status(201).json({ taskId: newTask.id, updatedColumn: updatedColumn });

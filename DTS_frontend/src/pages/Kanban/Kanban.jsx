@@ -49,14 +49,17 @@ export default function Kanban() {
   // 假设上述数据已经是一个状态或从props获取
   const [doingColumnId, setDoingColumnId] = useState(null);
 
-  // const {
-  //   isLoading: kanbanIsLoading,
-  //   isError: kanbansIsError,
-  //   error: KanbansError,
-  //   data: KanbansData,
-  // } = useQuery(["kanbanDatas", projectId], () => getKanbanColumns(projectId), {
-  //   onSuccess: setKanbanData,
-  // });
+  // 将 currentStage 和 currentSubStage 保存在状态中
+  const [currentStage, setCurrentStage] = useState(
+    localStorage.getItem("currentStage")
+  );
+  const [currentSubStage, setCurrentSubStage] = useState(
+    localStorage.getItem("currentSubStage")
+  );
+
+
+
+
   const {
     isLoading: kanbanIsLoading,
     isError: kanbansIsError,
@@ -151,19 +154,19 @@ export default function Kanban() {
       // socket.off('taskItem', KanbanUpdateEvent);
     };
   }, [socket]);
-
-  useEffect(() => {
-    if (
-      !localStorage.getItem("currentStage") ||
-      !localStorage.getItem("currentSubStage")
-    ) {
-      navigate(0);
-    }
-  }, [
-    localStorage.getItem("currentStage"),
-    localStorage.getItem("currentSubStage"),
-  ]);
-
+////////////////////////
+  // useEffect(() => {
+  //   if (
+  //     !localStorage.getItem("currentStage") ||
+  //     !localStorage.getItem("currentSubStage")
+  //   ) {
+  //     navigate(0, { replace: true });
+  //   }
+  // }, [
+  //   localStorage.getItem("currentStage"),
+  //   localStorage.getItem("currentSubStage"),
+  // ]);
+///////////////////////////
   const onDragEnd = ({ destination, source }) => {
     if (!destination) return;
     if (
@@ -281,6 +284,7 @@ export default function Kanban() {
     console.log("isPreviousStageIncomplete:", isPreviousStageIncomplete);
   };
 
+  ///////////////////////
   const { mutate } = useMutation(submitTask, {
     onSuccess: (res) => {
       if (res.message === "done") {
@@ -290,7 +294,7 @@ export default function Kanban() {
       // sucesssNotify(res.message)
       localStorage.removeItem("currentStage");
       localStorage.removeItem("currentSubStage");
-      navigate(`/project/${projectId}/kanban`);
+      navigate(0);
     },
     onError: (error) => {
       console.log(error);
@@ -318,11 +322,16 @@ export default function Kanban() {
       formData.append("currentStage", stageInfo.currentStage);
       formData.append("currentSubStage", stageInfo.currentSubStage);
       formData.append("content", "123");
-
-      // 執行提交操作
-      mutate(formData);
+      try {
+        await mutate(formData);
+      } catch (error) {
+        console.error("Error during submission:", error);
+      }
+      
     }
   };
+
+  //////////////////////////
 
   // 從 localStorage 中獲取當前的階段和子階段
   const currentLocalStorageStage = parseInt(
@@ -379,7 +388,6 @@ export default function Kanban() {
       console.error("Error creating tasks:", error);
     }
   };
-
   useEffect(() => {
     const handleColumnUpdate = (updatedColumn) => {
       queryClient.invalidateQueries(["kanbanDatas", projectId]);
@@ -391,6 +399,52 @@ export default function Kanban() {
       socket.off("columnUpdated", handleColumnUpdate);
     };
   }, [socket, queryClient, projectId]);
+
+  const handleImport = async (scaffoldingItem) => {
+    try {
+      const response = await createTaskAndUpdateColumn({
+        content: scaffoldingItem.scaffolding_template,
+        columnId: doingColumnId,
+      });
+      // 假設 response 是一個物件，且包含 taskId
+      console.log(response);
+      const newTaskId = response.taskId;
+      // 通知服务器新创建的任务ID
+      socket.emit("tasksCreated", {
+        columnId: doingColumnId,
+        taskId: newTaskId,
+      });
+    } catch (error) {
+      console.error("Error importing task:", error);
+    }
+  };
+
+  useEffect(() => {
+    const handleTasksCreated = (data) => {
+      const { newTasks } = data;
+      setKanbanData((prevData) => {
+        // 克隆目前的看板數據
+        const newKanbanData = [...prevData];
+        // 找到對應的列
+        const columnIndex = newKanbanData.findIndex(
+          (column) => column.id === data.columnId
+        );
+        if (columnIndex === -1) return prevData; // 如果找不到列，不進行更新
+        // 更新任務列表
+        newKanbanData[columnIndex].task = [
+          ...newKanbanData[columnIndex].task,
+          ...newTasks,
+        ];
+        return newKanbanData;
+      });
+    };
+
+    socket.on("tasksCreated", handleTasksCreated);
+
+    return () => {
+      socket.off("tasksCreated", handleTasksCreated);
+    };
+  }, [socket]);
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>
@@ -582,54 +636,21 @@ export default function Kanban() {
                       className={`${
                         snapshot.isDraggingOver
                           ? "bg-rose-100/70"
-                          : "bg-gray-300"
-                      } p-3 rounded-md shadow-xl flex flex-col w-full max-h-[65vh] 2xl:max-h-[70vh] overflow-y-scroll scrollbar-none`}
+                          : "bg-[#70c4c4]"
+                      } p-3 rounded-md shadow-xl flex flex-col w-full max-h-[65vh] 2xl:max-h-[70vh] overflow-y-scroll scrollbar-none `}
                     >
-                      <button onClick={handleOneClickUse}> 一鍵使用</button>
                       <h4 className="flex justify-between items-center mb-2">
-                        <span className="text-xl font-semibold text-gray-600">
-                          思考歷程模板
+                        <span className="text-xl font-semibold text-gray-100">
+                          思考歷程導引模板
                         </span>
+                        <button
+                          className="tex font-bold text-sm 2xl:font-semibold 2xl:text-base px-1 py-1 2xl:px-4 2xl:py-2 rounded-md transition ease-in-out bg-[#bbd6d6] hover:-translate-y-1  hover:scale-110 duration-100 ..."
+                          onClick={handleOneClickUse}
+                        >
+                          一鍵導入
+                        </button>
                       </h4>
-
-                      <React.Fragment>
-                        {/* {showForm && selectedcolumn === columnIndex ? (
-                          <div>
-                            <textarea
-                              className="border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-customgreen w-full p-1"
-                              rows={3}
-                              placeholder="Task info"
-                              onChange={handleChange}
-                            />
-                            <div className="flex justify-evenly">
-                              <button
-                                className="flex justify-center items-center w-1/2 my-1 mr-1 p-1 bg-white rounded-md font-bold text-sm"
-                                onClick={handleSubmit}
-                              >
-                                新增
-                              </button>
-                              <button
-                                className="flex justify-center items-center w-1/2 my-1 ml-1 p-1 bg-white rounded-md font-bold text-sm"
-                                onClick={() => {
-                                  setShowForm(false);
-                                }}
-                              >
-                                取消
-                              </button>
-                            </div>
-                          </div>
-                        ) : (
-                          <button
-                            className="flex justify-center items-center my-1 py-1 bg-white rounded-md text-lg"
-                            onClick={() => {
-                              setSelectedcolumn(columnIndex);
-                              setShowForm(true);
-                            }}
-                          >
-                            <FiPlus className="w-5 h-5" />
-                          </button>
-                        )} */}
-                      </React.Fragment>
+                      <React.Fragment></React.Fragment>
 
                       {template.length > 0 &&
                         template.map((scaffoldingItem, index) => {
@@ -638,7 +659,8 @@ export default function Kanban() {
                             <Carditemtemplate
                               key={keyId}
                               index={index}
-                              data={scaffoldingItem} // 传递整个对象而不是 scaffolding_template 字符串
+                              data={scaffoldingItem}
+                              onImportClick={handleImport} // 这里传递函数
                             />
                           );
                         })}
