@@ -12,7 +12,7 @@ const Column = sequelize.define('column', {
         allowNull:true
     },  
 });
-
+                                                                   
 Column.hasMany(Task);
 module.exports = Column;
 

@@ -11,7 +11,10 @@ import Loader from "../../components/Loader";
 import { motion } from "framer-motion";
 import { submitTask } from "../../api/submit";
 import Swal from "sweetalert2";
-
+import Lottie from "lottie-react";
+import owlAnimation from "../../assets/owlAnimation.json";
+import question from "../../assets/question.json";
+import SlideInNotifications from "./components/SlideInNotifications";
 import { DragDropContext } from "react-beautiful-dnd";
 import { StrictModeDroppable as Droppable } from "../../utils/StrictModeDroppable";
 
@@ -41,7 +44,7 @@ export default function Kanban() {
     name: "",
     description: "",
   });
-
+  const [notifications, setNotifications] = useState([]);
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const [showContainer, setShowContainer] = useState(false);
@@ -56,9 +59,6 @@ export default function Kanban() {
   const [currentSubStage, setCurrentSubStage] = useState(
     localStorage.getItem("currentSubStage")
   );
-
-
-
 
   const {
     isLoading: kanbanIsLoading,
@@ -154,7 +154,7 @@ export default function Kanban() {
       // socket.off('taskItem', KanbanUpdateEvent);
     };
   }, [socket]);
-////////////////////////
+  ////////////////////////
   // useEffect(() => {
   //   if (
   //     !localStorage.getItem("currentStage") ||
@@ -166,7 +166,7 @@ export default function Kanban() {
   //   localStorage.getItem("currentStage"),
   //   localStorage.getItem("currentSubStage"),
   // ]);
-///////////////////////////
+  ///////////////////////////
   const onDragEnd = ({ destination, source }) => {
     if (!destination) return;
     if (
@@ -215,16 +215,46 @@ export default function Kanban() {
   const stages1 = ["同理", "定義", "發想", "原型", "測試"];
 
   const stages2 = [
-    ["經驗分享與同理", "定義問題", "問題聚焦", "原型製作", "原型測試與分析"],
-    ["定義利害關係人", "投票", "篩選與整合方法", "", "開始修正"],
+    [
+      "經驗分享與同理",
+      "初步統整問題",
+      "問題聚焦",
+      "原型製作",
+      "原型測試與分析",
+    ],
+    ["定義利害關係人", "定義問題", "篩選與整合方法", "", "開始修正"],
     ["進場域前的同理", "", "", "", ""],
     ["歸類需求與問題", "", "", "", ""],
   ];
   const stages3 = [
-    ["分享", "問題", "聚焦", "原型", "分析"],
-    ["關係人", "投票", "篩選", "", "修正"],
-    ["場域前同理", "", "", "", ""],
-    ["歸類", "", "", "", ""],
+    [
+      "在 1-1 的階段中，回想自身經驗，或是身邊的人是否有同樣例子，並提供完整資訊分享給同組的夥伴，並再與小組討論完後，將想法張貼至想法牆中!",
+      "問將已張貼至想法牆中的 '利害關係人所遇到的問題' ，進行初步統整與統整歸類。題",
+      "根據前階段得出的待解決的問題，選定一個問題，並開始發散性思考解決方案，此階段不受限任何想法。",
+      "開始實作原型，此階段可透過Figma、draw.io等等設計工具輔助，用以快速建立原型。",
+      "將產出之原型丟入實際場域進行測試，將蒐集後的資料紀錄於想法牆中，接著旱小組成員討論並分析如何改進。",
+    ],
+    [
+      "根據剛剛所發散的想法，和組員討論並歸納出利害關係人，並定義利害關係人為哪些人?",
+      "根據上階段所歸類的問題，透過小組討論篩選出真正值得解決的問題，若遲遲無法得到共識，可使用公平的投票方式。",
+      "根據前階段所得的想法中，與小組成員討論，篩選並整合出最適合的解決方案。",
+      "",
+      "根據前階段得出之結果，原型若是不夠完善，則跌代回先前階段，重新跑流程。",
+    ],
+    [
+      "進入相關場域訪談前，必須先廣泛思考利害關係人可能遇到的問題，並和小組討論過後，再接續得出訪談的問題種類。",
+      "",
+      "",
+      "",
+      "",
+    ],
+    [
+      "待實際場域訪談後，將所記錄的資料進行彙整並張貼至想法牆中，並和小組討論以歸納利害關係人所遇到的問題。",
+      "",
+      "",
+      "",
+      "",
+    ],
   ];
   // 檢查是否有當前的階段和子階段
   if (stageInfo.currentStage && stageInfo.currentSubStage) {
@@ -327,7 +357,6 @@ export default function Kanban() {
       } catch (error) {
         console.error("Error during submission:", error);
       }
-      
     }
   };
 
@@ -446,6 +475,28 @@ export default function Kanban() {
     };
   }, [socket]);
 
+  // 主页面组件内部
+  const generateRandomNotif = () => {
+    const names = ["思考歷程導引模板"];
+
+    const randomIndex = Math.floor(Math.random() * names.length);
+
+    const data = {
+      id: Math.random(),
+      text: ` ${names[randomIndex]}可透過點擊"導入"或"一鍵導入"來使用 ，這些模板為各個子階段中預設的任務，使用他們可幫助你們快速上手喔! `,
+    };
+
+    return data;
+  };
+
+  // 当点击Lottie动画时，调用此函数来添加通知
+  const handleLottieClick = () => {
+    const newNotification = generateRandomNotif();
+    setNotifications((prevNotifications) => [
+      newNotification,
+      ...prevNotifications,
+    ]);
+  };
   return (
     <DragDropContext onDragEnd={onDragEnd}>
       <motion.div
@@ -614,9 +665,19 @@ export default function Kanban() {
             : "完成此階段"}
         </button>
       </div>
-
+      <SlideInNotifications
+        notifications={notifications}
+        setNotifications={setNotifications}
+        // className="absolute bottom-0 left-0 flex flex-col gap-1 w-72 mb-10 ml-10 z-50 pointer-events-none"
+      />
       <div className="grid grid-cols-4 gap-5  px-28 pt-2 2xl:pt-12 min-w-[800px] h-screen overflow-hidden bg-slate-100  ">
-        <TaskHint stageInfo={stageInfo} />
+        <div className="flex flex-col">
+          <TaskHint className="" stageInfo={stageInfo} />
+          <div className="flex" onClick={handleLottieClick}>
+            <Lottie className="w-36 h-36" animationData={owlAnimation} />
+            <Lottie className="wh-16 h-16" animationData={question} />
+          </div>
+        </div>
 
         {kanbanIsLoading ? (
           <Loader />
@@ -640,11 +701,11 @@ export default function Kanban() {
                       } p-3 rounded-md shadow-xl flex flex-col w-full max-h-[65vh] 2xl:max-h-[70vh] overflow-y-scroll scrollbar-none `}
                     >
                       <h4 className="flex justify-between items-center mb-2">
-                        <span className="text-xl font-semibold text-gray-100">
+                        <span className="text-base 2xl:text-xl font-semibold text-gray-100">
                           思考歷程導引模板
                         </span>
                         <button
-                          className="tex font-bold text-sm 2xl:font-semibold 2xl:text-base px-1 py-1 2xl:px-4 2xl:py-2 rounded-md transition ease-in-out bg-[#bbd6d6] hover:-translate-y-1  hover:scale-110 duration-100 ..."
+                          className="font-bold text-sm 2xl:font-semibold 2xl:text-base px-1 py-1 2xl:px-4 2xl:py-2 rounded-md transition ease-in-out bg-[#bbd6d6] hover:-translate-y-1  hover:scale-110 duration-100 ..."
                           onClick={handleOneClickUse}
                         >
                           一鍵導入

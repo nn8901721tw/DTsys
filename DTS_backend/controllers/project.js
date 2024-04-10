@@ -132,45 +132,41 @@ exports.createProject = async(req, res) => {
 
     const sub_stage_1_1 = await Sub_stage.create({
         name:"經驗分享與同理",
-        description:"在 1-1 的階段中，提出你感興趣的主題，並提供完整資訊分享給同組的夥伴，並再與小組討論完後，經驗分享與同理",
+        description:"在 1-1 的階段中，回想自身經驗，或是身邊的人是否有同樣例子，並提供完整資訊分享給同組的夥伴，並再與小組討論完後，將想法張貼至想法牆中!",
         userSubmit:{
-            "提議主題":"input",
-            "主題來源":"input",
+            "成果標題":"input",
             "附加檔案":"file",
-            "提議原因":"textarea",
+            "文字內容":"textarea",
         },
         stageId:stage1.id
     })
     const sub_stage_1_2 = await Sub_stage.create({
         name:"定義利害關係人",
-        description:"根據剛剛所想的研究主題，蒐集相關資料，並和組員討論出合適的題目。定義利害關係人",
+        description:"根據剛剛所發散的想法，和組員討論並歸納出利害關係人，並定義利害關係人為哪些人?",
         userSubmit:{
-            "提議題目":"input",
-            "提議原因":"textarea",
-            "相關資料":"textarea",
+            "成果標題":"input",
             "附加檔案":"file",
+            "文字內容":"textarea",
         },
         stageId:stage1.id
     });
     const sub_stage_1_3 = await Sub_stage.create({
         name:"進場域前的同理",
-        description:"根據剛剛所想的研究主題，蒐集相關資料，並和組員討論出合適的題目。進場域前的同理",
+        description:"進入相關場域訪談前，必須先廣泛思考利害關係人可能遇到的問題，並和小組討論過後，再接續得出訪談的問題種類。",
         userSubmit:{
-            "提議題目":"input",
-            "提議原因":"textarea",
-            "相關資料":"textarea",
+            "成果標題":"input",
             "附加檔案":"file",
+            "文字內容":"textarea",
         },
         stageId:stage1.id
     });
     const sub_stage_1_4 = await Sub_stage.create({
         name:"歸類需求與問題",
-        description:"根據剛剛所想的研究主題，蒐集相關資料，並和組員討論出合適的題目。歸類需求與問題",
+        description:"待實際場域訪談後，將所記錄的資料進行彙整並張貼至想法牆中，並和小組討論以歸納利害關係人所遇到的問題。",
         userSubmit:{
-            "提議題目":"input",
-            "提議原因":"textarea",
-            "相關資料":"textarea",
+            "成果標題":"input",
             "附加檔案":"file",
+            "文字內容":"textarea",
         },
         stageId:stage1.id
     });
@@ -182,23 +178,22 @@ exports.createProject = async(req, res) => {
     .catch(err => console.log(err));
 
     const sub_stage_2_1 = await Sub_stage.create({
-        name:"定義問題",
-        description:"接下來，你們要提出研究問題作為你們研究的目標，選擇「先做發散性思考」，還是「先做嘗試性實驗」。「先做發散性思考」請思考5W1H的方式，與誰有關?什麼時候?什麼地點?什麼事物?為什麼?如何?確認研究問題；「先做嘗試性實驗」先將已有的構想，簡略再想法牆上的說明實驗規劃，會用到那些研究器材、實驗步驟、記錄那些資料，在規劃完後，照著構想做幾次實驗，確認可行性，再進行「先做發散性思考」，確認研究問題。最後與小組成員討論出研究可能之相關變因與研究問題",
+        name:"初步統整問題",
+        description:"將已張貼至想法牆中的 '利害關係人所遇到的問題' ，進行初步統整與統整歸類。",
         userSubmit:{
-            "研究假設":"textarea",
-            "對應的研究便因":"textarea",
+            "成果標題":"input",
             "附加檔案":"file",
+            "文字內容":"textarea",
         },
         stageId:stage2.id
     });
     const sub_stage_2_2 = await Sub_stage.create({
-        name:"投票",
-        description:"請跟小組進行討論，填寫實驗所需使用的研究材料、研究步驟，投票。",
+        name:"定義問題",
+        description:"根據上階段所歸類的問題，透過小組討論篩選出真正值得解決的問題，若遲遲無法得到共識，可使用公平的投票方式。",
         userSubmit:{
-            "研究材料與工具":"textarea",
-            "研究步驟":"textarea",
-            "記錄方式":"textarea",
+            "成果標題":"input",
             "附加檔案":"file",
+            "文字內容":"textarea",
         },
         stageId:stage2.id
     });
@@ -231,17 +226,21 @@ exports.createProject = async(req, res) => {
 
     const sub_stage_3_1 = await Sub_stage.create({
         name:"問題聚焦",
-        description:"請先瀏覽研究構想後，與小組討論嘗試性實驗的結果，可以將過程撰寫在實驗日誌中。問題聚焦",
+        description:"根據前階段得出的待解決的問題，選定一個問題，並開始發散性思考解決方案，此階段不受限任何想法。",
         userSubmit:{
-            "實驗記錄":"file",
+            "成果標題":"input",
+            "附加檔案":"file",
+            "文字內容":"textarea",
         },
         stageId:stage3.id
     });
     const sub_stage_3_2 = await Sub_stage.create({
         name:"篩選與整合方法",
-        description:"請先瀏覽研究構想後，與小組討論實驗分析與圖表並上傳資料分析。篩選與整合方法",
+        description:"根據前階段所得的想法中，與小組成員討論，篩選並整合出最適合的解決方案。",
         userSubmit:{
-            "資料分析檔案":"file",
+            "成果標題":"input",
+            "附加檔案":"file",
+            "文字內容":"textarea",
         },
         stageId:stage3.id
     });
@@ -266,9 +265,11 @@ exports.createProject = async(req, res) => {
 
     const sub_stage_4_1 = await Sub_stage.create({
         name:"原型製作",
-        description:"進行一般性討論，針對實驗結果做討論，探討背後隱含的科學原理，再進行綜合性討論，針對有些實驗結果彼此之間的因果關係，需要放在一起討論才有意義。原型製作",
+        description:"開始實作原型，此階段可透過Figma、draw.io等等設計工具輔助，用以快速建立原型。",
         userSubmit:{
-            "研究討論":"file",
+            "成果標題":"input",
+            "附加檔案":"file",
+            "文字內容":"textarea",
         },
         stageId:stage4.id
     });
@@ -290,17 +291,21 @@ exports.createProject = async(req, res) => {
 
     const sub_stage_5_1 = await Sub_stage.create({
         name:"原型測試與分析",
-        description:"在將科展作品拿去參加科展競賽之前,必須統整出作品說明書，須包含封面。原型測試與分析",
+        description:"將產出之原型丟入實際場域進行測試，將蒐集後的資料紀錄於想法牆中，接著旱小組成員討論並分析如何改進。",
         userSubmit:{
-            "研究結論":"file",
+            "成果標題":"input",
+            "附加檔案":"file",
+            "文字內容":"textarea",
         },
         stageId:stage5.id
     });
     const sub_stage_5_2 = await Sub_stage.create({
         name:"開始修正",
-        description:"在將科展作品拿去參加科展競賽之前,必須統整出作品說明書，須包含封面。開始修正",
+        description:"根據前階段得出之結果，原型若是不夠完善，則跌代回先前階段，重新跑流程。",
         userSubmit:{
-            "研究結論":"file",
+            "成果標題":"input",
+            "附加檔案":"file",
+            "文字內容":"textarea",
         },
         stageId:stage5.id
     });

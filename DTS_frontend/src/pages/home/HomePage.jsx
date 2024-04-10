@@ -116,8 +116,8 @@ export default function HomePage() {
       transition: {
         type: "spring",
         delay: 0.2,
-        stiffness: 130,
-        duration: 0.9, // 这里设置动画持续时间，例如1秒
+        stiffness: 300,
+        duration: 2 // 这里设置动画持续时间，例如1秒
       },
     },
   };
@@ -157,7 +157,7 @@ export default function HomePage() {
                   animate="visible"
                   whileHover={{ scale: 1.05 }} // 添加悬停效果
                   transition={{ type: "spring", stiffness: 2000 }} // 可以调整transition来改变动画效果
-                  className="rounded-lg w-full max-h-[150px] min-h-[150px] bg-white shadow-md duration-150"
+                  className="rounded-lg w-full max-h-[150px] min-h-[150px] bg-[#D5DDD3] shadow-md duration-150"
                   // onClick={() => handleClick(projectItem)}
                   style={{ cursor: "pointer" }} // 添加样式改变光标为点击样式
                 >
@@ -189,7 +189,7 @@ export default function HomePage() {
               duration: 1, // 控制动画持续时间
               delay: projectData.length * 0.1, // 根据项目数量设置延迟，确保这是最后一个飞入的项目
             }}
-            className="rounded-lg w-full max-h-[150px] min-h-[150px] bg-white shadow-md duration-150 flex justify-center items-center text-slate-400 text-xl font-bold"
+            className="rounded-lg w-full max-h-[150px] min-h-[150px] bg-[#f1f8f0] shadow-md duration-150 flex justify-center items-center text-slate-400 text-xl font-bold"
             style={{ cursor: "default" }} // 使光标保持默认样式
           >
             建立專案

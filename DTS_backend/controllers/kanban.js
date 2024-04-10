@@ -196,7 +196,7 @@ exports.initializeData =async()=>{
         await Kanban_scaffolding.bulkCreate([
             { id:'1',sub_stage: '1-1', scaffolding_template: '各自拋出經驗' },
             { id:'2',sub_stage: '1-1', scaffolding_template: '網路查找相關資料' },
-            { id:'3',sub_stage: '1-2', scaffolding_template: '列出' },
+            { id:'3',sub_stage: '1-2', scaffolding_template: '列出利害關係人' },
             { id:'4',sub_stage: '1-2', scaffolding_template: '歸納利害關係人' },
             { id:'5',sub_stage: '1-3', scaffolding_template: '思考利害關係人可能遇到的問題' },
             { id:'6',sub_stage: '1-3', scaffolding_template: '思考要訪談的問題' },
@@ -207,7 +207,7 @@ exports.initializeData =async()=>{
             { id:'11',sub_stage: '2-2', scaffolding_template: '使用公平的投票方式' },
             { id:'12',sub_stage: '3-1', scaffolding_template: '一次針對一個問題進行解決方案發想' },
             { id:'13',sub_stage: '3-2', scaffolding_template: '組內整合解決方法' },
-            { id:'14',sub_stage: '4-1', scaffolding_template: '開始實作原型' },
+            { id:'14',sub_stage: '4-1', scaffolding_template: '開始實作原型(Figma、Draw.io)' },
             { id:'15',sub_stage: '5-1', scaffolding_template: '將原型進行實際場域測試' },
             { id:'16',sub_stage: '5-1', scaffolding_template: '蒐集並分析場域測試結果' },
             { id:'17',sub_stage: '5-2', scaffolding_template: '整理出修正要點' },
