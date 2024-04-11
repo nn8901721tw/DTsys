@@ -13,8 +13,8 @@ export default function ProjectLayout() {
                 //     <></>
                 // ):(
                     <>
-                        <TopBar />
-                        <SideBar /> 
+                        <TopBar className='z-20' />
+                        <SideBar  className='z-10'/> 
                     </>
                 // )
             } 

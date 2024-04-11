@@ -36,7 +36,7 @@ const Notification = ({ notification, removeNotif }) => {
       animate={{ y: 0, scale: 1.5 }}
       exit={{ x: "50%", opacity: 0 }}
       transition={{ duration: 0.5, ease: "easeOut" }}
-      className="rounded-lg p-2 flex items-start  gap-2 text-xs font-medium shadow-lg text-white bg-sky-700 pointer-events-auto"
+      className="rounded-lg p-2 flex items-start  gap-2 text-xs font-semibold shadow-lg text-black bg-[#dbeeee] pointer-events-auto"
     >
       <FiCheckSquare className="mt-0.5" />
       <span>{notification.text}</span>

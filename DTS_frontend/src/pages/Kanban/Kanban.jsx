@@ -28,6 +28,7 @@ import { getSubStage } from "../../api/stage";
 import { createTaskAndUpdateColumn } from "../../api/task";
 import { getScaffoldingTemplate } from "../../api/scaffoldingtemplate";
 import { socket } from "../../utils/socket";
+import SpringModal from './components/SpringModel';  // 確保從正確的路徑導入 SpringModal
 
 export default function Kanban() {
   const [kanbanData, setKanbanData] = useState([]);
@@ -36,6 +37,7 @@ export default function Kanban() {
   const [selectedcolumn, setSelectedcolumn] = useState(0);
   const { projectId } = useParams();
 
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [isStagecomplete, setIsStagecomplete] = useState(false);
   const [isPreviousStageIncomplete, setIsPreviousStageIncomplete] =
     useState(false);
@@ -154,7 +156,7 @@ export default function Kanban() {
       // socket.off('taskItem', KanbanUpdateEvent);
     };
   }, [socket]);
-  ////////////////////////
+  //////////////////////
   // useEffect(() => {
   //   if (
   //     !localStorage.getItem("currentStage") ||
@@ -166,7 +168,7 @@ export default function Kanban() {
   //   localStorage.getItem("currentStage"),
   //   localStorage.getItem("currentSubStage"),
   // ]);
-  ///////////////////////////
+  /////////////////////////
   const onDragEnd = ({ destination, source }) => {
     if (!destination) return;
     if (
@@ -345,17 +347,36 @@ export default function Kanban() {
       confirmButtonText: "確定",
     });
 
-    // 如果用戶確定，執行提交操作
+    // 如果用戶確定，則問是否有成果要上傳
     if (result.isConfirmed) {
-      const formData = new FormData();
-      formData.append("projectId", projectId);
-      formData.append("currentStage", stageInfo.currentStage);
-      formData.append("currentSubStage", stageInfo.currentSubStage);
-      formData.append("content", "123");
-      try {
-        await mutate(formData);
-      } catch (error) {
-        console.error("Error during submission:", error);
+      const resultUpload = await Swal.fire({
+        title: "成果上傳",
+        text: "是否有成果要上傳？",
+        icon: "warning",
+        showCancelButton: true,
+        cancelButtonText: "沒有",
+        confirmButtonText: "上傳",
+      });
+
+      // 按下取消，則執行提交操作
+      if (resultUpload.isDismissed) {
+        const formData = new FormData();
+        formData.append("projectId", projectId);
+        formData.append("currentStage", stageInfo.currentStage);
+        formData.append("currentSubStage", stageInfo.currentSubStage);
+        formData.append("content", " ");
+
+        try {
+          await mutate(formData);
+        } catch (error) {
+          console.error("Error during submission:", error);
+        }
+      } else {
+        // 如果用戶確定上傳成果，執行另外的操作
+        // 此處添加上傳成果的邏輯或進一步操作
+        // 如果用戶確定上傳成果，則跳轉到 SubmitTask 頁面
+      navigate(`/project/${projectId}/submitTask`);
+        console.log("進行上傳成果的操作");
       }
     }
   };
@@ -477,13 +498,13 @@ export default function Kanban() {
 
   // 主页面组件内部
   const generateRandomNotif = () => {
-    const names = ["思考歷程導引模板"];
+    const names = ["在我上方的灰色小方塊是子階段提示，這裡顯示當下子階段的目標及任務說明，大家要記得看喔!","思考歷程導引模板可透過點擊'導入'或'一鍵導入'來使用 ，這些模板為各個子階段中預設的任務，使用他們可幫助你們快速上手喔!"];
 
     const randomIndex = Math.floor(Math.random() * names.length);
 
     const data = {
       id: Math.random(),
-      text: ` ${names[randomIndex]}可透過點擊"導入"或"一鍵導入"來使用 ，這些模板為各個子階段中預設的任務，使用他們可幫助你們快速上手喔! `,
+      text: ` ${names[randomIndex]} `,
     };
 
     return data;
@@ -498,7 +519,7 @@ export default function Kanban() {
     ]);
   };
   return (
-    <DragDropContext onDragEnd={onDragEnd}>
+    <DragDropContext onDragEnd={onDragEnd} >
       <motion.div
         initial="hidden"
         animate={showContainer ? "visible" : "hidden"}
@@ -674,8 +695,8 @@ export default function Kanban() {
         <div className="flex flex-col">
           <TaskHint className="" stageInfo={stageInfo} />
           <div className="flex" onClick={handleLottieClick}>
-            <Lottie className="w-36 h-36" animationData={owlAnimation} />
-            <Lottie className="wh-16 h-16" animationData={question} />
+            <Lottie className="w-36 h-36 z-0" animationData={owlAnimation} />
+            <Lottie className="wh-16 h-16 z-0" animationData={question} />
           </div>
         </div>
 
@@ -750,7 +771,7 @@ export default function Kanban() {
                         >
                           <h4 className="flex justify-between items-center mb-2">
                             <span className="text-xl font-semibold text-gray-600">
-                              {column.name}
+                            {column.name}
                             </span>
                           </h4>
 
@@ -801,6 +822,7 @@ export default function Kanban() {
                                   index={index}
                                   data={item}
                                   columnIndex={columnIndex}
+                                  
                                 />
                               );
                             })}
@@ -809,6 +831,7 @@ export default function Kanban() {
                       </div>
                     )}
                   </Droppable>
+                  {/* <SpringModal isOpen={isModalOpen} setIsOpen={setIsModalOpen} /> */}
                 </div>
               );
             })}

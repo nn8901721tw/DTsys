@@ -200,9 +200,9 @@ const Cards = () => {
                 <TypeAnimation
                   sequence={[
                     "作為組員，協力完成活動",
-                    1500,
+                    600,
                     "和大家一起腦力激盪 !",
-                    1500,
+                    600,
                   ]}
                   speed={60}
                   wrapper="span"
@@ -238,9 +238,9 @@ const Cards = () => {
                 <TypeAnimation
                   sequence={[
                     "作為組長，帶領各位同學",
-                    1500,
+                    600,
                     "和大家一起腦力激盪 !",
-                    1500,
+                    600,
                   ]}
                   speed={60}
                   wrapper="span"
@@ -275,9 +275,9 @@ const Cards = () => {
                 <TypeAnimation
                   sequence={[
                     "查看所有活動",
-                    1500,
+                    600,
                     "遍歷設計思考活動!",
-                    1500,
+                    600,
                   ]}
                   speed={60}
                   wrapper="span"

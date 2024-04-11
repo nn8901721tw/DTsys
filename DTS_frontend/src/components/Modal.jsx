@@ -10,7 +10,7 @@ export default function Modal({ open, onClose, opacity, position, modalCoordinat
         <>
             {
                 coordinate ?
-                <div style={{top: `${coordinate.y}px`, left: `${coordinate.x}px`}} className={`fixed flex transition-colors ${open ? "visible" : "invisible"} ${opacity ? "bg-black/50" : ""} ${position}`}>
+                <div style={{top: `${coordinate.y}px`, left: `${coordinate.x}px`}} className={`z-[100] fixed flex transition-colors  ${open ? "visible" : "invisible"} ${opacity ? "bg-black/50" : ""} ${position}`}>
                     <div onClick={(e) => e.stopPropagation()} className={` bg-white rounded-md shadow transition-all duration-300 ${custom ? custom : "w-3/4 sm:w-1/3"} ${open ? "scale-100 opacity-100" : "scale-75 opacity-0"}`} >
                         {/* <button onClick={onClose} className=' absolute top-2 right-2 rounded-lg bg-white hover:bg-slate-200'>
                             <GrFormClose  className=' w-6 h-6'/>
@@ -19,8 +19,8 @@ export default function Modal({ open, onClose, opacity, position, modalCoordinat
                         </div>
                 </div>   
                 :
-                <div className={`fixed inset-0 flex transition-colors ${open ? "visible" : "invisible"} ${opacity ? "bg-black/50" : ""} ${position}`}>
-                    <div onClick={(e) => e.stopPropagation()} className={` bg-[#F7F6F6] rounded-md shadow p-8 transition-all duration-300 ${custom ? custom : "w-3/4 sm:w-1/3 2xl:w-1/3 "} ${open ? "scale-100 opacity-100" : "scale-75 opacity-0"}`} >
+                <div className={`z-[100] fixed inset-0 flex transition-colors ${open ? "visible" : "invisible"} ${opacity ? "bg-black/50 z-[100]" : ""} ${position} `}>
+                    <div onClick={(e) => e.stopPropagation()} className={`bg-[#F7F6F6] rounded-md shadow p-8 transition-all duration-300 ${custom ? custom : "w-3/4 sm:w-1/3 2xl:w-1/3 "} ${open ? "scale-100 opacity-100" : "scale-75 opacity-0"}`} >
                         {children}
                         </div>
                 </div> 

@@ -28,7 +28,7 @@ exports.createSubmit = async(req, res) => {
     }else{
         await Submit.create({
             stage: `${currentStageInt}-${currentSubStageInt}`,
-            content: "content",
+            content: content,
             projectId: projectId,
         })
     }

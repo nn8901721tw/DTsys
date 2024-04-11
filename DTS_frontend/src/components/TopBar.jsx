@@ -82,8 +82,8 @@ export default function TopBar() {
             登出
           </h3>
         </div>
-        <Modal open={referralCodeModalOpen} onClose={() => setReferralCodeModalOpen(false)} opacity={true} position={"justify-center items-center"}> 
-          <button onClick={() => setReferralCodeModalOpen(false)} className=' absolute top-1 right-1 rounded-lg bg-white hover:bg-slate-200'>
+        <Modal open={referralCodeModalOpen} onClose={() => setReferralCodeModalOpen(false)} opacity={true} position={"justify-center items-center"} className='z-50'> 
+          <button onClick={() => setReferralCodeModalOpen(false)} className=' absolute top-1 right-1 rounded-lg bg-slate-100 hover:bg-slate-200'>
             <GrFormClose  className=' w-6 h-6'/>
           </button> 
           <div className='flex flex-col p-3'>

@@ -12,7 +12,7 @@ export default function IdeaWallSideBar() {
         { name: "篩選", icon: AiFillEye },
     ]
     return (
-        <div className={` bg-[#FFF] fixed inset-y-0 left-0 min-h-screen duration-500 border-r-2 ${open ? "w-40" : "w-16"}`}>
+        <div className={` bg-[#FFF] fixed inset-y-0 left-0 min-h-screen duration-500 border-r-2  ${open ? "w-40" : "w-16"}  ` }>
             <div className='mt-2 py-3 pl-3 flex justify-start'>
                 <FaBars size={26} className='cursor-pointer' onClick={()=>setOpen(!open)}/>
             </div>

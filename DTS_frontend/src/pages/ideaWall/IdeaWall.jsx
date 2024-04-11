@@ -12,6 +12,11 @@ import { useQuery } from "react-query";
 import { getIdeaWall } from "../../api/ideaWall";
 import { getNodes, getNodeRelation } from "../../api/nodes";
 import { socket } from "../../utils/socket";
+import {
+  getKanbanColumns,
+  getKanbanTasks,
+  addCardItem,
+} from "../../api/kanban";
 
 export default function IdeaWall() {
   const container = useRef(null);
@@ -25,7 +30,41 @@ export default function IdeaWall() {
   const [createNodeModalOpen, setCreateNodeModalOpen] = useState(false);
   const [updateNodeModalOpen, setUpdateNodeModalOpen] = useState(false);
   const [canvasPosition, setCanvasPosition] = useState({});
+  const [kanbanData, setKanbanData] = useState([]);
+  const [inProgressTasks, setInProgressTasks] = useState([]);
+
+
+  const {
+    isLoading: kanbanIsLoading,
+    isError: kanbansIsError,
+    error: KanbansError,
+    data: KanbansData,
+  } = useQuery(["kanbanDatas", projectId], () => getKanbanColumns(projectId), {
+    onSuccess: (data) => {
+      setKanbanData(data);
+
+      // 假设数据结构是 [{id: 1, ...}, {id: 2, ...}]
+      if (data.length > 0) {
+        // setDoingColumnId(data[0].id);
+
+      }
+    },
+  });
+  useEffect(() => {
+    if (kanbanData.length > 0) {
+      const tasksInProgress = kanbanData.find(column => column.name === "進行中")?.task || [];
+      setInProgressTasks(tasksInProgress);
+      console.log("進行中的任務:", tasksInProgress);
+    }
+  }, [kanbanData]);  // 確保當 kanbanData 更新時重新運行此效果
+  
+  
+
+
+
+
   const [ideaWallInfo, setIdealWallInfo] = useState({
+    
     id: "1",
     name: "",
     type: "",
@@ -193,18 +232,19 @@ export default function IdeaWall() {
   };
 
   return (
-    <div>
+    <div className="z-10">
       {/* <TopBar />
             <IdeaWallSideBar /> */}
       {
         //to do ? :
         <div
           ref={container}
-          className=" h-screen w-full pl-[70px] pt-[70px]"
+          className=" h-screen w-full pl-[70px] pt-[70px] "
         ></div>
       }
-      <div className="mr-72">
-        <Scaffolding  currentStage={currentStage} currentSubStage={currentSubStage} />
+      <div className="w-full">
+      <Scaffolding className="w-full" currentStage={currentStage} currentSubStage={currentSubStage} inProgressTasks={inProgressTasks} />
+
       </div>
 
       {/* create option */}
@@ -214,6 +254,7 @@ export default function IdeaWall() {
         opacity={false}
         modalCoordinate={canvasPosition}
         custom={"w-30 h-15"}
+        
       >
         <div>
           <button

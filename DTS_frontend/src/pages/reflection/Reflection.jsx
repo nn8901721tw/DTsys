@@ -125,7 +125,7 @@ export default function Reflection() {
     return (
         <div  className='min-w-full min-h-screen h-screen'>
             <div className='flex flex-col my-5 pl-20 pr-5 sm:px-20 py-16 w-full h-screen justify-start items-start'>
-                <h3 className='text-lg font-bold'>個人日誌</h3>
+                <h3 className='text-2xl ml-4 mt-3 font-bold'>個人日誌</h3>
                 <hr className='w-full h-[5px] my-2 rounded-xl bg-gray-200 border-0 dark:bg-gray-700'/>
                 <div className=' flex flex-wrap justify-start items-center w-full mb-5'>
                     {
@@ -184,7 +184,7 @@ export default function Reflection() {
                         </button>
                     </div>
                 </div>
-                <h3 className='text-lg font-bold'>小組實驗日誌</h3>
+                {/* <h3 className='text-lg font-bold'>小組實驗日誌</h3>
                 <hr className='w-full h-[5px] my-2 rounded-xl bg-gray-200 border-0 dark:bg-gray-700'/>
                 <div className=' flex flex-wrap justify-start items-center w-full mb-5'>
                     {
@@ -216,7 +216,7 @@ export default function Reflection() {
                             新增日誌
                         </button>
                     </div>
-                </div>
+                </div> */}
             </div> 
             {/* 個人反思日誌 */}
             <Modal open={personalDailyModalOpen} onClose={() => setPersonalDailyModalOpen(false)} opacity={true} position={"justify-center items-center"}> 
@@ -226,10 +226,7 @@ export default function Reflection() {
                 <div className='flex flex-col px-1'>
                     <h3 className=' font-bold text-lg mb-3 text-center'>個人反思日誌</h3>
                     <p className=' font-bold text-base '>日誌內容可以撰寫以下項目:</p>
-                    <p className=' font-bold text-base '>1.最近完成的進度內容。</p>
-                    <p className=' font-bold text-base '>2.完成的完成的心得反思。</p>
-                    <p className=' font-bold text-base '>3.下次的預計完成的進度內容。</p>
-                    <p className=' font-bold text-base mb-3'> 4.是否遇到新的問題。</p>
+         
                     <p className=' font-bold text-base mb-3'>日誌標題</p>
                     <input className=" rounded outline-none ring-2 p-1 ring-customgreen w-full mb-3" 
                         type="text" 

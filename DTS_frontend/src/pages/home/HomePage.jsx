@@ -117,7 +117,7 @@ export default function HomePage() {
         type: "spring",
         delay: 0.2,
         stiffness: 300,
-        duration: 2 // 这里设置动画持续时间，例如1秒
+        duration: 2, // 这里设置动画持续时间，例如1秒
       },
     },
   };
@@ -127,7 +127,7 @@ export default function HomePage() {
       <TopBar />
 
       <div className="flex flex-col my-5 sm:px-10 md:px-6  py-16 w-full h-screen items-center">
-        <h5 className="font-bold  text-3xl">設計思考活動列表</h5>
+        <h5 className="font-bold text-3xl">設計思考活動列表</h5>
         {/* <div className=' flex flex-row justify-between items-center w-full sm:w-2/3 my-5'>
           <div className='flex  '>
             
@@ -155,23 +155,31 @@ export default function HomePage() {
                   variants={containerVariants}
                   initial="hidden"
                   animate="visible"
-                  whileHover={{ scale: 1.05 }} // 添加悬停效果
+                  whileHover={{ scale: 1.10 }} // 添加悬停效果
                   transition={{ type: "spring", stiffness: 2000 }} // 可以调整transition来改变动画效果
                   className="rounded-lg w-full max-h-[150px] min-h-[150px] bg-[#D5DDD3] shadow-md duration-150"
                   // onClick={() => handleClick(projectItem)}
                   style={{ cursor: "pointer" }} // 添加样式改变光标为点击样式
                 >
                   <div
-                    className="flex  w-full h-full justify-center items-center"
+                    className="flex flex-col w-full h-full justify-center items-center"
                     onClick={() => handleClick(projectItem)}
                   >
-                    <div className="flex-1 text-base md:text-lg font-bold text-center py-3  truncate ...">
+                    
+                    <div className=" flex-1 text-base md:text-lg font-bold text-center pt-11 truncate ...">
                       {projectItem?.name}
+                    </div>
+                    <div className="w-1/2 text-center md:text-xs font-normal py-3  truncate ...">
+                    {projectItem?.describe}
                     </div>
                     {/* <div className='flex-1 text-base md:text-lg font-bold text-center py-3  truncate ...'>{projectItem?.describe}</div> */}
                     {/* <div className='flex-1 py-3 '>
                       <BsBoxArrowInRight size={30} className='ml-[35%] cursor-pointer text-blue-500 hover:text-blue-700' onClick={() => {navigate(`/project/${projectItem.id}/kanban`)}}/>
                     </div>  */}
+
+                    <div className="flex w-full justify-end md:text-xs font-normal py-3  truncate ...">
+                      指導老師:{projectItem?.mentor}
+                    </div>
                   </div>
                 </motion.div>
               );
@@ -191,6 +199,8 @@ export default function HomePage() {
             }}
             className="rounded-lg w-full max-h-[150px] min-h-[150px] bg-[#f1f8f0] shadow-md duration-150 flex justify-center items-center text-slate-400 text-xl font-bold"
             style={{ cursor: "default" }} // 使光标保持默认样式
+            onClick={() => setCreateProjectModalOpen(true)}
+
           >
             建立專案
           </motion.div>
@@ -301,6 +311,68 @@ export default function HomePage() {
             type="submit"
           >
             加入
+          </button>
+        </div>
+      </Modal>
+
+      <Modal
+        open={createProjectModalOpen}
+        onClose={() => setCreateProjectModalOpen(false)}
+        opacity={true}
+        position={"justify-center items-center"}
+      >
+        <button
+          onClick={() => setCreateProjectModalOpen(false)}
+          className=" absolute top-1 right-1 rounded-lg bg-white hover:bg-slate-200"
+        >
+          <GrFormClose className=" w-6 h-6" />
+        </button>
+        <div className="flex flex-col p-3 bg-[#F7F6F6]">
+          <h3 className=" font-bold text-xl mb-3">創建設計思考活動</h3>
+          <p className=" font-bold text-base mb-3">活動名稱</p>
+          <input
+            className=" rounded outline-none p-1 w-full mb-3 drop-shadow-md "
+            type="text"
+            placeholder="專案名稱..."
+            name="projectName"
+            onChange={handleChange}
+            required
+          />
+          <p className=" font-bold text-base mb-3">活動詳情</p>
+          <textarea
+            className=" rounded outline-none drop-shadow-md  w-full p-1"
+            rows={3}
+            placeholder="描述名稱"
+            name="projectdescribe"
+            onChange={handleChange}
+          />
+          <div className="mt-4">
+            <label className="block text-gray-700 text-base">指導老師</label>
+            <select
+              name="projectMentor"
+              onChange={handleChange}
+              className=" text-base w-full px-4 py-3 rounded-lg bg-white mt-2 border focus:border-blue-500 focus:bg-white focus:outline-none"
+            >
+              <option value="吳老師">吳老師</option>
+            </select>
+          </div>
+        </div>
+        <div className="flex justify-end m-2">
+          <button
+            onClick={() => setCreateProjectModalOpen(false)}
+            className="mx-auto w-full h-9 mb-2 bg-[#bdcdce] rounded font-bold text-xs sm:text-sm xl:text-base text-black/60 mr-2"
+          >
+            取消
+          </button>
+          <button
+            onClick={() => {
+              handleCreateProject();
+              setCreateProjectModalOpen(false);
+            }}
+            type="submit"
+            className="mx-auto w-full h-9  mb-2 bg-[#7fd4d8] rounded font-bold text-xs sm:text-sm  xl:text-base text-white"
+          >
+            儲存
           </button>
         </div>
       </Modal>

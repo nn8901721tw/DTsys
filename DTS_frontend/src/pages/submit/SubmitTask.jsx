@@ -23,7 +23,8 @@ export default function SubmitTask() {
             sucesssNotify(res.message)
             localStorage.removeItem("currentStage");
             localStorage.removeItem("currentSubStage");
-            navigate(`/project/${projectId}/kanban`)
+
+            navigate(`/project/${projectId}/kanban`);
         },
         onError : (error) =>{
             console.log(error);
@@ -87,13 +88,14 @@ export default function SubmitTask() {
             <div className=' text-customgreen text-xl font-bold'>階段皆已完成</div>
         </div>
         :
-        <div className='flex flex-col my-5 pl-20 pr-5 sm:px-20 py-16 w-full h-screen justify-center items-center'>
+        <div className='flex flex-col my-5 pl-20 pr-5 sm:px-20 py-16 w-full h-screen justify-center items-center shadow-lg '>
             {
                 getSubStageQuery.isLoading ? <Loader/> :
-                <div className='flex flex-col w-1/3 p-3 bg-white border-2 border-gray-200 rounded-lg'>
-                    <h3 className=' font-bold text-xl text-center mb-3'>
+                <div className='flex flex-col w-3/5 p-3 bg-[#F7F6F6] border-2 border-gray-200 rounded-lg shadow-2xl'>
+                    <h3 className=' font-extrabold text-2xl text-center mb-3'>
                     {stageInfo.name}
                     </h3>
+                    <hr className='w-full h-[3px] rounded-xl bg-gray-200 border-0 dark:bg-gray-700 mb-4'/>
                     {Object.entries(stageInfo.userSubmit).map((element, index) =>{
                         const name = element[0];
                         const type = element[1];
@@ -110,9 +112,9 @@ export default function SubmitTask() {
                         }
                         
                     })}
-                    <div className='flex justify-end'>
+                    <div className='flex justify-end '>
                         <button onClick={ e => {handleSubmit(e)}}   
-                        className="mx-auto w-full h-7 my-3 bg-customgreen rounded font-bold text-xs sm:text-sm text-white">
+                        className="mx-auto w-full h-9  mb-2 bg-[#7fd4d8] rounded font-bold text-xs sm:text-sm  xl:text-base text-white">
                             上傳
                         </button>
                     </div> 

@@ -5,7 +5,7 @@ export default function TaskHint({stageInfo}) {
 
     return (
         (name && description && currentStage && currentSubStage) ?
-        <div className='bg-gray-100 p-3 rounded-md shadow-md flex flex-col overflow-auto w-full h-fit max-h-[80vh]'>
+        <div className='bg-[#dbeeee] p-3 rounded-md shadow-md flex flex-col overflow-auto w-full h-52 max-h-[80vh] scrollbar-none'>
             <h4 className=' flex mb-2 justify-center text-xl text-gray-600 font-bold'>
                 {currentStage}-{currentSubStage}{name}
             </h4>

@@ -79,7 +79,7 @@ export default function Carditem({ data, index, columnIndex }) {
           } rounded-md p-3 mt-3 truncate min-h-[80px] max-w-full shadow-md`}
         >
           <div>
-            <span className=' text-md my-3 text-base leading-6'>{data.content}</span>
+            <span className=' text-md my-3 text-base leading-6'>{index+1}. {data.content}</span>
             <div className='flex justify-between '>
               <span className='flex text-lg text-zinc-700'>{data.title}</span>
               <div className="flex items-center">

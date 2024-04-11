@@ -6,7 +6,7 @@ export default function CommonInput({handleChange, type, name, index}) {
             <p className=' font-bold text-base mb-3'>
             {name}
             </p>
-            <input className=" rounded outline-none ring-2 p-1 ring-customgreen w-full mb-3" 
+            <input className=" rounded outline-none p-1 w-full mb-3 drop-shadow-md" 
             type={type} 
             name={index}
             onChange={handleChange}
