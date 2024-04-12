@@ -7,4 +7,7 @@ router.get('/columns/:columnId', controller.getKanbanTask);
 // router.put('/:projectId', controller.updateKanban);
 // router.delete('/:projectId', controller.deleteKanban);
 
+
+
+router.put('/move-task', controller.moveTaskToCompleted);
 module.exports = router;

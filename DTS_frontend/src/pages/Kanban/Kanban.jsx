@@ -169,6 +169,13 @@ export default function Kanban() {
   //   localStorage.getItem("currentSubStage"),
   // ]);
   /////////////////////////
+
+  useEffect(() => {
+    if (!currentStage || !currentSubStage) {
+      navigate(0);
+    }
+  }, [currentStage, currentSubStage, navigate]);
+
   const onDragEnd = ({ destination, source }) => {
     if (!destination) return;
     if (
@@ -822,7 +829,7 @@ export default function Kanban() {
                                   index={index}
                                   data={item}
                                   columnIndex={columnIndex}
-                                  
+                            
                                 />
                               );
                             })}

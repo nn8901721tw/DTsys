@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 
 import Modal from "../../components/Modal";
 import IdeaWallSideBar from "./components/IdeaWallSideBar";
-import Scaffolding from "./components/Scaffolding";
+import Scaffolding from "./components/scaffolding";
 import TopBar from "../../components/TopBar";
 import { Network } from "vis-network";
 import { visNetworkOptions as option } from "../../utils/visNetworkOptions";
@@ -33,7 +33,6 @@ export default function IdeaWall() {
   const [kanbanData, setKanbanData] = useState([]);
   const [inProgressTasks, setInProgressTasks] = useState([]);
 
-
   const {
     isLoading: kanbanIsLoading,
     isError: kanbansIsError,
@@ -46,25 +45,21 @@ export default function IdeaWall() {
       // 假设数据结构是 [{id: 1, ...}, {id: 2, ...}]
       if (data.length > 0) {
         // setDoingColumnId(data[0].id);
-
       }
     },
   });
+
   useEffect(() => {
     if (kanbanData.length > 0) {
-      const tasksInProgress = kanbanData.find(column => column.name === "進行中")?.task || [];
+      const tasksInProgress =
+        kanbanData.find((column) => column.name === "進行中")?.task || [];
       setInProgressTasks(tasksInProgress);
       console.log("進行中的任務:", tasksInProgress);
+      console.log("kanbanData:", kanbanData);
     }
-  }, [kanbanData]);  // 確保當 kanbanData 更新時重新運行此效果
-  
-  
-
-
-
+  }, [kanbanData]); // 確保當 kanbanData 更新時重新運行此效果
 
   const [ideaWallInfo, setIdealWallInfo] = useState({
-    
     id: "1",
     name: "",
     type: "",
@@ -85,8 +80,8 @@ export default function IdeaWall() {
   const [currentSubStage, setCurrentSubStage] = useState(
     localStorage.getItem("currentSubStage")
   );
-  console.log("curstage",currentStage);
-  console.log("cursubstage",currentSubStage);
+  console.log("curstage", currentStage);
+  console.log("cursubstage", currentSubStage);
   const ideaWallInfoQuery = useQuery(
     "ideaWallInfo",
     // () => getIdeaWall(projectId, `${currentStage}-${currentSubStage}`),
@@ -231,6 +226,8 @@ export default function IdeaWall() {
     socket.emit("nodeDelete", selectNodeInfo);
   };
 
+
+
   return (
     <div className="z-10">
       {/* <TopBar />
@@ -243,8 +240,13 @@ export default function IdeaWall() {
         ></div>
       }
       <div className="w-full">
-      <Scaffolding className="w-full" currentStage={currentStage} currentSubStage={currentSubStage} inProgressTasks={inProgressTasks} />
-
+        <Scaffolding
+          className="w-full"
+          currentStage={currentStage}
+          currentSubStage={currentSubStage}
+          inProgressTasks={inProgressTasks}
+          kanbanDatas={kanbanData}
+        />
       </div>
 
       {/* create option */}
@@ -254,7 +256,6 @@ export default function IdeaWall() {
         opacity={false}
         modalCoordinate={canvasPosition}
         custom={"w-30 h-15"}
-        
       >
         <div>
           <button

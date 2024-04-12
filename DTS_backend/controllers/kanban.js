@@ -4,6 +4,7 @@ const Task = require('../models/task');
 const Project = require('../models/project');
 const Kanban_scaffolding = require('../models/kanban_scaffolding'); // 正確的模組名稱
 
+
 exports.getKanban = async ( req, res ) => {
     const projectId = req.params.projectId;
     //kanban
@@ -251,3 +252,44 @@ exports.getScaffoldingTemplate = async (req, res) => {
     }
   };
 
+  exports.moveTaskToCompleted = async (req, res) => {
+    const { taskId, inProgressColumnId, completedColumnId } = req.body;
+
+    try {
+        // 嘗試找到相關的列
+        const inProgressColumn = await Column.findByPk(inProgressColumnId);
+        const completedColumn = await Column.findByPk(completedColumnId);
+
+        if (!inProgressColumn || !completedColumn) {
+            // 如果其中一個列不存在，返回錯誤
+            return res.status(404).send({ message: 'One or both columns not found' });
+        }
+
+        // 更新任務的 columnId
+        const updateResult = await Task.update({ columnId: completedColumnId }, {
+            where: { id: taskId }
+        });
+
+        if (updateResult[0] === 0) {
+            // 如果沒有任務被更新，也返回錯誤
+            return res.status(404).send({ message: 'Task not found or update failed' });
+        }
+
+        // 從進行中列中移除任務
+        if (inProgressColumn.task && inProgressColumn.task.includes(taskId)) {
+            inProgressColumn.task = inProgressColumn.task.filter(id => id !== taskId);
+            await inProgressColumn.save();
+        }
+
+        // 將任務添加到完成列
+        if (completedColumn.task && !completedColumn.task.includes(taskId)) {
+            completedColumn.task.push(taskId);
+            await completedColumn.save();
+        }
+
+        res.status(200).send({ message: 'Task moved successfully' });
+    } catch (error) {
+        console.error('Error moving task:', error);
+        res.status(500).send({ message: 'Internal server error' });
+    }
+};

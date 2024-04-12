@@ -29,3 +29,14 @@ export const updateCardItem = async (cardItem) => {
 export const deleteCardItem = async (config) => {
     const response = await kanbanApi.delete("/",config)
 }
+
+export const moveTaskToCompleted = async (taskId, inProgressColumnId, completedColumnId) => {
+    // 发送 PUT 请求到后端，携带任务ID和目标列的ID
+    const response = await kanbanApi.put(`/move-task`, {
+        taskId,
+        inProgressColumnId,
+        completedColumnId
+    });
+    return response.data;
+}
+

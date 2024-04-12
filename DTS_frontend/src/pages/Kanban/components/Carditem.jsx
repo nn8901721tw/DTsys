@@ -75,12 +75,12 @@ export default function Carditem({ data, index, columnIndex }) {
           {...provided.draggableProps}
           {...provided.dragHandleProps}
           className={`${
-            snapshot.isDragging ? 'border-2 border-emerald-700 bg-sky-300' : 'border-0 bg-white'
+            snapshot.isDragging ? 'border-2 border-emerald-700 bg-sky-300' : 'border-0 '
           } rounded-md p-3 mt-3 truncate min-h-[80px] max-w-full shadow-md`}
         >
           <div>
             <span className=' text-md my-3 text-base leading-6'>{index+1}. {data.content}</span>
-            <div className='flex justify-between '>
+            <div className='flex justify-between  '>
               <span className='flex text-lg text-zinc-700'>{data.title}</span>
               <div className="flex items-center">
                 <FiEdit onClick={() => setOpen(true)} className='w-5 h-5 cursor-pointer mr-2'/>
