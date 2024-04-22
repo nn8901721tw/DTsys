@@ -5,7 +5,7 @@ import { useQuery } from "react-query";
 import { getAllSubmit } from "../../api/submit";
 import Loader from "../../components/Loader";
 import DragCloseModal from "./components/DragCloseModal";
-
+import FileDownload from "js-file-download";
 export default function Portfolio() {
   const [groupedPortfolio, setGroupedPortfolio] = useState({});
   const [modalOpen, setModalOpen] = useState(false);
@@ -18,7 +18,7 @@ export default function Portfolio() {
     {
       onSuccess: (data) => {
         const groupedData = data.reduce((acc, item) => {
-          const prefix = item.stage.split('-')[0];
+          const prefix = item.stage.split("-")[0];
           if (!acc[prefix]) {
             acc[prefix] = [];
           }
@@ -31,11 +31,11 @@ export default function Portfolio() {
   );
 
   const titles = {
-    "1": "同理",
-    "2": "定義",
-    "3": "發想",
-    "4": "原型",
-    "5": "測試",
+    1: "同理",
+    2: "定義",
+    3: "發想",
+    4: "原型",
+    5: "測試",
   };
   const stagesMap = {
     "1-1": "經驗分享與同理",
@@ -50,15 +50,17 @@ export default function Portfolio() {
     "5-1": "原型測試與分析",
     "5-2": "開始修正",
   };
+
   return (
     <div className="min-w-full h-screen overflow-y-auto scrollbar-thin">
       <div className="flex flex-col my-5 pl-20 pr-5 sm:px-32 py-16 justify-start items-start ">
         {Object.keys(titles).map((prefix) => (
           <div key={prefix}>
             <h3 className="text-3xl font-bold mb-2 ml-4">{titles[prefix]}</h3>
-            <hr className='w-full h-[3px] my-2 rounded-xl bg-gray-200 border-0 dark:bg-gray-700'/>
+            <hr className="w-full h-[3px] my-2 rounded-xl bg-gray-200 border-0 dark:bg-gray-700" />
             <div className="flex flex-nowrap w-full mb-5">
-              {groupedPortfolio[prefix] && groupedPortfolio[prefix].length > 0 ? (
+              {groupedPortfolio[prefix] &&
+              groupedPortfolio[prefix].length > 0 ? (
                 groupedPortfolio[prefix].map((item) => (
                   <div className="flex-shrink-0 mx-3" key={item.id}>
                     <button
@@ -66,10 +68,16 @@ export default function Portfolio() {
                       onClick={() => {
                         setModalOpen(true);
                         setModalData(item);
+                        console.log(item);
                       }}
                     >
-                      <AiTwotoneFolderAdd size={32} className="text-black mr-1" />
-                      <span>{item.stage} {stagesMap[item.stage]}</span>
+                      <AiTwotoneFolderAdd
+                        size={32}
+                        className="text-black mr-1"
+                      />
+                      <span>
+                        {item.stage} {stagesMap[item.stage]}
+                      </span>
                     </button>
                   </div>
                 ))
@@ -82,7 +90,9 @@ export default function Portfolio() {
         {modalOpen && (
           <DragCloseModal open={modalOpen} setOpen={setModalOpen}>
             <div className="text-center">
-              <h2 className="text-2xl font-bold text-white">{modalData.stage} {stagesMap[modalData.stage]}</h2>
+              <h2 className="text-2xl font-bold text-white">
+                {modalData.stage} {stagesMap[modalData.stage]}
+              </h2>
               {modalData.content ? (
                 Object.entries(JSON.parse(modalData.content)).map(
                   ([key, value], index) => (
@@ -94,6 +104,43 @@ export default function Portfolio() {
                 )
               ) : (
                 <p>No data available.</p>
+              )}
+              {modalData.fileData &&
+              modalData.fileData.data &&
+              modalData.filename ? (
+                <button
+                  className="inline-flex items-center bg-white hover:bg-slate-200/80 text-slate-400 border-2 border-slate-400 font-semibold rounded-md p-1 mt-3 sm:px-4 text-base  min-w-[100px]"
+                  onClick={() => {
+                    console.log(" modalData", modalData);
+                    console.log(
+                      "modalData.fileData.data",
+                      modalData.fileData.data
+                    );
+                    console.log("modalData.filename", modalData.filename);
+               
+                      console.log("modalData", modalData);
+                      // // 将 Buffer 转换为 Uint8Array
+                      // const buffer = new Uint8Array(modalData.fileData.data);
+                      // // 创建 Blob 对象
+                      // const blob = new Blob([buffer], { type: modalData.mimetype });
+
+                      // 将 Buffer 转换为 Uint8Array
+                      const buffer = new Uint8Array(modalData.fileData.data);
+                      // 创建 Blob 对象
+                      const blob = new Blob([buffer], {
+                        type: "application/octet-stream",
+                      });
+
+                      // 触发文件下载
+                      FileDownload(blob, modalData.filename);
+                    }
+                  }
+                >
+                  {/* <AiOutlineCloudDownload size={32} className=" text-black mr-1" /> */}
+                  <span>下載附件</span>
+                </button>
+              ) : (
+                ""
               )}
             </div>
           </DragCloseModal>

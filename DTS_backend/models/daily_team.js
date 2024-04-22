@@ -21,7 +21,10 @@ const Daily_team = sequelize.define('daily_team', {
     type:{
         type: DataTypes.TEXT,
         allowNull:false,
-    }
+    },fileData:{
+        type: DataTypes.BLOB,
+        allowNull:true,
+    },
 });
 
 module.exports = Daily_team;

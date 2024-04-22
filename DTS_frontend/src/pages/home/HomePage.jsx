@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import TopBar from "../../components/TopBar";
 import SideBar from "../../components/SideBar";
 import Modal from "../../components/Modal";
@@ -6,7 +6,7 @@ import toast, { Toaster } from "react-hot-toast";
 import { GrFormClose } from "react-icons/gr";
 import { FaSortDown } from "react-icons/fa";
 import Swal from "sweetalert2";
-
+import AnimatedDropdown from "./ui/AnimatedDropdown";
 import { motion } from "framer-motion";
 import Loader from "../../components/Loader";
 import { useMutation, useQuery, useQueryClient } from "react-query";
@@ -17,6 +17,8 @@ import {
 } from "../../api/project";
 import { useNavigate } from "react-router-dom";
 import { FaArrowLeft } from "react-icons/fa"; // 引入返回圖標
+import { AiTwotoneTrophy } from "react-icons/ai";
+
 
 export default function HomePage() {
   const [projectData, setProjectData] = useState([]);
@@ -121,13 +123,53 @@ export default function HomePage() {
       },
     },
   };
+  // 新增的狀態用於追踪選擇的排序方式
+  const [sortOrder, setSortOrder] = useState("未完成");
+
+  const handleSortChange = (selectedSortOrder) => {
+    setSortOrder(selectedSortOrder);
+    let sortedProjects;
+
+    switch (selectedSortOrder) {
+      case "已完成":
+        sortedProjects = [...projectData].sort(
+          (a, b) => b.ProjectEnd - a.ProjectEnd
+        );
+        break;
+      case "未完成":
+        sortedProjects = [...projectData].sort(
+          (a, b) => a.ProjectEnd - b.ProjectEnd
+        );
+        break;
+      case "依時間":
+        sortedProjects = [...projectData].sort(
+          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+        );
+        break;
+      default:
+        sortedProjects = [...projectData]; // 如果選擇無效，則不進行排序
+    }
+    setProjectData(sortedProjects);
+  };
+
+  useEffect(() => {
+    handleSortChange(sortOrder);
+  }, [sortOrder]);
 
   return (
     <div className="min-w-full min-h-screen h-screen overflow-hidden overflow-x-scroll">
       <TopBar />
 
       <div className="flex flex-col my-5 sm:px-10 md:px-6  py-16 w-full h-screen items-center">
-        <h5 className="font-bold text-3xl">設計思考活動列表</h5>
+        <div className="flex justify-between w-[65%] ml-24">
+          <h5 className="font-bold text-3xl text-center flex-grow">
+            設計思考活動列表
+          </h5>
+          <div className="order-last">
+            <AnimatedDropdown handleSortChange={handleSortChange} />
+          </div>
+        </div>
+        
         {/* <div className=' flex flex-row justify-between items-center w-full sm:w-2/3 my-5'>
           <div className='flex  '>
             
@@ -141,8 +183,21 @@ export default function HomePage() {
             <FaSortDown size={15} className=' cursor-pointer'/>
           </div>
         </div> */}
+
+        {/* <div className="flex justify-center my-6">
+          <select
+            className="border border-gray-300 rounded-md p-2"
+            value={sortOrder}
+            onChange={(e) => handleSortChange(e.target.value)}
+          >
+            <option value="未完成">未完成</option>
+            <option value="已完成">已完成</option>
+            <option value="時間">依時間</option>
+          </select>
+        </div> */}
+
         {/* item */}
-        <div className="mt-10  w-[75%] 2xl:w-[65%] grid gap-x-4 gap-y-4 sm:gap-x-6 sm:gap-y-4  lg:gap-x-8 lg:gap-y-8  grid-cols-3  mx-auto  content-start h-screen overflow-y-scroll scrollbar-none  scrollbar-thumb-slate-400/70 scrollbar-thumb-rounded-full scrollbar-track-rounded-full">
+        <div className="mt-3  w-[75%] 2xl:w-[65%] grid gap-x-4 gap-y-4 sm:gap-x-6 sm:gap-y-4  lg:gap-x-8 lg:gap-y-8  grid-cols-3  mx-auto  content-start h-screen overflow-y-scroll scrollbar-none  scrollbar-thumb-slate-400/70 scrollbar-thumb-rounded-full scrollbar-track-rounded-full">
           {isLoading ? (
             <Loader />
           ) : isError ? (
@@ -155,29 +210,47 @@ export default function HomePage() {
                   variants={containerVariants}
                   initial="hidden"
                   animate="visible"
-                  whileHover={{ scale: 1.10 }} // 添加悬停效果
+                  whileHover={{ scale: 1.1 }} // 添加悬停效果
                   transition={{ type: "spring", stiffness: 2000 }} // 可以调整transition来改变动画效果
-                  className="rounded-lg w-full max-h-[150px] min-h-[150px] bg-[#D5DDD3] shadow-md duration-150"
+                  className={`rounded-lg w-full h-[150px] hover:shadow-2xl ${
+                    projectItem.ProjectEnd ? "bg-[#dae2e2]" : "bg-[#80c9cc]"
+                  } shadow-md duration-150`}
                   // onClick={() => handleClick(projectItem)}
                   style={{ cursor: "pointer" }} // 添加样式改变光标为点击样式
                 >
+                  {/* {projectItem.ProjectEnd && (
+                    <div className=" flex font-bold text-white">
+                      <AiTwotoneTrophy />已完成
+                    </div>
+                  
+                  )} */}
+                  {projectItem.ProjectEnd?(
+                    <div className=" flex font-bold text-gray-700">
+                    <AiTwotoneTrophy  />已完成
+                  </div>
+                  
+                  ) : (
+                    <div className=" flex font-bold text-white">
+                      未完成
+                    </div>
+                  
+                  )}
                   <div
                     className="flex flex-col w-full h-full justify-center items-center"
                     onClick={() => handleClick(projectItem)}
                   >
-                    
-                    <div className=" flex-1 text-base md:text-lg font-bold text-center pt-11 truncate ...">
+                    <div className="-translate-y-6 text-base md:text-lg font-bold text-center truncate ...">
                       {projectItem?.name}
                     </div>
-                    <div className="w-1/2 text-center md:text-xs font-normal py-3  truncate ...">
-                    {projectItem?.describe}
+                    <div className="w-1/2 text-center md:text-xs font-normal  truncate ...">
+                      {projectItem?.describe}
                     </div>
                     {/* <div className='flex-1 text-base md:text-lg font-bold text-center py-3  truncate ...'>{projectItem?.describe}</div> */}
                     {/* <div className='flex-1 py-3 '>
                       <BsBoxArrowInRight size={30} className='ml-[35%] cursor-pointer text-blue-500 hover:text-blue-700' onClick={() => {navigate(`/project/${projectItem.id}/kanban`)}}/>
                     </div>  */}
 
-                    <div className="flex w-full justify-end md:text-xs font-normal py-3  truncate ...">
+                    <div className="translate-y-3 flex w-full justify-end md:text-xs font-normal  truncate ...">
                       指導老師:{projectItem?.mentor}
                     </div>
                   </div>
@@ -200,7 +273,6 @@ export default function HomePage() {
             className="rounded-lg w-full max-h-[150px] min-h-[150px] bg-[#f1f8f0] shadow-md duration-150 flex justify-center items-center text-slate-400 text-xl font-bold"
             style={{ cursor: "default" }} // 使光标保持默认样式
             onClick={() => setCreateProjectModalOpen(true)}
-
           >
             建立專案
           </motion.div>

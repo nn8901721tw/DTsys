@@ -14,6 +14,10 @@ const Daily_personal = sequelize.define('daily_personal', {
         type: DataTypes.TEXT,
         allowNull:true,
     }
+    ,fileData:{
+        type: DataTypes.BLOB,
+        allowNull:true,
+    },
 });
 
 module.exports = Daily_personal;

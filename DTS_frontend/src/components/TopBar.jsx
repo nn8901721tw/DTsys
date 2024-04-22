@@ -55,11 +55,15 @@ export default function TopBar() {
             getProjectUserQuery.isLoading || projectId === undefined ? <></> :  
             getProjectUserQuery.isError ? <p className=' font-bold text-2xl'>{kanbansIsError.message}</p> : 
             projectUsers.map((projectUser, index) => {
-              return(
-                <li key={index} className={`w-8 h-8 bg-customgreen border-[1px] border-slate-400 rounded-full flex items-center text-center p-2 shadow-xl text-xs overflow-hidden cursor-default`}>
+              return (
+                <li 
+                  key={index} 
+                  className="w-8 h-8 bg-teal-600 border-[1px] border-slate-400 rounded-full flex items-center justify-center text-center p-2 shadow-xl text-xs overflow-hidden cursor-default"
+                  title={`User ${projectUser.username}`}  // 添加圖例顯示用戶名
+                >
                   {projectUser.username}
                 </li>
-              )
+              );
             })
           }
           <li>
@@ -87,8 +91,8 @@ export default function TopBar() {
             <GrFormClose  className=' w-6 h-6'/>
           </button> 
           <div className='flex flex-col p-3'>
-                <h3 className=' font-bold text-base mb-3 text-stone-800'>專案邀請碼:</h3>
-                <h3 className=' text-center font-bold text-lg py-1 bg-emerald-400 rounded-md'>
+                <h3 className=' font-bold text-xl mb-3 text-stone-800'>組隊邀請碼:</h3>
+                <h3 className=' text-center font-bold text-lg py-1 bg-teal-600 rounded-md'>
                   {projectInfo.referral_code}
                 </h3>
           </div> 

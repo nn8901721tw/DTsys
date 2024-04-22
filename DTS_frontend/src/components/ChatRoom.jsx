@@ -20,7 +20,8 @@ export default function ChatRoom({chatRoomOpen, setChatRoomOpen}) {
                 time: new Date(Date.now()).getHours() + ":" + new Date(Date.now()).getMinutes(),
             };
             socket.emit("send_message", messageData);
-            setMessageList(prev => [...prev, messageData])
+            setMessageList(prev => [...prev, messageData]);
+          
         }
     }
 

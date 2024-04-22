@@ -8,15 +8,20 @@ import Carditem from "./components/Carditem";
 import Carditemtemplate from "./components/Carditem_template";
 import TaskHint from "./components/TaskHint";
 import Loader from "../../components/Loader";
+import OwlquestionFlyoutLink from "./components/OwlquestionFlyoutLink";
+
 import { motion } from "framer-motion";
-import { submitTask } from "../../api/submit";
+import { submitTask, getAllSubmit } from "../../api/submit";
 import Swal from "sweetalert2";
 import Lottie from "lottie-react";
-import owlAnimation from "../../assets/owlAnimation.json";
+import owlAnimation from "../../assets/owlAnimation1.json";
 import question from "../../assets/question.json";
+import welldone from "../../assets/welldone.json";
+import arrow from "../../assets/arrow.json";
 import SlideInNotifications from "./components/SlideInNotifications";
 import { DragDropContext } from "react-beautiful-dnd";
 import { StrictModeDroppable as Droppable } from "../../utils/StrictModeDroppable";
+import { AiFillPushpin } from "react-icons/ai";
 
 import { useQuery, useMutation, useQueryClient } from "react-query";
 import {
@@ -28,7 +33,7 @@ import { getSubStage } from "../../api/stage";
 import { createTaskAndUpdateColumn } from "../../api/task";
 import { getScaffoldingTemplate } from "../../api/scaffoldingtemplate";
 import { socket } from "../../utils/socket";
-import SpringModal from './components/SpringModel';  // 確保從正確的路徑導入 SpringModal
+import SpringModal from "./components/SpringModel"; // 確保從正確的路徑導入 SpringModal
 
 export default function Kanban() {
   const [kanbanData, setKanbanData] = useState([]);
@@ -61,6 +66,9 @@ export default function Kanban() {
   const [currentSubStage, setCurrentSubStage] = useState(
     localStorage.getItem("currentSubStage")
   );
+
+  const [showFlyout, setShowFlyout] = useState(false);
+  const [isAllStagesComplete, setIsAllStagesComplete] = useState(false);
 
   const {
     isLoading: kanbanIsLoading,
@@ -132,6 +140,9 @@ export default function Kanban() {
   }, [stageInfo.currentStage, stageInfo.currentSubStage, queryClient]);
 
   useEffect(() => {
+
+    socket.connect();
+    socket.emit("joinProject", projectId);
     function KanbanUpdateEvent(data) {
       if (data) {
         console.log(data);
@@ -144,7 +155,7 @@ export default function Kanban() {
         setKanbanData(data);
       }
     }
-    socket.connect();
+
     socket.on("taskItems", KanbanUpdateEvent);
     socket.on("taskItem", KanbanUpdateEvent);
     socket.on("dragtaskItem", kanbanDragEvent);
@@ -152,10 +163,14 @@ export default function Kanban() {
     return () => {
       socket.off("taskItems", KanbanUpdateEvent);
       socket.off("taskItem", KanbanUpdateEvent);
+      socket.off("dragtaskItem", kanbanDragEvent);
+      socket.emit("leaveProject", projectId);
       socket.disconnect();
-      // socket.off('taskItem', KanbanUpdateEvent);
     };
-  }, [socket]);
+  }, [socket, projectId]);
+
+
+
   //////////////////////
   // useEffect(() => {
   //   if (
@@ -187,6 +202,7 @@ export default function Kanban() {
       destination,
       source,
       kanbanData,
+      projectId
     });
   };
 
@@ -210,6 +226,7 @@ export default function Kanban() {
         selectedcolumn,
         item,
         kanbanData,
+        projectId,
       });
       setShowForm(false);
       setNewCard("");
@@ -344,48 +361,46 @@ export default function Kanban() {
   const handleSubmitTask = async (e) => {
     e.preventDefault();
 
-    // 使用 SweetAlert2 彈出對話框
-    const result = await Swal.fire({
-      title: "是否完成？",
-      text: "確定提交此任務嗎？",
-      icon: "question",
+    // // 使用 SweetAlert2 彈出對話框
+    // const result = await Swal.fire({
+    //   title: "是否完成？",
+    //   text: "確定提交此任務嗎？",
+    //   icon: "question",
+    //   showCancelButton: true,
+    //   cancelButtonText: "取消",
+    //   confirmButtonText: "確定",
+    // });
+
+    // // 如果用戶確定，則問是否有成果要上傳
+    // if (result.isConfirmed) {
+    const resultUpload = await Swal.fire({
+      title: "成果上傳",
+      text: "是否有成果要上傳？",
+      icon: "warning",
       showCancelButton: true,
-      cancelButtonText: "取消",
-      confirmButtonText: "確定",
+      cancelButtonText: "沒有",
+      confirmButtonText: "上傳",
     });
 
-    // 如果用戶確定，則問是否有成果要上傳
-    if (result.isConfirmed) {
-      const resultUpload = await Swal.fire({
-        title: "成果上傳",
-        text: "是否有成果要上傳？",
-        icon: "warning",
-        showCancelButton: true,
-        cancelButtonText: "沒有",
-        confirmButtonText: "上傳",
-      });
+    // 按下取消，則執行提交操作
+    // eif (resultUpload.isDismissed) {
+    //   const formData = new FormData();
+    //   formData.append("projectId", projectId);
+    //   formData.append("currentStage", stageInfo.currentStage);
+    //   formData.append("currentSubStage", stageInfo.currentSubStage);
+    //   formData.append("content", " ");
 
-      // 按下取消，則執行提交操作
-      if (resultUpload.isDismissed) {
-        const formData = new FormData();
-        formData.append("projectId", projectId);
-        formData.append("currentStage", stageInfo.currentStage);
-        formData.append("currentSubStage", stageInfo.currentSubStage);
-        formData.append("content", " ");
-
-        try {
-          await mutate(formData);
-        } catch (error) {
-          console.error("Error during submission:", error);
-        }
-      } else {
-        // 如果用戶確定上傳成果，執行另外的操作
-        // 此處添加上傳成果的邏輯或進一步操作
-        // 如果用戶確定上傳成果，則跳轉到 SubmitTask 頁面
+    //   try {
+    //     await mutate(formData);
+    //   } catch (error) {
+    //     console.error("Error during submission:", error);
+    //   }
+    // }
+    if (resultUpload.isConfirmed) {
       navigate(`/project/${projectId}/submitTask`);
-        console.log("進行上傳成果的操作");
-      }
+      console.log("進行上傳成果的操作");
     }
+    // }
   };
 
   //////////////////////////
@@ -437,7 +452,8 @@ export default function Kanban() {
       );
       const newTasksIds = responses.map((res) => res.data.taskId);
       // 你可能需要在这里通知服务器，比如发送一个socket事件来告知新创建的任务ID
-      socket.emit("tasksCreated", { columnId: doingColumnId, newTasksIds });
+      socket.emit("tasksCreated", { columnId: doingColumnId, newTasksIds,
+        projectId });
 
       // 更新前端狀態或提示用戶
       // ... 這裡可能需要更新前端的 column 狀態，取決於您的實際需求 ...
@@ -470,6 +486,7 @@ export default function Kanban() {
       socket.emit("tasksCreated", {
         columnId: doingColumnId,
         taskId: newTaskId,
+        projectId:projectId
       });
     } catch (error) {
       console.error("Error importing task:", error);
@@ -503,19 +520,6 @@ export default function Kanban() {
     };
   }, [socket]);
 
-  // 主页面组件内部
-  const generateRandomNotif = () => {
-    const names = ["在我上方的灰色小方塊是子階段提示，這裡顯示當下子階段的目標及任務說明，大家要記得看喔!","思考歷程導引模板可透過點擊'導入'或'一鍵導入'來使用 ，這些模板為各個子階段中預設的任務，使用他們可幫助你們快速上手喔!"];
-
-    const randomIndex = Math.floor(Math.random() * names.length);
-
-    const data = {
-      id: Math.random(),
-      text: ` ${names[randomIndex]} `,
-    };
-
-    return data;
-  };
 
   // 当点击Lottie动画时，调用此函数来添加通知
   const handleLottieClick = () => {
@@ -525,8 +529,41 @@ export default function Kanban() {
       ...prevNotifications,
     ]);
   };
+
+  useEffect(() => {
+    const checkAllStagesComplete = async () => {
+      try {
+        const config = {
+          params: { projectId },
+        };
+        const submits = await getAllSubmit(config);
+        const isComplete = submits.some((submit) => submit.stage === "5-2");
+        setIsAllStagesComplete(isComplete);
+      } catch (error) {
+        console.error("Error fetching submits:", error);
+      }
+    };
+
+    checkAllStagesComplete();
+  }, [currentStage, currentSubStage]);
+
+  const handleImageClick = (message) => {
+    const newNotification = { id: Math.random(), text: message };
+    setNotifications((prevNotifications) => [
+      ...prevNotifications,
+      newNotification,
+    ]);
+    setShowFlyout(false); // Immediately close the flyout
+    // Optionally clear notification after some time
+    setTimeout(() => {
+      setNotifications((prevNotifications) =>
+        prevNotifications.filter((notif) => notif.id !== newNotification.id)
+      );
+    }, 5000); // Remove notification after 5 seconds
+  };
+
   return (
-    <DragDropContext onDragEnd={onDragEnd} >
+    <DragDropContext onDragEnd={onDragEnd}>
       <motion.div
         initial="hidden"
         animate={showContainer ? "visible" : "hidden"}
@@ -540,22 +577,20 @@ export default function Kanban() {
           visibility: showContainer ? "visible" : "hidden",
         }}
       >
-        <div className="transition-all duration-500 transform flex flex-col items-center bg-slate-200 mx-56 2xl:mx-96 rounded-2xl opacity-100 scale-y-100 text-gray-700">
+        <div className="transition-all duration-500 transform flex flex-col items-center bg-slate-200 lg:mx-64 xl:mx-80 rounded-2xl opacity-100 scale-y-100 text-gray-700">
           <div className="wrapper">
-            <div className="flex font-bold text-lg pt-1 2xl:text-2xl 2xl:pt-5 2xl:font-extrabold">
-              階段
-            </div>
+            <div className="flex font-bold text-lg pt-1 ">階段</div>
           </div>
 
           <div className="wrapper flex flex-row">
             {stages1.map((subStage, index) => (
-              <div key={index} className="flex justify-center pt-1 2xl:pt-5">
+              <div key={index} className="flex justify-center pt-1 ">
                 <React.Fragment>
                   {index !== 0 && (
                     <hr className="border-solid border-t-8 w-6 items-center justify-center my-auto border-[#C4D8D9]" />
                   )}
                   <div
-                    className={`relative px-3 w-32 2xl:w-48 2xl:text-3xl rounded-md h-14 2xl:h-20 text-xl font-bold text-center flex items-center justify-center ${
+                    className={`relative px-3 w-32 rounded-md h-14  text-xl font-bold text-center flex items-center justify-center ${
                       parseInt(stageInfo.currentStage) === index + 1
                         ? "bg-[#5698a0] animate-none text-white"
                         : currentLocalStorageStage > index + 1
@@ -573,15 +608,13 @@ export default function Kanban() {
             ))}
           </div>
           <div className="wrapper">
-            <div className="flex font-bold text-lg pt-1 2xl:text-2xl 2xl:pt-5 2xl:font-extrabold">
-              子階段
-            </div>
+            <div className="flex font-bold text-lg pt-1">子階段</div>
           </div>
           <div className="wrapper flex flex-col">
             {stages2.map((stage, stageIndex) => (
               <div
                 key={stageIndex}
-                className="flex flex-row justify-center pt-1 2xl:pt-5"
+                className="flex flex-row justify-center pt-1"
               >
                 {stage.map((subStage, subStageIndex) => (
                   <React.Fragment key={subStageIndex}>
@@ -590,7 +623,7 @@ export default function Kanban() {
                     )}
                     {subStage ? (
                       <div
-                        className={`relative px-3 w-32 2xl:w-48 2xl:text-xl rounded-md h-12 2xl:h-16 text-sm font-bold text-gray-700 text-center flex items-center justify-center cursor-pointer ${
+                        className={`relative px-3 w-32  rounded-md h-12 text-sm font-bold text-gray-700 text-center flex items-center justify-center cursor-pointer ${
                           stageInfo.name === subStage
                             ? "bg-[#5698a0] animate-bounce text-white"
                             : currentLocalStorageStage > subStageIndex + 1 ||
@@ -618,7 +651,7 @@ export default function Kanban() {
                         {subStage}
                       </div>
                     ) : (
-                      <div className=" px-3 w-32 2xl:w-48 2xl:text-2xl rounded-md h-12 2xl:h-16 text-sm font-bold text-white text-center flex items-center justify-center bg-[#E2E8F0] cursor-default ">
+                      <div className=" px-3 w-32  rounded-md h-12  text-sm font-bold text-white text-center flex items-center justify-center bg-[#E2E8F0] cursor-default ">
                         {subStage}
                       </div>
                     )}
@@ -634,25 +667,25 @@ export default function Kanban() {
                 className="ml-2 hover:text-gray-700 focus:outline-none transition ease-in-out delay-150 hover:-translate-y-3 hover:scale-150  duration-300"
                 onClick={() => setShowContainer(!showContainer)}
               >
-                <FiChevronUp className=" animate-bounce w-5 h-5 2xl:w-8 2xl:h-8" />
+                <FiChevronUp className=" animate-bounce w-5 h-5 " />
               </button>
             </div>
           </div>
         </div>
       </motion.div>
 
-      <div className="flex flex-row justify-center mx-auto bg-slate-100 px-24 pt-20 2xl:pt-24">
+      <div className="flex flex-row justify-center mx-auto bg-slate-100 px-24 pt-20 mt-2 ">
         <div className="wrapper flex flex-row">
           {stages1.map((subStage, index) => (
-            <div key={index} className="flex justify-center pt-1 2xl:pt-5">
+            <div key={index} className="flex justify-center pt-1 ">
               <React.Fragment>
                 {index !== 0 && (
                   <hr className="border-solid border-t-8 w-6 items-center justify-center my-auto border-[#C4D8D9]" />
                 )}
                 <div
-                  className={`px-3 w-32 2xl:w-48 2xl:text-3xl rounded-md h-14 2xl:h-20 text-xl font-bold text-white text-center flex items-center justify-center ${
+                  className={`px-3 w-32 rounded-md h-14  text-xl font-bold text-white text-center flex items-center justify-center ${
                     parseInt(stageInfo.currentStage) === index + 1
-                      ? "bg-[#5698a0] animate-pulse"
+                      ? "bg-[#5698a0]"
                       : "bg-[#c4cfcf]"
                   }`}
                 >
@@ -666,28 +699,36 @@ export default function Kanban() {
 
       <div className="bg-slate-100 flex items-center justify-center">
         <button
-          className=" 2xl:text-lg transition ease-in-out delay-150 hover:translate-y-2 hover:scale-125  duration-300"
+          className=" transition ease-in-out delay-150 hover:translate-y-2 hover:scale-125  duration-300"
           onClick={() => {
             setShowContainer(true); // 新增的部分
           }}
         >
-          <FiChevronDown className="animate-bounce w-5 h-5  2xl:w-8 2xl:h-8" />
+          <FiChevronDown className="w-5 h-5 " />
         </button>
       </div>
-      <div className="flex justify-end bg-slate-100 pr-28 -mt-7">
+      <div className="flex justify-end bg-slate-100 pr-44 -mt-7">
         <button
-          className={`text-sm font-bold transition delay-150 duration-300 px-4 py-2 2xl:px-4 2xl:py-2 rounded-md ${
-            isPreviousStageIncomplete || isStageIncomplete || isStagecomplete // 新增 isStagecomplete 到條件中
+          className={`text-sm font-bold transition delay-150 duration-300 px-4 py-2 rounded-md ${
+            isPreviousStageIncomplete ||
+            isStageIncomplete ||
+            isStagecomplete ||
+            isAllStagesComplete // 新增 isStagecomplete 到條件中
               ? "bg-gray-300 cursor-not-allowed"
-              : "bg-teal-500 hover:-translate-y-1 hover:scale-110 hover:bg-teal-500 text-white"
+              : "bg-teal-600 hover:-translate-y-1 hover:scale-110 hover:bg-teal-700 text-white"
           }`}
           onClick={handleSubmitTask}
           disabled={
-            isPreviousStageIncomplete || isStageIncomplete || isStagecomplete
+            isPreviousStageIncomplete ||
+            isStageIncomplete ||
+            isStagecomplete ||
+            isAllStagesComplete
           } // 根據 isStagecomplete 設置 disabled
         >
           {isPreviousStageIncomplete || isStageIncomplete
             ? "請完成先前階段"
+            : isAllStagesComplete
+            ? "所有階段皆完成!"
             : isStagecomplete
             ? "已完成"
             : "完成此階段"}
@@ -698,13 +739,38 @@ export default function Kanban() {
         setNotifications={setNotifications}
         // className="absolute bottom-0 left-0 flex flex-col gap-1 w-72 mb-10 ml-10 z-50 pointer-events-none"
       />
-      <div className="grid grid-cols-4 gap-5  px-28 pt-2 2xl:pt-12 min-w-[800px] h-screen overflow-hidden bg-slate-100  ">
+      <div className="grid grid-cols-4 gap-5  px-44 pt-2  min-w-[800px] h-screen overflow-hidden bg-slate-100  ">
         <div className="flex flex-col">
+          <AiFillPushpin className="translate-y-4 -mt-4 text-[#355ca5] w-7 h-5" />
           <TaskHint className="" stageInfo={stageInfo} />
-          <div className="flex" onClick={handleLottieClick}>
-            <Lottie className="w-36 h-36 z-0" animationData={owlAnimation} />
-            <Lottie className="wh-16 h-16 z-0" animationData={question} />
-          </div>
+
+          {isAllStagesComplete ? (
+            <Lottie
+              className="w-50 h-48 z-0 -translate-x-16 "
+              animationData={welldone}
+            />
+          ) : (
+            <div
+              onMouseEnter={() => setShowFlyout(true)}
+              onMouseLeave={() => setShowFlyout(false)}
+              className="flex"
+              onClick={handleLottieClick} // Define handleLottieClick if it has specific functionality
+            >
+              <Lottie
+                className="w-50 h-40 z-0 scale-x-[-1] -translate-x-32 "
+                animationData={owlAnimation}
+              />
+              <Lottie
+                className="wh-16 h-16 z-0 -translate-x-32 "
+                animationData={question}
+                loop={false} // Stop looping
+                autoplay={true} // Automatically start playing
+              />
+              {showFlyout && (
+                <OwlquestionFlyoutLink onImageClick={handleImageClick} />
+              )}
+            </div>
+          )}
         </div>
 
         {kanbanIsLoading ? (
@@ -725,15 +791,15 @@ export default function Kanban() {
                       className={`${
                         snapshot.isDraggingOver
                           ? "bg-rose-100/70"
-                          : "bg-[#70c4c4]"
-                      } p-3 rounded-md shadow-xl flex flex-col w-full max-h-[65vh] 2xl:max-h-[70vh] overflow-y-scroll scrollbar-none `}
+                          : "bg-[#647B71]"
+                      } p-3 rounded-md shadow-xl flex flex-col w-full max-h-[50vh]  overflow-y-scroll scrollbar-none `}
                     >
                       <h4 className="flex justify-between items-center mb-2">
-                        <span className="text-base 2xl:text-xl font-semibold text-gray-100">
+                        <span className="text-base font-semibold text-gray-100">
                           思考歷程導引模板
                         </span>
                         <button
-                          className="font-bold text-sm 2xl:font-semibold 2xl:text-base px-1 py-1 2xl:px-4 2xl:py-2 rounded-md transition ease-in-out bg-[#bbd6d6] hover:-translate-y-1  hover:scale-110 duration-100 ..."
+                          className="font-bold text-sm px-1 py-1 rounded-md transition ease-in-out bg-[#bbd6d6] hover:-translate-y-1  hover:scale-110 duration-100 ..."
                           onClick={handleOneClickUse}
                         >
                           一鍵導入
@@ -773,20 +839,60 @@ export default function Kanban() {
                           className={`${
                             snapshot.isDraggingOver
                               ? "bg-rose-100/70"
-                              : "bg-gray-100"
-                          } p-3 rounded-md shadow-xl flex flex-col w-full max-h-[65vh] 2xl:max-h-[70vh] overflow-y-scroll scrollbar-none`}
+                              : "bg-gray-200"
+                          } p-3 rounded-md shadow-xl flex flex-col w-full h-[58vh] overflow-y-scroll scrollbar-none`}
                         >
-                          <h4 className="flex justify-between items-center mb-2">
-                            <span className="text-xl font-semibold text-gray-600">
-                            {column.name}
-                            </span>
-                          </h4>
+                          {/* 進行中看板 */}
 
+                          <h4 className="flex justify-between items-center mb-1 h-8 rounded-md shadow-lg">
+                            <span className="text-xl font-semibold text-gray-600 h-8">
+                              {column.name}
+                            </span>
+                            {column.name == "進行中" ? (
+                              <div className="flex">
+                                <Lottie
+                                  loop={false} // Stop looping
+                                  autoplay={true} // Automatically start playing
+                                  className="w-8 h-8 rotate-45"
+                                  animationData={arrow}
+                                />
+                                <span className="font-semibold text-teal-700">
+                                  當前任務
+                                </span>
+                              </div>
+                            ) : (
+                              ""
+                            )}
+                          </h4>
+                          {column.name === "進行中" &&
+                            column.task.length === 0 && (
+                              <div className="flex items-center justify-center min-h-[80px] top-0 border-2 border-teal-700 rounded-md bg-transparent pointer-events-none text-teal-700 font-semibold">
+                                <span>目前尚無進行中的任務</span>
+                              </div>
+                            )}
+
+                          {column.task.length > 0 &&
+                            column.task.map((item, index) => {
+                              return (
+                                <Carditem
+                                  key={item.id}
+                                  index={index}
+                                  data={item}
+                                  columnIndex={columnIndex}
+                                  columnId={doingColumnId}
+                                  isFirst={index === 0} // 是否是第一个条目
+                                  isProgressing={column.name === "進行中"} // 是否是“进行中”列
+                                />
+                              );
+                            })}
+                          {provided.placeholder}
+                        </div>
+                        {column.name == "進行中" ? (
                           <React.Fragment>
                             {showForm && selectedcolumn === columnIndex ? (
-                              <div>
+                              <div className="-mt-5">
                                 <textarea
-                                  className="border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-customgreen w-full p-1"
+                                  className="border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-customgreen w-full p-1 lg:h-14"
                                   rows={3}
                                   placeholder="Task info"
                                   onChange={handleChange}
@@ -810,31 +916,20 @@ export default function Kanban() {
                               </div>
                             ) : (
                               <button
-                                className="flex justify-center items-center my-1 py-1 bg-white rounded-md text-lg"
+                                className="flex justify-center items-center  py-1 bg-white rounded-md text-sm w-full hover:shadow-xl"
                                 onClick={() => {
                                   setSelectedcolumn(columnIndex);
                                   setShowForm(true);
                                 }}
                               >
+                                加入任務
                                 <FiPlus className="w-5 h-5" />
                               </button>
                             )}
                           </React.Fragment>
-
-                          {column.task.length > 0 &&
-                            column.task.map((item, index) => {
-                              return (
-                                <Carditem
-                                  key={item.id}
-                                  index={index}
-                                  data={item}
-                                  columnIndex={columnIndex}
-                            
-                                />
-                              );
-                            })}
-                          {provided.placeholder}
-                        </div>
+                        ) : (
+                          ""
+                        )}
                       </div>
                     )}
                   </Droppable>

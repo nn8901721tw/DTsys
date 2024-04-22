@@ -91,7 +91,7 @@ export default function Carditemtemplate({
             className={`${
               snapshot.isDragging
                 ? "border-2 border-emerald-700 bg-sky-300"
-                : "border-0 bg-white"
+                : "border-0 bg-slate-100"
             } rounded-md p-3 mt-3 truncate min-h-[80px] max-w-full shadow-md`}
           >
             <div>

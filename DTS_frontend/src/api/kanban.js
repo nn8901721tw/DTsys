@@ -39,4 +39,3 @@ export const moveTaskToCompleted = async (taskId, inProgressColumnId, completedC
     });
     return response.data;
 }
-

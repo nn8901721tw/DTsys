@@ -2,23 +2,20 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { submitTask } from "../../../api/submit";
 import { useQuery, useMutation, useQueryClient } from "react-query";
-
+import { socket } from "../../../utils/socket";
 import Tag from "../../../assets/Tag.png";
 import { moveTaskToCompleted } from "../../../api/kanban";
 import Swal from "sweetalert2";
 
-
-
 const Scaffolding = ({
+
   currentStage,
   currentSubStage,
   inProgressTasks,
   kanbanDatas,
   onTaskComplete,
+  setKanbanData, // 現在你可以在這裡使用 setKanbanData
 }) => {
-
-
- 
   const navigate = useNavigate();
   // 将 currentStage 和 currentSubStage 保存在状态中
   const [localStoragecurrentStage, setlocalStorageCurrentStage] = useState(
@@ -28,10 +25,13 @@ const Scaffolding = ({
     useState(localStorage.getItem("currentSubStage"));
   useEffect(() => {
     if (!localStoragecurrentStage || !localStoragecurrentSubStage) {
-  
     }
   }, [currentStage, currentSubStage]);
   const { projectId } = useParams();
+
+
+
+  const queryClient = useQueryClient();
 
   const stagesMap = {
     "1-1": "經驗分享與同理",
@@ -49,28 +49,26 @@ const Scaffolding = ({
 
   ///////////////////////
 
-  // console.log("kanbanDatasid1:", kanbanDatas[0].id);
-  // console.log("kanbanDatasid2:", kanbanDatas[0].id);
-  // 添加在函数内部或者作为 prop 传递
-  const handleCompleteSubtask = async (taskId) => {
-    if (!kanbanDatas || kanbanDatas.length < 2) {
-      console.error("缺少kanban資料");
-      return;
-    }
+  // const handleCompleteSubtask = async (taskId) => {
+  //   if (!kanbanDatas || kanbanDatas.length < 2) {
+  //     console.error("缺少kanban資料");
+  //     return;
+  //   }
 
-    // 假定第一个列是“进行中”，第二个列是“已完成”
-    const inProgressColumnId = kanbanDatas[0].id;
-    const completedColumnId = kanbanDatas[1].id;
-    console.log("inProgressColumnId", inProgressColumnId);
-    console.log("completedColumnId", completedColumnId);
-  };
+  //   // 假定第一个列是“进行中”，第二个列是“已完成”
+  //   const inProgressColumnId = kanbanDatas[0].id;
+  //   const completedColumnId = kanbanDatas[1].id;
+  //   console.log("inProgressColumnId", inProgressColumnId);
+  //   console.log("completedColumnId", completedColumnId);
+  // };
 
   const completeTask = () => {
     if (inProgressTasks.length > 0 && kanbanDatas.length >= 2) {
       const taskId = inProgressTasks[0].id;
       const inProgressColumnId = kanbanDatas[0].id; // 进行中列的ID
       const completedColumnId = kanbanDatas[1].id; // 完成列的ID
-
+      console.log("inProgressColumnId", inProgressColumnId);
+      console.log("completedColumnId", completedColumnId);
       Swal.fire({
         title: "是否已完成此任務?",
         text: "確認後將無法撤銷！",
@@ -85,9 +83,11 @@ const Scaffolding = ({
           moveTaskToCompleted(taskId, inProgressColumnId, completedColumnId)
             .then((response) => {
               console.log("Task moved successfully:", response);
+              socket.emit('taskUpdated'); // 廣播任務更新事件
+             
               Swal.fire("完成!", "任務已成功移動至完成列。", "success").then(
                 () => {
-                  navigate(0); // 刷新页面
+                  queryClient.invalidateQueries(["kanbanDatas", projectId]);
                 }
               );
             })
@@ -139,7 +139,7 @@ const Scaffolding = ({
   // Determine the background color based on active sub-stage
   const getBackgroundColor = (subStageId) => {
     return `${currentStage}-${currentSubStage}` === subStageId
-      ? "bg-[#4ECDC5]"
+      ? "bg-[#4ECDC5] animate-pulse"
       : "bg-[#C4D8D9]";
   };
   // Determine the background color based on active sub-stage
@@ -226,8 +226,33 @@ const Scaffolding = ({
     }
   };
 
+
+   // socket
+  //  useEffect(() => {
+  //   function KanbanUpdateEvent(data) {
+  //     if (data) {
+  //       console.log(data);
+  //       queryClient.invalidateQueries(["kanbanDatas", projectId]);
+  //     }
+  //   }
+  //   function kanbanDragEvent(data) {
+  //     if (data) {
+  //       console.log(data);
+  //       setKanbanData(data);
+  //     }
+  //   }
+  //   socket.connect();
+
+  //   socket.on("taskItems", KanbanUpdateEvent);
+  //   socket.on("taskItem", KanbanUpdateEvent);
+  //   socket.on("dragtaskItem", kanbanDragEvent);
+  //   return () => {
+  //     socket.disconnect();
+  //   };
+  // }, [socket]);
+
   return (
-    <div className=" w-64 p-6 bg-white rounded-lg shadow-md divide-y divide-gray-200 fixed top-20 right-2 h-4/5 2xl:h-3/5 z-20  overflow-y-auto overflow-x-hidden scrollbar-none ">
+    <div className=" w-64 p-6 bg-white rounded-lg shadow-md divide-y divide-gray-200 fixed top-20 right-2 h-4/5  z-20  overflow-y-auto overflow-x-hidden scrollbar-none ">
       <div className="pb-2">
         <div className="flex">
           <img className="w-5 h-5 bg-transparent" src={Tag} alt="/" />
@@ -239,11 +264,14 @@ const Scaffolding = ({
 
         {inProgressTasks.length > 0 ? (
           <h2 className="text-lg font-semibold text-gray-900 cursor-pointer">
-            當前子任務-{inProgressTasks[0].content}
+            當前子任務-
+            <span className="text-[#3279ca] font-bold">
+              {inProgressTasks[0].content}
+            </span>
           </h2>
         ) : (
           <h2 className="text-lg font-semibold text-gray-900">
-            當前無進行中任務
+            進行中的子任務皆已完成
           </h2>
         )}
         <p className="mt-1 text-sm text-gray-600">
@@ -256,18 +284,18 @@ const Scaffolding = ({
         <div className="flex justify-end">
           {inProgressTasks.length > 0 ? (
             <button
-              className=" text-neutral-50 font-bold text-sm 2xl:font-semibold 2xl:text-base px-1 py-1 rounded-md transition ease-in-out bg-[#4ECDC5] hover:-translate-y-1  hover:scale-110 duration-100 ..."
+              className=" text-neutral-50 font-bold text-sm 2xl:font-semibold 2xl:text-base px-1 py-1 rounded-md transition ease-in-out bg-[#4b7fbb] hover:-translate-y-1  hover:scale-110 duration-100 ..."
               onClick={completeTask}
             >
               子任務完成
             </button>
           ) : (
             <div className="flex text-sm w-full ">
-              <div className="my-auto font-semibold justify-start">
+              <div className="my-auto font-semibold justify-start text-xs">
                 進入下個子階段-
               </div>
               <div
-                className=" text-neutral-50 font-bold text-sm 2xl:font-semibold 2xl:text-base px-1 py-1 rounded-md transition ease-in-out bg-[#4b7fbb] hover:-translate-y-1  hover:scale-110 duration-100 ..."
+                className=" cursor-pointer text-neutral-50 font-bold text-xs 2xl:font-semibold 2xl:text-base px-1 py-1 rounded-md transition ease-in-out bg-[#4ECDC5] hover:-translate-y-1  hover:scale-110 duration-100 ..."
                 onClick={handleSubmitTask}
               >
                 {nextStageDescription}
@@ -377,15 +405,15 @@ const Scaffolding = ({
                                   <div
                                     className={`h-[10px] w-[10px] pl-3 rounded-full ${
                                       taskIndex === 0
-                                        ? "bg-[#4ECDC5]"
-                                        : "bg-slate-400"
+                                        ? "bg-[#3279ca] animate-pulse"
+                                        : "bg-gray-400"
                                     }`}
                                   ></div>
                                   <div
-                                    className={` text-xs text-center ${
+                                    className={` text-xs font-bold text-center ${
                                       taskIndex === 0
-                                        ? "text-[#4ECDC5]"
-                                        : "text-slate-400"
+                                        ? "text-[#3279ca] "
+                                        : "text-gray-400"
                                     }`}
                                   >
                                     <span className="pl-16 font-semibold">
@@ -409,6 +437,10 @@ const Scaffolding = ({
                       No sub-stages available for this stage.
                     </p>
                   )}
+                  <div className="bg-slate-300 w-[2px] h-12"></div>
+                  <div className=" text-base font-semibold text-slate-400">
+                    進入下個子階段...
+                  </div>
                 </div>
               </div>
             </div>

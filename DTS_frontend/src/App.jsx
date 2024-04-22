@@ -19,7 +19,7 @@ import Protfolio from './pages/protfolio/Protfolio';
 import ManageIdeaWall from "./pages/manageIdeaWall/ManageIdeaWall";
 import IdeaWall from "./pages/ideaWall/IdeaWall";
 import NotFound from "./pages/notFound/NotFound";
-import Ideawall_scaffolding from "./pages/ideaWall/Ideawallscaffolding";
+
 
 
 export default function App() {
@@ -32,7 +32,7 @@ export default function App() {
         </Route>
         <Route element={<ProtectedRoute />}>
           <Route path="homepage" element={<HomePage />} />
-          <Route path="Ideawall_scaffolding" element={<Ideawall_scaffolding />} />
+
           <Route path="lobypage" element={<LobyPage />} />
           <Route path="bulletin" element={<Bulletin />} />
           <Route path="List" element={<List />} />

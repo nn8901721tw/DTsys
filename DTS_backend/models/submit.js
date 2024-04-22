@@ -14,6 +14,10 @@ const Submit = sequelize.define('submit', {
         type: DataTypes.TEXT,
         allowNull:true,
     },
+    fileData:{
+        type: DataTypes.BLOB,
+        allowNull:true,
+    },
 });
 
 module.exports = Submit;

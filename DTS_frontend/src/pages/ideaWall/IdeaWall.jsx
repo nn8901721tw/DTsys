@@ -8,7 +8,7 @@ import { Network } from "vis-network";
 import { visNetworkOptions as option } from "../../utils/visNetworkOptions";
 import svgConvertUrl from "../../utils/svgConvertUrl";
 import { useParams } from "react-router-dom";
-import { useQuery } from "react-query";
+import { useQuery,useQueryClient  } from "react-query";
 import { getIdeaWall } from "../../api/ideaWall";
 import { getNodes, getNodeRelation } from "../../api/nodes";
 import { socket } from "../../utils/socket";
@@ -32,7 +32,7 @@ export default function IdeaWall() {
   const [canvasPosition, setCanvasPosition] = useState({});
   const [kanbanData, setKanbanData] = useState([]);
   const [inProgressTasks, setInProgressTasks] = useState([]);
-
+  const queryClient = useQueryClient(); // 使用 useQueryClient 鉤子
   const {
     isLoading: kanbanIsLoading,
     isError: kanbansIsError,
@@ -70,6 +70,7 @@ export default function IdeaWall() {
     content: "",
     owner: "",
     ideaWallId: "",
+    projectId:""
   });
   const [buildOnNodeId, setBuildOnId] = useState("");
   const [tempid, setTempId] = useState("");
@@ -123,6 +124,7 @@ export default function IdeaWall() {
       temp.push(item);
     });
   }, [nodes]);
+
   // socket
   useEffect(() => {
     function nodeUpdateEvent(data) {
@@ -132,12 +134,28 @@ export default function IdeaWall() {
         getNodeRelationQuery.refetch();
       }
     }
+    function KanbanUpdateEvent(data) {
+      if (data) {
+        console.log(data);
+        queryClient.invalidateQueries(["kanbanDatas", projectId]);
+      }
+    }
+    function kanbanDragEvent(data) {
+      if (data) {
+        console.log(data);
+        setKanbanData(data);
+      }
+    }
     socket.connect();
+    socket.emit("joinProject", projectId);
     socket.on("nodeUpdated", nodeUpdateEvent);
+    socket.on("taskItems", KanbanUpdateEvent);
+    socket.on("taskItem", KanbanUpdateEvent);
+    socket.on("dragtaskItem", kanbanDragEvent);
     return () => {
-      socket.disconnect();
+      // socket.disconnect();
     };
-  }, [socket]);
+  }, [socket, projectId]);
 
   // vis network
   useEffect(() => {
@@ -195,6 +213,7 @@ export default function IdeaWall() {
       ideaWallId: ideaWallInfo.id,
       owner: localStorage.getItem("username"),
       from_id: buildOnNodeId,
+      projectId:projectId
     }));
   };
 
@@ -205,6 +224,7 @@ export default function IdeaWall() {
       [name]: value,
       ideaWallId: ideaWallInfo.id,
       owner: localStorage.getItem("username"),
+      projectId:projectId
     }));
   };
 
@@ -227,6 +247,7 @@ export default function IdeaWall() {
   };
 
 
+  
 
   return (
     <div className="z-10">
@@ -246,6 +267,7 @@ export default function IdeaWall() {
           currentSubStage={currentSubStage}
           inProgressTasks={inProgressTasks}
           kanbanDatas={kanbanData}
+          setKanbanData={setKanbanData}
         />
       </div>
 
@@ -312,15 +334,15 @@ export default function IdeaWall() {
           <h3 className=" font-bold text-base mb-3">建立便利貼</h3>
           <p className=" font-bold text-base mb-3">標題</p>
           <input
-            className=" rounded outline-none ring-2 p-1 ring-customgreen w-full mb-3"
+            className=" rounded  p-1 w-full mb-3 shadow-lg hover:shadow-2xl"
             type="text"
             placeholder="標題"
             name="title"
             onChange={handleChange}
           />
-          <p className=" font-bold text-base mb-3">內容</p>
+          <p className=" font-bold text-base mb-3 ">內容</p>
           <textarea
-            className=" rounded outline-none ring-2 ring-customgreen w-full p-1"
+            className=" rounded  w-full p-1 shadow-lg hover:shadow-2xl"
             rows={3}
             placeholder="內容"
             name="content"
@@ -330,13 +352,13 @@ export default function IdeaWall() {
         <div className="flex justify-end m-2">
           <button
             onClick={() => setCreateNodeModalOpen(false)}
-            className="mx-auto w-full h-7 mb-2 bg-customgray rounded font-bold text-xs sm:text-sm text-black/60 mr-2"
+            className="mx-auto w-full h-7 mb-2 bg-slate-100 rounded font-bold text-xs sm:text-sm text-black/60 mr-2"
           >
             取消
           </button>
           <button
             onClick={handleCreateSubmit}
-            className="mx-auto w-full h-7 mb-2 bg-customgreen rounded font-bold text-xs sm:text-sm text-white"
+            className="mx-auto w-full h-7 mb-2 bg-teal-500 rounded font-bold text-xs sm:text-sm text-white"
           >
             儲存
           </button>
@@ -354,7 +376,7 @@ export default function IdeaWall() {
             <h3 className=" font-bold text-base mb-3">檢視便利貼</h3>
             <p className=" font-bold text-base mb-3">標題</p>
             <input
-              className=" rounded outline-none ring-2 p-1 ring-customgreen w-full mb-3"
+              className=" rounded outline-none ring-2 p-1 w-full mb-3"
               type="text"
               placeholder="標題"
               name="title"
@@ -363,7 +385,7 @@ export default function IdeaWall() {
             />
             <p className=" font-bold text-base mb-3">內容</p>
             <textarea
-              className=" rounded outline-none ring-2 ring-customgreen w-full p-1"
+              className=" rounded outline-none ring-2 w-full p-1"
               rows={3}
               placeholder="內容"
               name="content"
@@ -391,7 +413,7 @@ export default function IdeaWall() {
                 </button>
                 <button
                   onClick={handleUpdateSubmit}
-                  className="w-16 h-7 bg-customgreen rounded font-bold text-xs sm:text-bas text-white"
+                  className="w-16 h-7 bg-cyan-800 rounded font-bold text-xs sm:text-bas text-white"
                 >
                   儲存
                 </button>

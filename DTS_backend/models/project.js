@@ -33,7 +33,11 @@ const Project = sequelize.define('project', {
     currentSubStage:{
         type:DataTypes.INTEGER,
         allowNull:true
-    }
+    },
+    ProjectEnd:{
+        type:DataTypes.BOOLEAN,
+        allowNull:true
+    },
 });
 
 Project.hasMany(Chatroom_message);

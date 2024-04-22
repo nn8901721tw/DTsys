@@ -270,6 +270,8 @@ exports.getScaffoldingTemplate = async (req, res) => {
             where: { id: taskId }
         });
 
+        console.log(updateResult); // 添加這行來檢查更新結果
+
         if (updateResult[0] === 0) {
             // 如果沒有任務被更新，也返回錯誤
             return res.status(404).send({ message: 'Task not found or update failed' });
@@ -281,11 +283,12 @@ exports.getScaffoldingTemplate = async (req, res) => {
             await inProgressColumn.save();
         }
 
-        // 將任務添加到完成列
-        if (completedColumn.task && !completedColumn.task.includes(taskId)) {
-            completedColumn.task.push(taskId);
-            await completedColumn.save();
-        }
+// 將任務ID添加到完成列
+if (!completedColumn.task.includes(taskId)) {
+    const updatedCompletedTasks = [...completedColumn.task, taskId];
+    completedColumn.setDataValue('task', updatedCompletedTasks); // 強制更新欄位
+    await completedColumn.save();
+}
 
         res.status(200).send({ message: 'Task moved successfully' });
     } catch (error) {

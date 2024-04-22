@@ -21,6 +21,7 @@ module.exports = {
         '-72': '-25rem',
                 }
     },
+
   },
   plugins: [
     require('tailwind-scrollbar')({ nocompatible: true }),

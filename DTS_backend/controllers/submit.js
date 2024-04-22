@@ -8,23 +8,32 @@ exports.createSubmit = async(req, res) => {
     const {currentStage, currentSubStage, content, projectId} = req.body;
     const currentStageInt = parseInt(currentStage);
     const currentSubStageInt = parseInt(currentSubStage);
+
+    const fs = require('fs').promises; // 使用 Promise 接口
+
     if(!content){
         return res.status(404).send({message: 'please fill in the form !'})
     }
     if(req.files.length > 0){
-        req.files.map(item => {
-            const filename = item.filename
-            Submit.create({
-                stage: `${currentStageInt}-${currentSubStageInt}`,
-                content: "content",
-                projectId: projectId,
-                // filename:filename
-            })
-            .catch(err => {
-                console.log(err)
-                return res.status(500).send({message: 'create failed!'});
-            });
-        })
+        try {
+            await Promise.all(req.files.map(async (item) => {
+                // const fileData = item.fileData;
+                console.log("CreateItem:",item)
+
+                const fileData = await fs.readFile(item.path);
+
+                return Submit.create({
+                    stage: `${currentStageInt}-${currentSubStageInt}`,
+                    content: content,
+                    projectId: projectId,
+                    fileData: fileData ,
+                    filename: item.filename
+                });
+            }));
+        } catch(err) {
+            console.log(err);
+            return res.status(500).send({message: 'create failed!'});
+        }
     }else{
         await Submit.create({
             stage: `${currentStageInt}-${currentSubStageInt}`,
@@ -72,6 +81,14 @@ exports.createSubmit = async(req, res) => {
             return res.status(500).send({message: 'create failed!'});
         })
     }else if(currentStageInt === process[0].stage.length && currentSubStageInt === stage[0].sub_stage.length){
+        await Project.update({
+            ProjectEnd: true
+        }, {
+            where: {
+                id: projectId
+            }
+        });
+
         return res.status(200).send({message: 'done'});
     }else{
         await Project.update({

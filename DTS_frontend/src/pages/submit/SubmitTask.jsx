@@ -6,6 +6,8 @@ import toast, { Toaster } from 'react-hot-toast';
 import { getSubStage } from '../../api/stage';
 import CommonInput from './components/CommonInput';
 import Loader from '../../components/Loader';
+import { socket } from "../../utils/socket";
+
 
 export default function SubmitTask() {
     const [ taskData, setTaskData ] = useState({});
@@ -14,16 +16,18 @@ export default function SubmitTask() {
     const {projectId} = useParams();
     const [ stageInfo ,setStageInfo ] = useState({userSubmit:{}});
 
+    
     const {mutate} = useMutation( submitTask, {
         onSuccess : ( res ) =>{
             if(res.message === "done"){
+                socket.emit('taskUpdated'); // 廣播任務更新事件
                 sucesssNotify("全部階段已完成")
                 localStorage.setItem('stageEnd', "true")
             }
             sucesssNotify(res.message)
             localStorage.removeItem("currentStage");
             localStorage.removeItem("currentSubStage");
-
+            socket.emit('taskUpdated'); // 廣播任務更新事件
             navigate(`/project/${projectId}/kanban`);
         },
         onError : (error) =>{
@@ -71,7 +75,7 @@ export default function SubmitTask() {
         formData.append('content',JSON.stringify(taskData));
         if(attachFile){
             for (let i = 0; i < attachFile.length; i++){
-                formData.append("attachFile", attachFile[i])
+                formData.append("attachFile", attachFile[i]);
             }
         }
         for(let key in taskData){

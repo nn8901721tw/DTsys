@@ -66,7 +66,7 @@ export default function Login() {
     <section className="flex flex-col md:flex-row h-screen items-center">
       <div className="hidden bg-[#8AB3B6] w-full md:w-1/2 xl:w-1/2 h-screen md:flex md:items-center md:justify-center">
         <div className="flex flex-col -m-56">
-          <h1 className=" md:mx-auto md:text-2xl xl:text-5xl xl:font-semibold mx-auto text-gray-200  mb-2">
+          <h1 className=" md:mx-auto md:text-xl xl:text-5xl xl:font-semibold mx-auto text-gray-200  mb-2">
             {/* 
               Network Learning <br/>Technology
               <br/> */}

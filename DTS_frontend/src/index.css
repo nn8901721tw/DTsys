@@ -6,3 +6,20 @@
 body {
     @apply bg-[#F8FAFB];
 }
+.border-animate::before {
+    content: '';
+    position: absolute;
+    top: -1px; /* 根据需要调整 */
+    left: -1px; /* 根据需要调整 */
+    right: -1px; /* 根据需要调整 */
+    bottom: -1px; /* 根据需要调整 */
+    border: 2px solid transparent;
+    border-top-color: #f00; /* 红色 */
+    border-radius: inherit;
+    animation: spin-border 2s linear infinite;
+    z-index: 0;
+  }
+  
+  .border-animate {
+    position: relative;
+  }
