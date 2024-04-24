@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 const PricingContent = ({ onImageClick }) => {
   return (
     <div className="w-56 bg-white p-6 shadow-xl space-y-3">
-      <div className="hover:shadow-xl cursor-pointer" onClick={() => onImageClick("Taskhint,在我上方的灰色小方塊是子階段提示，這裡顯示當下子階段的目標及任務說明，大家要記得看喔!")}>
+      <div className="hover:shadow-xl cursor-pointer" onClick={() => onImageClick("在我上方的灰色小方塊是子階段提示，這裡顯示當下子階段的目標及任務說明，大家要記得看喔!")}>
         <h3 className="font-semibold">子階段提示</h3>
         <img src="/images/kanban_taskhint.png" alt="Introduction" className="w-9/12 h-auto" />
       </div>
@@ -35,7 +35,7 @@ const OwlquestionFlyoutLink = ({ onImageClick }) => {
           .flyout-link::before {
             content: '';
             position: absolute;
-            left: -10px;
+            left: -5px;
             top: 50%;
             width: 0;
             height: 0;
@@ -50,8 +50,8 @@ const OwlquestionFlyoutLink = ({ onImageClick }) => {
       initial={{ opacity: 0, x: -50, scale: 0.5 }} // Start from left and scaled down
       animate={{ opacity: 1, x: 0, scale: 1 }}     // End at normal position and scale
       exit={{ opacity: 0, x: -100, scale: 0.5 }}    // Exit the same way it entered
-      transition={{ duration: 0.3, ease: "easeOut" }}
-      className="flyout-link fixed bottom-0 left-72 mb-4 ml-4 bg-white text-black shadow-lg p-4 rounded-lg"
+      transition={{ duration: 0.7, ease: "easeOut" }}
+      className="flyout-link fixed bottom-0 left-64 mb-4 ml-4 bg-white text-black shadow-lg p-4 rounded-lg"
     >
       <PricingContent onImageClick={onImageClick} />
       </motion.div>

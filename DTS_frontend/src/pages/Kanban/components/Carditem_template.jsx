@@ -82,7 +82,7 @@ export default function Carditemtemplate({
 
   return (
     <>
-      <Draggable key={keyId} index={index} draggableId={`item-${index}`}>
+      <Draggable key={keyId} index={index} draggableId={`item-${index}`} isDragDisabled={true} isDropDisabled={true}>
         {(provided, snapshot) => (
           <div
             ref={provided.innerRef}

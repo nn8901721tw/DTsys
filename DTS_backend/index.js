@@ -234,6 +234,14 @@ io.on("connection", (socket) => {
         }
     });
 
+    socket.on('taskSubmitted', (data) => {
+        console.log('Task submitted:KKKKKKKKKK', data);
+        // 将事件广播到所有连接的客户端，除了发送消息的客户端
+        // io.sockets.emit("taskItems", addIntoTaskArray);
+
+        socket.broadcast.emit('refreshKanban', data);
+    });
+
 
     socket.on("disconnect", () => {
         console.log(`${socket.id} a user disconnected`)

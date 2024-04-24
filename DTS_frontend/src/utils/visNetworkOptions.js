@@ -14,7 +14,7 @@ export const visNetworkOptions = {
         color: {
             color: '#4d4c4c',
             highlight: '#5BA491',
-            hover: '#81c7b5',
+            hover: '#63999F',
         },
     },
     physics: {

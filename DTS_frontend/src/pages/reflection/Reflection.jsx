@@ -13,6 +13,8 @@ import toast, { Toaster } from "react-hot-toast";
 import Loader from "../../components/Loader";
 import { motion } from "framer-motion";
 import { socket } from "../../utils/socket";
+import { AiFillTag } from "react-icons/ai";
+
 
 export default function Reflection() {
   const { projectId } = useParams();
@@ -27,6 +29,15 @@ export default function Reflection() {
   const [inspectDailyModalOpen, setInspectDailyModalOpen] = useState(false);
   const [personalDailyModalOpen, setPersonalDailyModalOpen] = useState(false);
   const [teamDailyModalOpen, setTeamDailyModalOpen] = useState(false);
+  // 将 currentStage 和 currentSubStage 保存在状态中
+  const [projectname, setProjectname] = useState(localStorage.getItem("name"));
+  // 将 currentStage 和 currentSubStage 保存在状态中
+  const [projectEnd, setProjectEnd] = useState(
+    localStorage.getItem("ProjectEnd")
+  );
+
+
+
   const queryClient = useQueryClient();
   const { isLoading, isError, error } = useQuery(
     "personalDaily",
@@ -127,13 +138,13 @@ export default function Reflection() {
       formData.append(key, dailyData[key]);
     }
     console.log(...formData);
-   // 发送表单数据到后端
-   teamDailyMutate(formData, {
-    onSuccess: () => {
+    // 发送表单数据到后端
+    teamDailyMutate(formData, {
+      onSuccess: () => {
         // 成功后，发送 socket 事件
         socket.emit("createTeamDaily", { projectId, formData: dailyData });
-    }
-});
+      },
+    });
   };
 
   const errorNotify = (toastContent) => toast.error(toastContent);
@@ -160,11 +171,11 @@ export default function Reflection() {
   };
 
   const bigstagesMap = {
-    "1": "同理",
-    "2": "定義",
-    "3": "發想",
-    "4": "原型",
-    "5": "測試",
+    1: "同理",
+    2: "定義",
+    3: "發想",
+    4: "原型",
+    5: "測試",
   };
 
   const stagesMap = {
@@ -183,8 +194,16 @@ export default function Reflection() {
 
   return (
     <div className="min-w-full min-h-screen h-screen">
-      <div className="flex flex-col my-5 pl-28 pr-10 py-11 w-full h-screen justify-start items-start">
-        <h3 className="text-2xl ml-4 mt-3 font-bold text-orange-900">個人日誌</h3>
+      <div className="flex fixed top-[70px] left-20 text-[#446269] cursor-default">
+        <AiFillTag className="w-6 h-6" />
+        <span className="justify-center items-center translate-x-2 font-semibold">
+          主題 : {projectname}
+        </span>
+      </div>
+      <div className="flex flex-col my-16 pl-28 pr-10 py-11 w-full h-screen justify-start items-start">
+        <h3 className="text-2xl ml-4 mt-3 font-bold text-orange-900">
+          個人日誌
+        </h3>
         <hr className="w-full h-[5px] my-2 rounded-xl bg-gray-200 border-0 dark:bg-gray-700" />
 
         <div className="flex flex-nowrap justify-start items-center w-full mb-5 overflow-x-auto h-44 scrollbar-thin scrollbar-track-teal-700 ">
@@ -226,7 +245,9 @@ export default function Reflection() {
           )}
         </div>
 
-        <h3 className="mt-6 text-2xl font-extrabold text-orange-900">小組討論日誌</h3>
+        <h3 className="mt-6 text-2xl font-extrabold text-orange-900">
+          小組討論日誌
+        </h3>
         <hr className="w-full h-[5px] rounded-xl bg-gray-200 border-0 dark:bg-gray-700" />
 
         <div className="flex flex-nowrap justify-start items-center w-full mb-5 overflow-x-auto h-40 scrollbar-thin scrollbar-track-teal-700">

@@ -18,6 +18,9 @@ import {
   addCardItem,
 } from "../../api/kanban";
 
+
+
+
 export default function IdeaWall() {
   const container = useRef(null);
   const url = svgConvertUrl("node");
@@ -31,7 +34,10 @@ export default function IdeaWall() {
   const [updateNodeModalOpen, setUpdateNodeModalOpen] = useState(false);
   const [canvasPosition, setCanvasPosition] = useState({});
   const [kanbanData, setKanbanData] = useState([]);
-  const [inProgressTasks, setInProgressTasks] = useState([]);
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
+
+
   const queryClient = useQueryClient(); // 使用 useQueryClient 鉤子
   const {
     isLoading: kanbanIsLoading,
@@ -49,15 +55,7 @@ export default function IdeaWall() {
     },
   });
 
-  useEffect(() => {
-    if (kanbanData.length > 0) {
-      const tasksInProgress =
-        kanbanData.find((column) => column.name === "進行中")?.task || [];
-      setInProgressTasks(tasksInProgress);
-      console.log("進行中的任務:", tasksInProgress);
-      console.log("kanbanData:", kanbanData);
-    }
-  }, [kanbanData]); // 確保當 kanbanData 更新時重新運行此效果
+
 
   const [ideaWallInfo, setIdealWallInfo] = useState({
     id: "1",
@@ -119,7 +117,9 @@ export default function IdeaWall() {
   useEffect(() => {
     const temp = [];
     nodes.map((item) => {
-      item.image = svgConvertUrl(item.title);
+      item.image = svgConvertUrl(item.title,item.owner);
+
+      
       item.shape = "image";
       temp.push(item);
     });
@@ -146,16 +146,22 @@ export default function IdeaWall() {
         setKanbanData(data);
       }
     }
+    const handleRefreshKanban = (newStages) => {
+      queryClient.invalidateQueries('getProject');
+      queryClient.invalidateQueries('getSubStage');
+      
+  };
     socket.connect();
     socket.emit("joinProject", projectId);
     socket.on("nodeUpdated", nodeUpdateEvent);
-    socket.on("taskItems", KanbanUpdateEvent);
-    socket.on("taskItem", KanbanUpdateEvent);
-    socket.on("dragtaskItem", kanbanDragEvent);
+    // socket.on("taskItems", KanbanUpdateEvent);
+    // socket.on("taskItem", KanbanUpdateEvent);
+    // socket.on("dragtaskItem", kanbanDragEvent);
+    socket.on('refreshKanban', handleRefreshKanban);
     return () => {
-      // socket.disconnect();
+
     };
-  }, [socket, projectId]);
+  }, [socket, projectId,kanbanData]);
 
   // vis network
   useEffect(() => {
@@ -207,6 +213,14 @@ export default function IdeaWall() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+
+    if (name === "title") {
+      setTitle(value);
+    } else if (name === "content") {
+      setContent(value);
+    }
+
+
     setNodeData((prevData) => ({
       ...prevData,
       [name]: value,
@@ -233,6 +247,9 @@ export default function IdeaWall() {
     setCreateNodeModalOpen(false);
     socket.emit("nodeCreate", nodeData);
     setBuildOnId("");
+    setTitle("");
+    setContent("");
+
   };
   const handleUpdateSubmit = (e) => {
     e.preventDefault();
@@ -265,9 +282,6 @@ export default function IdeaWall() {
           className="w-full"
           currentStage={currentStage}
           currentSubStage={currentSubStage}
-          inProgressTasks={inProgressTasks}
-          kanbanDatas={kanbanData}
-          setKanbanData={setKanbanData}
         />
       </div>
 
@@ -279,15 +293,15 @@ export default function IdeaWall() {
         modalCoordinate={canvasPosition}
         custom={"w-30 h-15"}
       >
-        <div>
+        <div className="font-bold">
           <button
             onClick={() => {
               setCreateOptionModalOpen(false);
               setCreateNodeModalOpen(true);
             }}
-            className="w-full h-full p-2 rounded-md bg-white hover:bg-slate-100"
+            className="w-full h-full p-2 rounded-md bg-cyan-500 hover:bg-slate-100"
           >
-            建立便利貼
+            建立想法節點
           </button>
           <button
             onClick={() => setCreateOptionModalOpen(false)}
@@ -331,7 +345,7 @@ export default function IdeaWall() {
         position={"justify-center items-center"}
       >
         <div className="flex flex-col p-3">
-          <h3 className=" font-bold text-base mb-3">建立便利貼</h3>
+          <h3 className=" font-bold text-base mb-3">建立想法節點</h3>
           <p className=" font-bold text-base mb-3">標題</p>
           <input
             className=" rounded  p-1 w-full mb-3 shadow-lg hover:shadow-2xl"
@@ -339,6 +353,8 @@ export default function IdeaWall() {
             placeholder="標題"
             name="title"
             onChange={handleChange}
+            required
+            value={title}
           />
           <p className=" font-bold text-base mb-3 ">內容</p>
           <textarea
@@ -347,18 +363,21 @@ export default function IdeaWall() {
             placeholder="內容"
             name="content"
             onChange={handleChange}
+            required
+            value={content}
           />
         </div>
         <div className="flex justify-end m-2">
           <button
             onClick={() => setCreateNodeModalOpen(false)}
-            className="mx-auto w-full h-7 mb-2 bg-slate-100 rounded font-bold text-xs sm:text-sm text-black/60 mr-2"
+            className="mx-auto w-full h-7 mb-2 bg-zinc-300 rounded font-bold text-xs sm:text-sm text-black/60 mr-2"
           >
             取消
           </button>
           <button
             onClick={handleCreateSubmit}
-            className="mx-auto w-full h-7 mb-2 bg-teal-500 rounded font-bold text-xs sm:text-sm text-white"
+            className="mx-auto w-full h-7 mb-2 bg-cyan-600 rounded font-bold text-xs sm:text-sm text-white"
+            disabled={!title}
           >
             儲存
           </button>
@@ -373,10 +392,10 @@ export default function IdeaWall() {
           position={"justify-center items-center"}
         >
           <div className="flex flex-col p-3">
-            <h3 className=" font-bold text-base mb-3">檢視便利貼</h3>
+            <h3 className=" font-bold text-base mb-3">檢視想法節點</h3>
             <p className=" font-bold text-base mb-3">標題</p>
             <input
-              className=" rounded outline-none ring-2 p-1 w-full mb-3"
+              className=" rounded shadow-xl p-1 w-full mb-3"
               type="text"
               placeholder="標題"
               name="title"
@@ -385,7 +404,7 @@ export default function IdeaWall() {
             />
             <p className=" font-bold text-base mb-3">內容</p>
             <textarea
-              className=" rounded outline-none ring-2 w-full p-1"
+              className=" rounded shadow-xl w-full p-1"
               rows={3}
               placeholder="內容"
               name="content"
@@ -407,13 +426,13 @@ export default function IdeaWall() {
               <div className="flex">
                 <button
                   onClick={() => setUpdateNodeModalOpen(false)}
-                  className="w-16 h-7  bg-customgray rounded font-bold text-xs sm:text-bas text-black/60 mr-2"
+                  className="w-16 h-7  bg-zinc-300 rounded font-bold text-xs sm:text-bas text-black/60 mr-2"
                 >
                   取消
                 </button>
                 <button
                   onClick={handleUpdateSubmit}
-                  className="w-16 h-7 bg-cyan-800 rounded font-bold text-xs sm:text-bas text-white"
+                  className="w-16 h-7 bg-cyan-600 rounded font-bold text-xs sm:text-bas text-white"
                 >
                   儲存
                 </button>
@@ -423,7 +442,7 @@ export default function IdeaWall() {
             <div className="flex justify-end m-2">
               <button
                 onClick={() => setUpdateNodeModalOpen(false)}
-                className="mx-auto w-1/3 h-7 mb-2 bg-customgreen rounded font-bold text-xs sm:text-base text-white mr-2"
+                className="mx-auto w-1/3 h-7 mb-2 bg-zinc-300 rounded font-bold text-xs sm:text-base text-black/80 mr-2"
               >
                 關閉
               </button>

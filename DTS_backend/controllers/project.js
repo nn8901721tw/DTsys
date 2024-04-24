@@ -60,7 +60,8 @@ exports.createProject = async(req, res) => {
         mentor: projectMentor,
         referral_code: referral_code,
         currentStage:1,
-        currentSubStage:1
+        currentSubStage:1,
+        ProjectEnd:false
     });
     const userId = req.body.userId;
     const creater = await User.findByPk(userId);
@@ -375,7 +376,10 @@ exports.inviteForProject = async (req, res) => {
 
         console.log('Successfully invited user to project!');
         // 成功邀请用户加入项目
-        return res.status(200).json({ message: '成功加入活動!' });
+        return res.status(200).json({ 
+            message: '成功加入活動!',
+            projectId: referralProject.id // 返回项目ID
+         });
     } catch (error) {
         console.error(error);
         return res.status(500).json({ message: 'Internal server error!' });

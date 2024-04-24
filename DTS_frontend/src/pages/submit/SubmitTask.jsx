@@ -28,6 +28,8 @@ export default function SubmitTask() {
             localStorage.removeItem("currentStage");
             localStorage.removeItem("currentSubStage");
             socket.emit('taskUpdated'); // 廣播任務更新事件
+            socket.emit('taskSubmitted', { projectId: projectId, message: 'Task updated' });
+            console.log("taskSubmitted");
             navigate(`/project/${projectId}/kanban`);
         },
         onError : (error) =>{

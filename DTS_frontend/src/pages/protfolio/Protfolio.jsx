@@ -6,10 +6,20 @@ import { getAllSubmit } from "../../api/submit";
 import Loader from "../../components/Loader";
 import DragCloseModal from "./components/DragCloseModal";
 import FileDownload from "js-file-download";
+import { AiFillTag } from "react-icons/ai";
+
 export default function Portfolio() {
   const [groupedPortfolio, setGroupedPortfolio] = useState({});
   const [modalOpen, setModalOpen] = useState(false);
   const [modalData, setModalData] = useState({});
+
+  // 将 currentStage 和 currentSubStage 保存在状态中
+  const [projectname, setProjectname] = useState(localStorage.getItem("name"));
+  // 将 currentStage 和 currentSubStage 保存在状态中
+  const [projectEnd, setProjectEnd] = useState(
+    localStorage.getItem("ProjectEnd")
+  );
+
   const { projectId } = useParams();
 
   const { isLoading, isError, data } = useQuery(
@@ -53,7 +63,13 @@ export default function Portfolio() {
 
   return (
     <div className="min-w-full h-screen overflow-y-auto scrollbar-thin">
-      <div className="flex flex-col my-5 pl-20 pr-5 sm:px-32 py-16 justify-start items-start ">
+      <div className="flex fixed top-[70px] left-20 text-[#446269] cursor-default">
+        <AiFillTag className="w-6 h-6" />
+        <span className="justify-center items-center translate-x-2 font-semibold">
+        主題 : {projectname}
+        </span>
+      </div>
+      <div className="flex flex-col my-10 pl-44 pr-5 py-16 justify-start items-start ">
         {Object.keys(titles).map((prefix) => (
           <div key={prefix}>
             <h3 className="text-3xl font-bold mb-2 ml-4">{titles[prefix]}</h3>
@@ -117,24 +133,23 @@ export default function Portfolio() {
                       modalData.fileData.data
                     );
                     console.log("modalData.filename", modalData.filename);
-               
-                      console.log("modalData", modalData);
-                      // // 将 Buffer 转换为 Uint8Array
-                      // const buffer = new Uint8Array(modalData.fileData.data);
-                      // // 创建 Blob 对象
-                      // const blob = new Blob([buffer], { type: modalData.mimetype });
 
-                      // 将 Buffer 转换为 Uint8Array
-                      const buffer = new Uint8Array(modalData.fileData.data);
-                      // 创建 Blob 对象
-                      const blob = new Blob([buffer], {
-                        type: "application/octet-stream",
-                      });
+                    console.log("modalData", modalData);
+                    // // 将 Buffer 转换为 Uint8Array
+                    // const buffer = new Uint8Array(modalData.fileData.data);
+                    // // 创建 Blob 对象
+                    // const blob = new Blob([buffer], { type: modalData.mimetype });
 
-                      // 触发文件下载
-                      FileDownload(blob, modalData.filename);
-                    }
-                  }
+                    // 将 Buffer 转换为 Uint8Array
+                    const buffer = new Uint8Array(modalData.fileData.data);
+                    // 创建 Blob 对象
+                    const blob = new Blob([buffer], {
+                      type: "application/octet-stream",
+                    });
+
+                    // 触发文件下载
+                    FileDownload(blob, modalData.filename);
+                  }}
                 >
                   {/* <AiOutlineCloudDownload size={32} className=" text-black mr-1" /> */}
                   <span>下載附件</span>

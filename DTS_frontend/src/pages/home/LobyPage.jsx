@@ -73,17 +73,6 @@ const Cards = () => {
     },
   });
 
-  // const {mutate: referral_CodeMutate } = useMutation( inviteForProject, {
-  //   onSuccess : ( res ) =>{
-  //     console.log(res);
-  //     queryClient.invalidateQueries("projectDatas")
-  //     sucesssReferralCodeNotify(res.message)
-  //   },
-  //   onError : (error) =>{
-  //     console.log(error);
-  //     errorReferralCodeNotify(error.response.data.message)
-  //   }
-  // })
   const { mutate: referral_CodeMutate } = useMutation(inviteForProject, {
     onSuccess: (res) => {
       console.log(res);
@@ -136,8 +125,26 @@ const Cards = () => {
   };
 
   const handleSubmitReferral_Code = () => {
-    referral_CodeMutate(inviteprojectData);
+    referral_CodeMutate(inviteprojectData, {
+      onSuccess: (response) => {
+        // 假设返回的响应中包含了活动的ID
+        const projectId = response.projectId;
+        // 使用 navigate 函数跳转到活动页面
+        navigate(`/project/${projectId}/kanban`);
+        setInviteProjectModalOpen(false);
+      },
+      onError: (error) => {
+        console.error('Failed to join project:', error);
+        Swal.fire({
+          icon: 'error',
+          title: 'Failed to Join',
+          text: error.response ? error.response.data.message : 'Error joining project',
+        });
+      }
+    });
   };
+  
+  
 
   const errorReferralCodeNotify = (toastContent) => toast.error(toastContent);
   const sucesssReferralCodeNotify = (toastContent) =>
@@ -173,11 +180,11 @@ const Cards = () => {
     <div className="min-w-full   ">
       <TopBar />
 
-      <div className="w-full h-screen py-[10rem] 2xl:py-[12rem] lg:py-[6rem] md:py-[8rem] px-4 bg-[#F7F6F6]0">
+      <div className="w-full h-screen py-[10rem] 2xl:py-[9rem] lg:py-[6rem] md:py-[8rem] px-4 bg-[#F7F6F6]0">
         <div className="flex justify-center pb-8">
           <h1 className="text-3xl font-semibold">加入或建立設計思考活動!</h1>
         </div>
-        <div className=" 2xl:max-w-[1350px] xl:max-w-[1000px] lg:max-w-[900px] md:max-w-[650px] mx-auto grid md:grid-cols-3 gap-4 justify-items-center cursor-pointer">
+        <div className=" 2xl:max-w-[1150px] xl:max-w-[1000px] lg:max-w-[900px] md:max-w-[650px] mx-auto grid md:grid-cols-3 gap-4 justify-items-center cursor-pointer">
           
           <div
             className="w-48 h-48 bg-[#B6D2D4] shadow-xl flex flex-col p-4 my-4 mx-10 rounded-2xl hover:scale-105 duration-300 "

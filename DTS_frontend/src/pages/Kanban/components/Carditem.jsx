@@ -16,7 +16,7 @@ import { socket } from "../../../utils/socket";
 import { MovingBorder } from "./ui/moving-border.jsx";
 import Lottie from "lottie-react";
 import cardarrow from "../../../assets/cardarrow.json";
-
+import { BsPersonCircle } from "react-icons/bs";
 import { useNavigate } from "react-router-dom";
 
 export default function Carditem({
@@ -25,12 +25,16 @@ export default function Carditem({
   columnIndex,
   isFirst,
   isProgressing,
-  columnId
+  columnId,
 }) {
   const [open, setOpen] = useState(false);
   const [tagModalopen, setTagModalOpen] = useState(false);
   const [assignMemberModalopen, setAssignMemberModalOpen] = useState(false);
   const { projectId } = useParams();
+  const [projectEnd, setProjectEnd] = useState(
+    localStorage.getItem("ProjectEnd")
+  );
+console.log("projectEnd",projectEnd);
   const [cardData, setCardData] = useState({
     id: "",
     title: "",
@@ -47,7 +51,7 @@ export default function Carditem({
   const shouldAnimate = isFirst && isProgressing;
 
   // 计算边框样式和动画类
-  const borderClass = shouldAnimate ? 'border-2 border-red-500' : 'border-0';
+  const borderClass = shouldAnimate ? "border-2 border-red-500" : "border-0";
 
   const handleClick = () => {
     setClickedCardIndex(index);
@@ -79,41 +83,56 @@ export default function Carditem({
     }));
   };
   const cardHandleSubmit = () => {
-    socket.emit("cardUpdated", { cardData, columnIndex, index ,projectId});
+    socket.emit("cardUpdated", { cardData, columnIndex, index, projectId });
     setOpen(false);
   };
- // 计算边框样式
- // 计算边框样式
-//  const borderClass = isFirst && isProgressing ? 'border-2 border-blue-500 rounded-md' : '';
- const borderStyle = isFirst && isProgressing ? 'border-2 border-blue-500 rounded-md' : '';
- const navigate = useNavigate();  // 创建导航函数
+  // 计算边框样式
+  // 计算边框样式
+  //  const borderClass = isFirst && isProgressing ? 'border-2 border-blue-500 rounded-md' : '';
+  const borderStyle =
+    isFirst && isProgressing ? "border-2 border-blue-500 rounded-md" : "";
+  const navigate = useNavigate(); // 创建导航函数
 
- const handleNavigate = () => {
-  navigate(`/project/${projectId}/ideaWall`);  // 使用模板字符串导航到 Ideal Wall 页面
- };
+  const handleNavigate = () => {
+    navigate(`/project/${projectId}/ideaWall`); // 使用模板字符串导航到 Ideal Wall 页面
+  };
 
- const cardHandleDelete = () => {
+  const cardHandleDelete = () => {
+    Swal.fire({
+      title: "刪除",
+      text: "確定要刪除卡片嗎?",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonColor: "#5BA491",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "確定",
+      cancelButtonText: "取消",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        console.log("columnId", columnId);
+        socket.emit("cardDelete", { cardData, columnId, index });
+        setOpen(false);
+      }
+    });
+  };
 
-  Swal.fire({
-    title: "刪除",
-    text: "確定要刪除卡片嗎?",
-    icon: "question",
-    showCancelButton: true,
-    confirmButtonColor: "#5BA491",
-    cancelButtonColor: "#d33",
-    confirmButtonText: "確定",
-    cancelButtonText: "取消"
-  }).then((result) => {
-    if (result.isConfirmed) {
-      console.log("columnId",columnId);
-      socket.emit("cardDelete", { cardData, columnId, index });
-      setOpen(false);
-    }
-  });
-
-
-}
-
+  const colors = [
+    "bg-cyan-700",
+    "bg-green-500",
+    "bg-blue-500",
+    "bg-cyan-500",
+    "bg-teal-500",
+    "bg-blue-700",
+    "bg-teal-700",
+    "bg-cyan-600",
+    "bg-indigo-500",
+    "bg-lime-500",
+    "bg-emerald-500",
+    "bg-cyan-500",
+    "bg-amber-500",
+    "bg-violet-500",
+    "bg-fuchsia-500",
+  ];
 
   return (
     <>
@@ -121,34 +140,37 @@ export default function Carditem({
         index={index}
         draggableId={data && data.id ? data.id.toString() : " "}
       >
-        
         {(provided, snapshot) => (
           <div
             ref={provided.innerRef}
             {...provided.draggableProps}
             {...provided.dragHandleProps}
-            className={`${borderStyle} rounded-md p-3 truncate min-h-[100px] max-w-full shadow-md  font-semibold hover:shadow-xl mt-1 ${
-              snapshot.isDragging ? 'bg-sky-300' : 'bg-white'
+            className={`${borderStyle} rounded-md p-3 truncate min-h-[100px] max-w-full shadow-md  font-semibold hover:shadow-xl mt-1 hover:skew-y-1 ${
+              snapshot.isDragging ? "bg-sky-300 " : "bg-white"
             }`}
-
           >
-
-            <div  className="truncate">
+            <div className="truncate">
               <span className=" text-md my-3 text-base leading-6 w-3/5 ">
                 {index + 1}. {data.content}
               </span>
               <div className="flex justify-between  ">
                 <span className="flex text-lg text-">{data.title}</span>
                 <div className="flex items-center">
-                  <FiEdit
-                    onClick={() => setOpen(true)}
-                    className="w-5 h-5 cursor-pointer mr-2"
-                  />
-                  {isFirst && isProgressing ?
-                  
-                  <Lottie onClick={handleNavigate}className="w-5 h-5 cursor-pointer" animationData={cardarrow}  
-
-                  />:""}
+                  {projectEnd && (
+                    <FiEdit
+                      onClick={() => setOpen(true)}
+                      className="w-5 h-5 cursor-pointer mr-2"
+                    />
+                  )}
+                  {isFirst && isProgressing ? (
+                    <Lottie
+                      onClick={handleNavigate}
+                      className="w-5 h-5 cursor-pointer"
+                      animationData={cardarrow}
+                    />
+                  ) : (
+                    ""
+                  )}
                 </div>
               </div>
 
@@ -192,7 +214,7 @@ export default function Carditem({
           <div className="flex justify-between">
             <div className="flex flex-col w-2/3">
               <input
-                className=" rounded outline-none ring-2 p-1 ring-customgreen w-full mb-3"
+                className=" rounded shadow-lg p-1 w-full mb-3"
                 type="text"
                 placeholder="title"
                 name="title"
@@ -200,7 +222,7 @@ export default function Carditem({
                 onChange={cardHandleChange}
               />
               <textarea
-                className=" rounded outline-none ring-2 ring-customgreen w-full p-1"
+                className=" rounded shadow-lg w-full p-1"
                 rows={3}
                 placeholder="Task info"
                 name="content"
@@ -247,24 +269,41 @@ export default function Carditem({
               <div className="flex flex-row">
                 {cardData.assignees &&
                   cardData.assignees.map((assignee, index) => {
+                    const bgColor = colors[(assignee.id - 1) % colors.length]; // 使用用户 ID 取模来获取颜色
                     return (
-                      <div
-                        key={index}
-                        className={`w-8 h-8 border-[1px] border-slate-400 bg-slate-100 rounded-full flex items-center text-center p-2 shadow-xl text-xs cursor-default`}
-                      >
-                        {assignee.username}
+                      // <div
+                      //   key={index}
+                      //   className={`w-8 h-8 border-[1px] border-slate-400 bg-slate-100 rounded-full flex items-center text-center p-2 shadow-xl text-xs cursor-default`}
+                      // >
+                      //   {assignee.username}
+                      // </div>
+
+                      <div key={index} className="relative group">
+                        <div
+                          className={`${bgColor} -mx-1 w-8 h-8 rounded-full flex items-center justify-center shadow-lg cursor-pointer`}
+                        >
+                          <BsPersonCircle className="w-full h-full text-white" />
+                        </div>
+                        {/* Tooltip */}
+                        <div
+                          className={`${bgColor} absolute opacity-0 group-hover:opacity-100 bg-black text-white text-xs rounded-lg p-2 z-10 transition-all duration-200 ease-in-out transform group-hover:translate-y-20 group-hover:scale-105 hidden group-hover:block bottom-full mb-2`}
+                        >
+                          {assignee.username}
+                        </div>
                       </div>
                     );
                   })}
               </div>
             </div>
             <div className="flex flex-row items-end w-1/3 ml-4">
-            <button className="flex justify-center items-center w-full h-7 mb-2 bg-[#fa3c3c] rounded font-bold text-xs sm:text-sm text-white mr-2"
-                onClick={cardHandleDelete}>
+              <button
+                className="flex justify-center items-center w-full h-7 mb-2 bg-[#fa3c3c] rounded font-bold text-xs sm:text-sm text-white mr-2"
+                onClick={cardHandleDelete}
+              >
                 刪除
               </button>
               <button
-                className="flex justify-center items-center w-full h-7 mb-2 bg-customgray rounded font-bold text-xs sm:text-sm text-black/60 mr-2"
+                className="flex justify-center items-center w-full h-7 mb-2 bg-[#cbcfcf] rounded font-bold text-xs sm:text-sm text-black/60 mr-2"
                 onClick={() => {
                   setOpen(false);
                   cardDataReset();
@@ -273,7 +312,7 @@ export default function Carditem({
                 取消
               </button>
               <button
-                className="flex justify-center items-center w-full h-7 mb-2 bg-[#A2C4C6] rounded font-bold text-xs sm:text-sm text-white"
+                className="flex justify-center items-center w-full h-7 mb-2 bg-[#A2C4C6] rounded font-bold text-xs sm:text-sm text-gray-700 "
                 onClick={cardHandleSubmit}
               >
                 儲存

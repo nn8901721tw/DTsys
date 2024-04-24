@@ -161,11 +161,11 @@ export default function HomePage() {
       <TopBar />
 
       <div className="flex flex-col my-5 sm:px-10 md:px-6  py-16 w-full h-screen items-center">
-        <div className="flex justify-between w-[65%] ml-24">
-          <h5 className="font-bold text-3xl text-center flex-grow">
+        <div className="flex justify-between w-[65%] ml-24 py-4">
+          <h5 className="font-bold text-3xl text-center flex-grow ">
             設計思考活動列表
           </h5>
-          <div className="order-last">
+          <div className="order-last ">
             <AnimatedDropdown handleSortChange={handleSortChange} />
           </div>
         </div>

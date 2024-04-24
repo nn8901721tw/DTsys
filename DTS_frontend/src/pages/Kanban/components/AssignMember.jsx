@@ -2,6 +2,8 @@ import React from 'react'
 
 export default function AssignMember({menberData, setMenberData, setCardData }) {
 
+
+
     const handleChangeCheckBox = (e) => {
         const {name, checked} = e.target;
         if(name ==="allSelect"){
@@ -39,9 +41,12 @@ export default function AssignMember({menberData, setMenberData, setCardData }) 
                     onChange={handleChangeCheckBox}
                     />
             </div>
+
             <h4 className='font-bold mt-2 mb-2'>專案成員</h4>
             {
                 menberData.map((member, index) => {
+   
+
                     return(
                         <div key={index} className='flex flex-row  justify-between bg-customgray w-full p-2 mb-2'>
                             <div className=' text-base'>{member.username}</div>

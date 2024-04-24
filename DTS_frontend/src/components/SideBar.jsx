@@ -28,7 +28,7 @@ export default function SideBar() {
 
     return (
         <>
-            <div className={` bg-[#FFF] fixed inset-y-16 left-0 min-h-screen duration-500 border-r-2  ${open ? "w-44" : "w-16"} z-10 `}>
+            <div className={`shadow-xl bg-[#d0d9db] fixed inset-y-16 left-0 min-h-screen duration-500 border-r-2  ${open ? "w-44" : "w-16"} z-10 `}>
                 <div className='mt-2 py-3 pl-3 flex justify-start'>
                     <FaBars size={26} className='cursor-pointer' onClick={()=>setOpen(!open)}/>
                 </div>

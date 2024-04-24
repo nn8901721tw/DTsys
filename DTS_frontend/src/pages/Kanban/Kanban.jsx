@@ -30,10 +30,12 @@ import {
   addCardItem,
 } from "../../api/kanban";
 import { getSubStage } from "../../api/stage";
+import { getProject } from "../../api/project";
 import { createTaskAndUpdateColumn } from "../../api/task";
 import { getScaffoldingTemplate } from "../../api/scaffoldingtemplate";
 import { socket } from "../../utils/socket";
 import SpringModal from "./components/SpringModel"; // 確保從正確的路徑導入 SpringModal
+import { AiFillTag } from "react-icons/ai";
 
 export default function Kanban() {
   const [kanbanData, setKanbanData] = useState([]);
@@ -65,6 +67,12 @@ export default function Kanban() {
   );
   const [currentSubStage, setCurrentSubStage] = useState(
     localStorage.getItem("currentSubStage")
+  );
+  // 将 currentStage 和 currentSubStage 保存在状态中
+  const [projectname, setProjectname] = useState(localStorage.getItem("name"));
+  // 将 currentStage 和 currentSubStage 保存在状态中
+  const [projectEnd, setProjectEnd] = useState(
+    localStorage.getItem("ProjectEnd")
   );
 
   const [showFlyout, setShowFlyout] = useState(false);
@@ -140,7 +148,6 @@ export default function Kanban() {
   }, [stageInfo.currentStage, stageInfo.currentSubStage, queryClient]);
 
   useEffect(() => {
-
     socket.connect();
     socket.emit("joinProject", projectId);
     function KanbanUpdateEvent(data) {
@@ -155,7 +162,12 @@ export default function Kanban() {
         setKanbanData(data);
       }
     }
+    const handleRefreshKanban = (newStages) => {
+      queryClient.invalidateQueries("getProject");
+      queryClient.invalidateQueries("getSubStage");
+    };
 
+    socket.on("refreshKanban", handleRefreshKanban);
     socket.on("taskItems", KanbanUpdateEvent);
     socket.on("taskItem", KanbanUpdateEvent);
     socket.on("dragtaskItem", kanbanDragEvent);
@@ -165,25 +177,8 @@ export default function Kanban() {
       socket.off("taskItem", KanbanUpdateEvent);
       socket.off("dragtaskItem", kanbanDragEvent);
       socket.emit("leaveProject", projectId);
-      socket.disconnect();
     };
   }, [socket, projectId]);
-
-
-
-  //////////////////////
-  // useEffect(() => {
-  //   if (
-  //     !localStorage.getItem("currentStage") ||
-  //     !localStorage.getItem("currentSubStage")
-  //   ) {
-  //     navigate(0, { replace: true });
-  //   }
-  // }, [
-  //   localStorage.getItem("currentStage"),
-  //   localStorage.getItem("currentSubStage"),
-  // ]);
-  /////////////////////////
 
   useEffect(() => {
     if (!currentStage || !currentSubStage) {
@@ -202,7 +197,7 @@ export default function Kanban() {
       destination,
       source,
       kanbanData,
-      projectId
+      projectId,
     });
   };
 
@@ -361,49 +356,35 @@ export default function Kanban() {
   const handleSubmitTask = async (e) => {
     e.preventDefault();
 
-    // // 使用 SweetAlert2 彈出對話框
-    // const result = await Swal.fire({
-    //   title: "是否完成？",
-    //   text: "確定提交此任務嗎？",
-    //   icon: "question",
-    //   showCancelButton: true,
-    //   cancelButtonText: "取消",
-    //   confirmButtonText: "確定",
-    // });
+    // Find the "進行中" column
+    const inProgressColumn = kanbanData.find(
+      (column) => column.name === "進行中"
+    );
 
-    // // 如果用戶確定，則問是否有成果要上傳
-    // if (result.isConfirmed) {
-    const resultUpload = await Swal.fire({
-      title: "成果上傳",
-      text: "是否有成果要上傳？",
-      icon: "warning",
-      showCancelButton: true,
-      cancelButtonText: "沒有",
-      confirmButtonText: "上傳",
-    });
+    if (inProgressColumn && inProgressColumn.task.length === 0) {
+      const resultUpload = await Swal.fire({
+        title: `"${projectname}"階段任務皆已完成`,
+        text: "進入成果上傳頁面",
+        icon: "warning",
+        showCancelButton: true,
+        cancelButtonText: "沒有",
+        confirmButtonText: "上傳",
+      });
 
-    // 按下取消，則執行提交操作
-    // eif (resultUpload.isDismissed) {
-    //   const formData = new FormData();
-    //   formData.append("projectId", projectId);
-    //   formData.append("currentStage", stageInfo.currentStage);
-    //   formData.append("currentSubStage", stageInfo.currentSubStage);
-    //   formData.append("content", " ");
-
-    //   try {
-    //     await mutate(formData);
-    //   } catch (error) {
-    //     console.error("Error during submission:", error);
-    //   }
-    // }
-    if (resultUpload.isConfirmed) {
-      navigate(`/project/${projectId}/submitTask`);
-      console.log("進行上傳成果的操作");
+      if (resultUpload.isConfirmed) {
+        navigate(`/project/${projectId}/submitTask`);
+        console.log("進行上傳成果的操作");
+      }
+    } else {
+      // If tasks are still in progress, show error
+      Swal.fire({
+        title: "有未完成的任務!",
+        text: "此階段仍有進行中的任務，請先完成喔!",
+        icon: "error",
+        confirmButtonText: "Ok",
+      });
     }
-    // }
   };
-
-  //////////////////////////
 
   // 從 localStorage 中獲取當前的階段和子階段
   const currentLocalStorageStage = parseInt(
@@ -452,8 +433,11 @@ export default function Kanban() {
       );
       const newTasksIds = responses.map((res) => res.data.taskId);
       // 你可能需要在这里通知服务器，比如发送一个socket事件来告知新创建的任务ID
-      socket.emit("tasksCreated", { columnId: doingColumnId, newTasksIds,
-        projectId });
+      socket.emit("tasksCreated", {
+        columnId: doingColumnId,
+        newTasksIds,
+        projectId,
+      });
 
       // 更新前端狀態或提示用戶
       // ... 這裡可能需要更新前端的 column 狀態，取決於您的實際需求 ...
@@ -486,7 +470,7 @@ export default function Kanban() {
       socket.emit("tasksCreated", {
         columnId: doingColumnId,
         taskId: newTaskId,
-        projectId:projectId
+        projectId: projectId,
       });
     } catch (error) {
       console.error("Error importing task:", error);
@@ -519,7 +503,6 @@ export default function Kanban() {
       socket.off("tasksCreated", handleTasksCreated);
     };
   }, [socket]);
-
 
   // 当点击Lottie动画时，调用此函数来添加通知
   const handleLottieClick = () => {
@@ -562,26 +545,143 @@ export default function Kanban() {
     }, 5000); // Remove notification after 5 seconds
   };
 
-  return (
-    <DragDropContext onDragEnd={onDragEnd}>
-      <motion.div
-        initial="hidden"
-        animate={showContainer ? "visible" : "hidden"}
-        exit="exit"
-        variants={containerVariants}
-        transition={{ duration: 0.5 }}
-        className="fixed top-16 left-0 right-0 z-10"
-        style={{
-          opacity: showContainer ? 1 : 0,
-          y: showContainer ? 0 : 50,
-          visibility: showContainer ? "visible" : "hidden",
-        }}
-      >
-        <div className="transition-all duration-500 transform flex flex-col items-center bg-slate-200 lg:mx-64 xl:mx-80 rounded-2xl opacity-100 scale-y-100 text-gray-700">
-          <div className="wrapper">
-            <div className="flex font-bold text-lg pt-1 ">階段</div>
-          </div>
+  const getProjectQuery = useQuery("getProject", () => getProject(projectId), {
+    onSuccess: (data) => {
+      localStorage.setItem("currentStage", data.currentStage);
+      localStorage.setItem("currentSubStage", data.currentSubStage);
+      localStorage.setItem("name", data.name);
+      localStorage.setItem("ProjectEnd", data.ProjectEnd);
+      setCurrentSubStage(data.currentSubStage);
+      setCurrentStage(data.currentStage);
+      setProjectname(data.name);
+      setProjectEnd(data.ProjectEnd);
+    },
+    enabled: !!projectId,
+  });
 
+  return (
+    <div className="bg-slate-100 h-full">
+      <div className="flex fixed top-[70px] left-20 text-[#446269] cursor-default ">
+        <AiFillTag className="w-6 h-6" />
+        <span className="justify-center items-center translate-x-2 font-semibold">
+          主題 : {projectname}
+        </span>
+      </div>
+
+      <DragDropContext onDragEnd={onDragEnd} className='bg-slate-100'>
+        <motion.div
+          initial="hidden"
+          animate={showContainer ? "visible" : "hidden"}
+          exit="exit"
+          variants={containerVariants}
+          transition={{ duration: 0.5 }}
+          className="fixed top-16 left-0 right-0 z-10"
+          style={{
+            opacity: showContainer ? 1 : 0,
+            y: showContainer ? 0 : 50,
+            visibility: showContainer ? "visible" : "hidden",
+          }}
+        >
+          <div className="transition-all duration-500 transform flex flex-col items-center bg-slate-200 lg:mx-64 xl:mx-80 rounded-2xl opacity-100 scale-y-100 text-gray-700">
+            <div className="wrapper">
+              <div className="flex font-bold text-lg pt-1 ">階段</div>
+            </div>
+
+            <div className="wrapper flex flex-row">
+              {stages1.map((subStage, index) => (
+                <div key={index} className="flex justify-center pt-1 ">
+                  <React.Fragment>
+                    {index !== 0 && (
+                      <hr className="border-solid border-t-8 w-6 items-center justify-center my-auto border-[#C4D8D9]" />
+                    )}
+                    <div
+                      className={`relative px-3 w-32 rounded-md h-14  text-xl font-bold text-center flex items-center justify-center ${
+                        parseInt(stageInfo.currentStage) === index + 1
+                          ? "bg-[#5698a0] animate-none text-white"
+                          : currentLocalStorageStage > index + 1
+                          ? "bg-[#5d92a7] text-white"
+                          : "bg-[#c4cfcf]"
+                      }`}
+                    >
+                      {currentLocalStorageStage > index + 1 && (
+                        <FiCheckCircle className="absolute top-1 right-1 text-sky-100" />
+                      )}
+                      {subStage}
+                    </div>
+                  </React.Fragment>
+                </div>
+              ))}
+            </div>
+            <div className="wrapper">
+              <div className="flex font-bold text-lg pt-1">子階段</div>
+            </div>
+            <div className="wrapper flex flex-col">
+              {stages2.map((stage, stageIndex) => (
+                <div
+                  key={stageIndex}
+                  className="flex flex-row justify-center pt-1"
+                >
+                  {stage.map((subStage, subStageIndex) => (
+                    <React.Fragment key={subStageIndex}>
+                      {subStageIndex !== 0 && (
+                        <hr className="border-solid border-t-8 w-6 items-center justify-center my-auto border-[#E2E8F0]" />
+                      )}
+                      {subStage ? (
+                        <div
+                          className={`relative px-3 w-32  rounded-md h-12 text-sm font-bold text-gray-700 text-center flex items-center justify-center cursor-pointer ${
+                            stageInfo.name === subStage
+                              ? "bg-[#5698a0] animate-bounce text-white"
+                              : currentLocalStorageStage > subStageIndex + 1 ||
+                                (currentLocalStorageStage ===
+                                  subStageIndex + 1 &&
+                                  currentLocalStorageSubStage > stageIndex &&
+                                  currentLocalStorageSubStage !==
+                                    stageIndex + 1)
+                              ? "bg-[#5d92a7] text-white"
+                              : "bg-[#c4cfcf]"
+                          }`}
+                          onClick={() =>
+                            handleSubStageClick(
+                              subStage,
+                              stageIndex,
+                              subStageIndex
+                            )
+                          }
+                        >
+                          {(currentLocalStorageStage > subStageIndex + 1 ||
+                            (currentLocalStorageStage === subStageIndex + 1 &&
+                              currentLocalStorageSubStage > stageIndex &&
+                              currentLocalStorageSubStage !==
+                                stageIndex + 1)) && (
+                            <FiCheckCircle className="absolute top-1 right-1 text-sky-100" />
+                          )}
+                          {subStage}
+                        </div>
+                      ) : (
+                        <div className=" px-3 w-32  rounded-md h-12  text-sm font-bold text-white text-center flex items-center justify-center bg-[#E2E8F0] cursor-default ">
+                          {subStage}
+                        </div>
+                      )}
+                    </React.Fragment>
+                  ))}
+                </div>
+              ))}
+            </div>
+
+            <div className="wrapper">
+              <div className="bg-slate-200 flex justify-center w-full">
+                <button
+                  className="ml-2 hover:text-gray-700 focus:outline-none transition ease-in-out delay-150 hover:-translate-y-3 hover:scale-150  duration-300"
+                  onClick={() => setShowContainer(!showContainer)}
+                >
+                  <FiChevronUp className=" animate-bounce w-5 h-5 " />
+                </button>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+
+        <div className="flex flex-row justify-center mx-auto bg-slate-100 px-24 pt-20 mt-2 ">
           <div className="wrapper flex flex-row">
             {stages1.map((subStage, index) => (
               <div key={index} className="flex justify-center pt-1 ">
@@ -590,273 +690,185 @@ export default function Kanban() {
                     <hr className="border-solid border-t-8 w-6 items-center justify-center my-auto border-[#C4D8D9]" />
                   )}
                   <div
-                    className={`relative px-3 w-32 rounded-md h-14  text-xl font-bold text-center flex items-center justify-center ${
+                    className={`px-3 w-32 rounded-md h-14  text-xl font-bold text-white text-center flex items-center justify-center ${
                       parseInt(stageInfo.currentStage) === index + 1
-                        ? "bg-[#5698a0] animate-none text-white"
-                        : currentLocalStorageStage > index + 1
-                        ? "bg-[#5d92a7] text-white"
+                        ? "bg-[#5698a0]"
                         : "bg-[#c4cfcf]"
                     }`}
                   >
-                    {currentLocalStorageStage > index + 1 && (
-                      <FiCheckCircle className="absolute top-1 right-1 text-sky-100" />
-                    )}
                     {subStage}
                   </div>
                 </React.Fragment>
               </div>
             ))}
           </div>
-          <div className="wrapper">
-            <div className="flex font-bold text-lg pt-1">子階段</div>
-          </div>
-          <div className="wrapper flex flex-col">
-            {stages2.map((stage, stageIndex) => (
+        </div>
+
+        <div className="bg-slate-100 flex items-center justify-center">
+          <button
+            className=" transition ease-in-out delay-150 hover:translate-y-2 hover:scale-125  duration-300"
+            onClick={() => {
+              setShowContainer(true); // 新增的部分
+            }}
+          >
+            <FiChevronDown className="w-5 h-5 " />
+          </button>
+        </div>
+        <div className="flex justify-end bg-slate-100 pr-44 -mt-7">
+          <button
+            className={`text-sm font-bold transition delay-150 duration-300 px-4 py-2 rounded-md ${
+              isPreviousStageIncomplete ||
+              isStageIncomplete ||
+              isStagecomplete ||
+              projectEnd // 新增 isStagecomplete 到條件中
+                ? "bg-gray-300 cursor-not-allowed"
+                : "bg-teal-600 hover:-translate-y-1 hover:scale-110 hover:bg-teal-700 text-white"
+            }`}
+            onClick={handleSubmitTask}
+            disabled={
+              isPreviousStageIncomplete ||
+              isStageIncomplete ||
+              isStagecomplete ||
+              projectEnd
+            } // 根據 isStagecomplete 設置 disabled
+          >
+            {isPreviousStageIncomplete || isStageIncomplete
+              ? "請完成先前階段"
+              : projectEnd
+              ? "所有階段皆完成!"
+              : isStagecomplete
+              ? "已完成"
+              : "完成此階段"}
+          </button>
+        </div>
+        <SlideInNotifications
+          notifications={notifications}
+          setNotifications={setNotifications}
+        />
+
+        <div className="grid grid-cols-4 gap-5 px-44 pt-2  min-w-[800px] h-fit overflow-hidden bg-slate-100  ">
+          <div className="flex flex-col">
+            {projectEnd ? (
+              ""
+            ) : (
+              <>
+                <AiFillPushpin className="translate-y-4 -mt-4 text-[#787c85] w-7 h-5" />
+                <TaskHint className="" stageInfo={stageInfo} />
+              </>
+            )}
+
+            {projectEnd ? (
+              <Lottie
+                className="w-96 h-96 z-0 ml-44 "
+                animationData={welldone}
+              />
+            ) : (
               <div
-                key={stageIndex}
-                className="flex flex-row justify-center pt-1"
+                onMouseEnter={() => setShowFlyout(true)}
+                onMouseLeave={() => setShowFlyout(false)}
+                className="flex mt-32"
+                onClick={handleLottieClick} // Define handleLottieClick if it has specific functionality
               >
-                {stage.map((subStage, subStageIndex) => (
-                  <React.Fragment key={subStageIndex}>
-                    {subStageIndex !== 0 && (
-                      <hr className="border-solid border-t-8 w-6 items-center justify-center my-auto border-[#E2E8F0]" />
-                    )}
-                    {subStage ? (
-                      <div
-                        className={`relative px-3 w-32  rounded-md h-12 text-sm font-bold text-gray-700 text-center flex items-center justify-center cursor-pointer ${
-                          stageInfo.name === subStage
-                            ? "bg-[#5698a0] animate-bounce text-white"
-                            : currentLocalStorageStage > subStageIndex + 1 ||
-                              (currentLocalStorageStage === subStageIndex + 1 &&
-                                currentLocalStorageSubStage > stageIndex &&
-                                currentLocalStorageSubStage !== stageIndex + 1)
-                            ? "bg-[#5d92a7] text-white"
-                            : "bg-[#c4cfcf]"
-                        }`}
-                        onClick={() =>
-                          handleSubStageClick(
-                            subStage,
-                            stageIndex,
-                            subStageIndex
-                          )
-                        }
-                      >
-                        {(currentLocalStorageStage > subStageIndex + 1 ||
-                          (currentLocalStorageStage === subStageIndex + 1 &&
-                            currentLocalStorageSubStage > stageIndex &&
-                            currentLocalStorageSubStage !==
-                              stageIndex + 1)) && (
-                          <FiCheckCircle className="absolute top-1 right-1 text-sky-100" />
-                        )}
-                        {subStage}
-                      </div>
-                    ) : (
-                      <div className=" px-3 w-32  rounded-md h-12  text-sm font-bold text-white text-center flex items-center justify-center bg-[#E2E8F0] cursor-default ">
-                        {subStage}
-                      </div>
-                    )}
-                  </React.Fragment>
-                ))}
+                <Lottie
+                  className=" w-50 h-40 z-0 scale-x-[-1] -translate-x-32  "
+                  animationData={owlAnimation}
+                />
+                <Lottie
+                  className="wh-16 h-16 z-0 -translate-x-32 "
+                  animationData={question}
+                  loop={false} // Stop looping
+                  autoplay={true} // Automatically start playing
+                />
+                {showFlyout && (
+                  <OwlquestionFlyoutLink onImageClick={handleImageClick} />
+                )}
               </div>
-            ))}
+            )}
           </div>
 
-          <div className="wrapper">
-            <div className="bg-slate-200 flex justify-center w-full">
-              <button
-                className="ml-2 hover:text-gray-700 focus:outline-none transition ease-in-out delay-150 hover:-translate-y-3 hover:scale-150  duration-300"
-                onClick={() => setShowContainer(!showContainer)}
-              >
-                <FiChevronUp className=" animate-bounce w-5 h-5 " />
-              </button>
-            </div>
-          </div>
-        </div>
-      </motion.div>
-
-      <div className="flex flex-row justify-center mx-auto bg-slate-100 px-24 pt-20 mt-2 ">
-        <div className="wrapper flex flex-row">
-          {stages1.map((subStage, index) => (
-            <div key={index} className="flex justify-center pt-1 ">
-              <React.Fragment>
-                {index !== 0 && (
-                  <hr className="border-solid border-t-8 w-6 items-center justify-center my-auto border-[#C4D8D9]" />
-                )}
-                <div
-                  className={`px-3 w-32 rounded-md h-14  text-xl font-bold text-white text-center flex items-center justify-center ${
-                    parseInt(stageInfo.currentStage) === index + 1
-                      ? "bg-[#5698a0]"
-                      : "bg-[#c4cfcf]"
-                  }`}
-                >
-                  {subStage}
-                </div>
-              </React.Fragment>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <div className="bg-slate-100 flex items-center justify-center">
-        <button
-          className=" transition ease-in-out delay-150 hover:translate-y-2 hover:scale-125  duration-300"
-          onClick={() => {
-            setShowContainer(true); // 新增的部分
-          }}
-        >
-          <FiChevronDown className="w-5 h-5 " />
-        </button>
-      </div>
-      <div className="flex justify-end bg-slate-100 pr-44 -mt-7">
-        <button
-          className={`text-sm font-bold transition delay-150 duration-300 px-4 py-2 rounded-md ${
-            isPreviousStageIncomplete ||
-            isStageIncomplete ||
-            isStagecomplete ||
-            isAllStagesComplete // 新增 isStagecomplete 到條件中
-              ? "bg-gray-300 cursor-not-allowed"
-              : "bg-teal-600 hover:-translate-y-1 hover:scale-110 hover:bg-teal-700 text-white"
-          }`}
-          onClick={handleSubmitTask}
-          disabled={
-            isPreviousStageIncomplete ||
-            isStageIncomplete ||
-            isStagecomplete ||
-            isAllStagesComplete
-          } // 根據 isStagecomplete 設置 disabled
-        >
-          {isPreviousStageIncomplete || isStageIncomplete
-            ? "請完成先前階段"
-            : isAllStagesComplete
-            ? "所有階段皆完成!"
-            : isStagecomplete
-            ? "已完成"
-            : "完成此階段"}
-        </button>
-      </div>
-      <SlideInNotifications
-        notifications={notifications}
-        setNotifications={setNotifications}
-        // className="absolute bottom-0 left-0 flex flex-col gap-1 w-72 mb-10 ml-10 z-50 pointer-events-none"
-      />
-      <div className="grid grid-cols-4 gap-5  px-44 pt-2  min-w-[800px] h-screen overflow-hidden bg-slate-100  ">
-        <div className="flex flex-col">
-          <AiFillPushpin className="translate-y-4 -mt-4 text-[#355ca5] w-7 h-5" />
-          <TaskHint className="" stageInfo={stageInfo} />
-
-          {isAllStagesComplete ? (
-            <Lottie
-              className="w-50 h-48 z-0 -translate-x-16 "
-              animationData={welldone}
-            />
+          {kanbanIsLoading ? (
+            <Loader />
+          ) : kanbansIsError ? (
+            <p className="font-bold text-4xl">{kanbansIsError.message}</p>
           ) : (
-            <div
-              onMouseEnter={() => setShowFlyout(true)}
-              onMouseLeave={() => setShowFlyout(false)}
-              className="flex"
-              onClick={handleLottieClick} // Define handleLottieClick if it has specific functionality
-            >
-              <Lottie
-                className="w-50 h-40 z-0 scale-x-[-1] -translate-x-32 "
-                animationData={owlAnimation}
-              />
-              <Lottie
-                className="wh-16 h-16 z-0 -translate-x-32 "
-                animationData={question}
-                loop={false} // Stop looping
-                autoplay={true} // Automatically start playing
-              />
-              {showFlyout && (
-                <OwlquestionFlyoutLink onImageClick={handleImageClick} />
-              )}
-            </div>
-          )}
-        </div>
-
-        {kanbanIsLoading ? (
-          <Loader />
-        ) : kanbansIsError ? (
-          <p className="font-bold text-4xl">{kanbansIsError.message}</p>
-        ) : (
-          <>
-            <div>
-              <Droppable droppableId="5">
-                {(provided, snapshot) => (
-                  <div
-                    {...provided.droppableProps}
-                    ref={provided.innerRef}
-                    className="shadow-xl"
+            <>
+              {projectEnd ? (
+                ""
+              ) : (
+                <div>
+                  <Droppable
+                    droppableId="5"
+                    className="cursor-help"
+                    isDropDisabled= {true}
                   >
-                    <div
-                      className={`${
-                        snapshot.isDraggingOver
-                          ? "bg-rose-100/70"
-                          : "bg-[#647B71]"
-                      } p-3 rounded-md shadow-xl flex flex-col w-full max-h-[50vh]  overflow-y-scroll scrollbar-none `}
-                    >
-                      <h4 className="flex justify-between items-center mb-2">
-                        <span className="text-base font-semibold text-gray-100">
-                          思考歷程導引模板
-                        </span>
-                        <button
-                          className="font-bold text-sm px-1 py-1 rounded-md transition ease-in-out bg-[#bbd6d6] hover:-translate-y-1  hover:scale-110 duration-100 ..."
-                          onClick={handleOneClickUse}
-                        >
-                          一鍵導入
-                        </button>
-                      </h4>
-                      <React.Fragment></React.Fragment>
-
-                      {template.length > 0 &&
-                        template.map((scaffoldingItem, index) => {
-                          const keyId = scaffoldingItem.id || index;
-                          return (
-                            <Carditemtemplate
-                              key={keyId}
-                              index={index}
-                              data={scaffoldingItem}
-                              onImportClick={handleImport} // 这里传递函数
-                            />
-                          );
-                        })}
-                    </div>
-                  </div>
-                )}
-              </Droppable>
-            </div>
-
-            {kanbanData.map((column, columnIndex) => {
-              return (
-                <div key={column.name}>
-                  <Droppable droppableId={columnIndex.toString()}>
                     {(provided, snapshot) => (
                       <div
                         {...provided.droppableProps}
-                        ref={provided.innerRef}
-                        className="shadow-xl"
+                        ref={provided.innerRef} // Make sure innerRef is attached here
+                        className="shadow-xl cursor-default" // Set cursor to default
                       >
                         <div
-                          className={`${
-                            snapshot.isDraggingOver
-                              ? "bg-rose-100/70"
-                              : "bg-gray-200"
-                          } p-3 rounded-md shadow-xl flex flex-col w-full h-[58vh] overflow-y-scroll scrollbar-none`}
+                          className={`bg-[#647B71] p-3 rounded-md shadow-xl flex flex-col w-full max-h-[50vh]  overflow-y-scroll scrollbar-none `}
                         >
-                          {/* 進行中看板 */}
+                          <h4 className="flex justify-between items-center mb-2">
+                            <span className="text-xl font-semibold text-gray-100">
+                              思考歷程導引模板
+                            </span>
+                            <button
+                              className="font-bold text-sm px-1 py-1 rounded-md transition ease-in-out bg-[#bbd6d6] hover:-translate-y-1  hover:scale-110 duration-100 ..."
+                              onClick={handleOneClickUse}
+                            >
+                              一鍵導入
+                            </button>
+                          </h4>
 
-                          <h4 className="flex justify-between items-center mb-1 h-8 rounded-md shadow-lg">
-                            <span className="text-xl font-semibold text-gray-600 h-8">
+                          {template.length > 0 &&
+                            template.map((scaffoldingItem, index) => {
+                              const keyId = scaffoldingItem.id || index;
+                              return (
+                                <Carditemtemplate
+                                  key={keyId}
+                                  index={index}
+                                  data={scaffoldingItem}
+                                  onImportClick={handleImport} // 这里传递函数
+                                />
+                              );
+                            })}
+                        </div>
+                      </div>
+                    )}
+                  </Droppable>
+                </div>
+              )}
+
+              {kanbanData.map((column, columnIndex) => {
+                if (projectEnd && column.name === "進行中") {
+                  return null; // 如果 projectEnd 为 true 并且列名为“进行中”，则不渲染该列
+                }
+                return (
+                  <div key={column.name}>
+                    <Droppable droppableId={columnIndex.toString()}>
+                      {(provided, snapshot) => (
+                        <div
+                          {...provided.droppableProps}
+                          ref={provided.innerRef}
+                          className={`bg-zinc-300 rounded-md  ${
+                            projectEnd ? "translate-x-60" : ""
+                          }`}
+                        >
+                          <h4 className="flex justify-between items-center rounded-md h-8 mb-2">
+                            <span className="text-xl font-extrabold text-gray-500 h-8 ml-3 mt-4 ">
                               {column.name}
                             </span>
                             {column.name == "進行中" ? (
-                              <div className="flex">
+                              <div className="flex translate-y-4 -translate-x-3">
                                 <Lottie
                                   loop={false} // Stop looping
                                   autoplay={true} // Automatically start playing
                                   className="w-8 h-8 rotate-45"
                                   animationData={arrow}
                                 />
-                                <span className="font-semibold text-teal-700">
+                                <span className="font-semibold text-teal-700 ">
                                   當前任務
                                 </span>
                               </div>
@@ -864,82 +876,94 @@ export default function Kanban() {
                               ""
                             )}
                           </h4>
-                          {column.name === "進行中" &&
-                            column.task.length === 0 && (
-                              <div className="flex items-center justify-center min-h-[80px] top-0 border-2 border-teal-700 rounded-md bg-transparent pointer-events-none text-teal-700 font-semibold">
-                                <span>目前尚無進行中的任務</span>
-                              </div>
-                            )}
+                          <div
+                            className={`${
+                              snapshot.isDraggingOver
+                                ? "bg-slate-400"
+                                : "bg-zinc-300"
+                            }  ${
+                              projectEnd ? "" : ""
+                            }  p-3 rounded-md shadow-xl flex flex-col w-full h-[53vh] overflow-y-scroll scrollbar-none`}
+                          >
+                            {/* 進行中看板 */}
 
-                          {column.task.length > 0 &&
-                            column.task.map((item, index) => {
-                              return (
-                                <Carditem
-                                  key={item.id}
-                                  index={index}
-                                  data={item}
-                                  columnIndex={columnIndex}
-                                  columnId={doingColumnId}
-                                  isFirst={index === 0} // 是否是第一个条目
-                                  isProgressing={column.name === "進行中"} // 是否是“进行中”列
-                                />
-                              );
-                            })}
-                          {provided.placeholder}
-                        </div>
-                        {column.name == "進行中" ? (
-                          <React.Fragment>
-                            {showForm && selectedcolumn === columnIndex ? (
-                              <div className="-mt-5">
-                                <textarea
-                                  className="border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-customgreen w-full p-1 lg:h-14"
-                                  rows={3}
-                                  placeholder="Task info"
-                                  onChange={handleChange}
-                                />
-                                <div className="flex justify-evenly">
-                                  <button
-                                    className="flex justify-center items-center w-1/2 my-1 mr-1 p-1 bg-white rounded-md font-bold text-sm"
-                                    onClick={handleSubmit}
-                                  >
-                                    新增
-                                  </button>
-                                  <button
-                                    className="flex justify-center items-center w-1/2 my-1 ml-1 p-1 bg-white rounded-md font-bold text-sm"
-                                    onClick={() => {
-                                      setShowForm(false);
-                                    }}
-                                  >
-                                    取消
-                                  </button>
+                            {column.name === "進行中" &&
+                              column.task.length === 0 && (
+                                <div className="flex items-center justify-center min-h-[80px] top-0 border-2 border-teal-700 rounded-md bg-transparent pointer-events-none text-teal-700 font-semibold">
+                                  <span>目前尚無進行中的任務</span>
                                 </div>
-                              </div>
-                            ) : (
-                              <button
-                                className="flex justify-center items-center  py-1 bg-white rounded-md text-sm w-full hover:shadow-xl"
-                                onClick={() => {
-                                  setSelectedcolumn(columnIndex);
-                                  setShowForm(true);
-                                }}
-                              >
-                                加入任務
-                                <FiPlus className="w-5 h-5" />
-                              </button>
-                            )}
-                          </React.Fragment>
-                        ) : (
-                          ""
-                        )}
-                      </div>
-                    )}
-                  </Droppable>
-                  {/* <SpringModal isOpen={isModalOpen} setIsOpen={setIsModalOpen} /> */}
-                </div>
-              );
-            })}
-          </>
-        )}
-      </div>
-    </DragDropContext>
+                              )}
+
+                            {column.task.length > 0 &&
+                              column.task.map((item, index) => {
+                                return (
+                                  <Carditem
+                                    key={item.id}
+                                    index={index}
+                                    data={item}
+                                    columnIndex={columnIndex}
+                                    columnId={doingColumnId}
+                                    isFirst={index === 0} // 是否是第一个条目
+                                    isProgressing={column.name === "進行中"} // 是否是“进行中”列
+                                  />
+                                );
+                              })}
+                            {provided.placeholder}
+                          </div>
+                          {column.name == "進行中" ? (
+                            <React.Fragment>
+                              {showForm && selectedcolumn === columnIndex ? (
+                                <div className="">
+                                  <textarea
+                                    className="border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-teal-800 w-full p-1 lg:h-14"
+                                    rows={3}
+                                    placeholder="Task info"
+                                    onChange={handleChange}
+                                  />
+                                  <div className="flex justify-evenly">
+                                    <button
+                                      className="flex justify-center items-center w-1/2 mr-1 p-1 bg-white rounded-md font-bold text-sm"
+                                      onClick={handleSubmit}
+                                    >
+                                      新增
+                                    </button>
+                                    <button
+                                      className="flex justify-center items-center w-1/2 ml-1 p-1 bg-white rounded-md font-bold text-sm"
+                                      onClick={() => {
+                                        setShowForm(false);
+                                      }}
+                                    >
+                                      取消
+                                    </button>
+                                  </div>
+                                </div>
+                              ) : (
+                                <button
+                                  className="flex justify-center items-center  py-1 bg-white rounded-md text-sm w-full hover:shadow-xl"
+                                  onClick={() => {
+                                    setSelectedcolumn(columnIndex);
+                                    setShowForm(true);
+                                  }}
+                                >
+                                  加入任務
+                                  <FiPlus className="w-5 h-5" />
+                                </button>
+                              )}
+                            </React.Fragment>
+                          ) : (
+                            ""
+                          )}
+                        </div>
+                      )}
+                    </Droppable>
+                    {/* <SpringModal isOpen={isModalOpen} setIsOpen={setIsModalOpen} /> */}
+                  </div>
+                );
+              })}
+            </>
+          )}
+        </div>
+      </DragDropContext>
+    </div>
   );
 }

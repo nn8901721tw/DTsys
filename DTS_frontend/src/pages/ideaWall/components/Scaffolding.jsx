@@ -6,33 +6,65 @@ import { socket } from "../../../utils/socket";
 import Tag from "../../../assets/Tag.png";
 import { moveTaskToCompleted } from "../../../api/kanban";
 import Swal from "sweetalert2";
+import { AiFillTag } from "react-icons/ai";
+import { getSubStage } from "../../../api/stage";
+import { getProject } from "../../../api/project";
+import {
+  getKanbanColumns,
+  getKanbanTasks,
+  addCardItem,
+} from "../../../api/kanban";
+import { AiFillPushpin } from "react-icons/ai";
+import Lottie from "lottie-react";
+import welldone from "../../../assets/welldone.json";
 
-const Scaffolding = ({
-
-  currentStage,
-  currentSubStage,
-  inProgressTasks,
-  kanbanDatas,
-  onTaskComplete,
-  setKanbanData, // 現在你可以在這裡使用 setKanbanData
-}) => {
+const Scaffolding = ({ onTaskComplete }) => {
   const navigate = useNavigate();
+
+  const [kanbanData, setKanbanData] = useState([]);
   // 将 currentStage 和 currentSubStage 保存在状态中
-  const [localStoragecurrentStage, setlocalStorageCurrentStage] = useState(
+  const [currentStage, setCurrentStage] = useState(
     localStorage.getItem("currentStage")
   );
-  const [localStoragecurrentSubStage, setlocalStorageCurrentSubStage] =
-    useState(localStorage.getItem("currentSubStage"));
+  const [currentSubStage, setCurrentSubStage] = useState(
+    localStorage.getItem("currentSubStage")
+  );
+  // 将 currentStage 和 currentSubStage 保存在状态中
+  const [projectname, setProjectname] = useState(localStorage.getItem("name"));
+  // 将 currentStage 和 currentSubStage 保存在状态中
+  const [projectEnd, setProjectEnd] = useState(
+    localStorage.getItem("ProjectEnd")
+  );
+
   useEffect(() => {
-    if (!localStoragecurrentStage || !localStoragecurrentSubStage) {
+    if (!currentStage || !currentSubStage) {
+      console.log("Nocurrent!!!");
     }
   }, [currentStage, currentSubStage]);
+
   const { projectId } = useParams();
 
-
+  const [inProgressTasks, setInProgressTasks] = useState([]);
 
   const queryClient = useQueryClient();
 
+  const {
+    isLoading: kanbanIsLoading,
+    isError: kanbansIsError,
+    error: KanbansError,
+    data: KanbansData,
+  } = useQuery(["kanbanDatas", projectId], () => getKanbanColumns(projectId), {
+    onSuccess: (data) => {
+      setKanbanData(data);
+
+      // 假设数据结构是 [{id: 1, ...}, {id: 2, ...}]
+      if (data.length > 0) {
+        // setDoingColumnId(data[0].id);
+      }
+    },
+  });
+
+  console.log("scaffolding", kanbanData);
   const stagesMap = {
     "1-1": "經驗分享與同理",
     "1-2": "定義利害關係人",
@@ -47,26 +79,70 @@ const Scaffolding = ({
     "5-2": "開始修正",
   };
 
+  const getSubStageQuery = useQuery(
+    "getSubStage",
+    () =>
+      getSubStage({
+        projectId: projectId,
+        currentStage: localStorage.getItem("currentStage"),
+        currentSubStage: localStorage.getItem("currentSubStage"),
+      }),
+    {
+      onSuccess: (data) => {
+        localStorage.getItem("currentStage");
+        localStorage.getItem("currentSubStage");
+
+        // setcstage()
+      },
+      enabled: !!localStorage.getItem("currentStage"),
+    }
+  );
+
+  const getProjectQuery = useQuery("getProject", () => getProject(projectId), {
+    onSuccess: (data) => {
+      localStorage.setItem("currentStage", data.currentStage);
+      localStorage.setItem("currentSubStage", data.currentSubStage);
+      localStorage.setItem("name", data.name);
+      localStorage.setItem("ProjectEnd", data.ProjectEnd);
+      setCurrentSubStage(data.currentSubStage);
+      setCurrentStage(data.currentStage);
+      setProjectname(data.name);
+      setProjectEnd(data.ProjectEnd);
+    },
+    enabled: !!projectId,
+  });
+  useEffect(() => {
+    socket.emit("joinProject", projectId);
+
+    function KanbanUpdateEvent(data) {
+      if (data) {
+        console.log(data);
+        queryClient.invalidateQueries(["kanbanDatas", projectId]);
+      }
+    }
+    const handleRefreshKanban = (newStages) => {
+      queryClient.invalidateQueries("getProject");
+      queryClient.invalidateQueries("getSubStage");
+    };
+    function kanbanDragEvent(data) {
+      if (data) {
+        console.log(data);
+        setKanbanData(data);
+      }
+    }
+    socket.on("dragtaskItem", kanbanDragEvent);
+    socket.on("refreshKanban", handleRefreshKanban);
+    socket.on("taskItem", KanbanUpdateEvent);
+    socket.on("taskItems", KanbanUpdateEvent);
+    return () => {};
+  }, [socket, projectId]);
   ///////////////////////
 
-  // const handleCompleteSubtask = async (taskId) => {
-  //   if (!kanbanDatas || kanbanDatas.length < 2) {
-  //     console.error("缺少kanban資料");
-  //     return;
-  //   }
-
-  //   // 假定第一个列是“进行中”，第二个列是“已完成”
-  //   const inProgressColumnId = kanbanDatas[0].id;
-  //   const completedColumnId = kanbanDatas[1].id;
-  //   console.log("inProgressColumnId", inProgressColumnId);
-  //   console.log("completedColumnId", completedColumnId);
-  // };
-
   const completeTask = () => {
-    if (inProgressTasks.length > 0 && kanbanDatas.length >= 2) {
+    if (inProgressTasks.length > 0 && kanbanData.length >= 2) {
       const taskId = inProgressTasks[0].id;
-      const inProgressColumnId = kanbanDatas[0].id; // 进行中列的ID
-      const completedColumnId = kanbanDatas[1].id; // 完成列的ID
+      const inProgressColumnId = kanbanData[0].id; // 进行中列的ID
+      const completedColumnId = kanbanData[1].id; // 完成列的ID
       console.log("inProgressColumnId", inProgressColumnId);
       console.log("completedColumnId", completedColumnId);
       Swal.fire({
@@ -83,8 +159,8 @@ const Scaffolding = ({
           moveTaskToCompleted(taskId, inProgressColumnId, completedColumnId)
             .then((response) => {
               console.log("Task moved successfully:", response);
-              socket.emit('taskUpdated'); // 廣播任務更新事件
-             
+              socket.emit("taskUpdated"); // 廣播任務更新事件
+
               Swal.fire("完成!", "任務已成功移動至完成列。", "success").then(
                 () => {
                   queryClient.invalidateQueries(["kanbanDatas", projectId]);
@@ -111,8 +187,6 @@ const Scaffolding = ({
       });
     }
   };
-
-  // console.log("inProgressTasks",inProgressTasks.length);
 
   const getNextStageDescription = (currentStage, currentSubStage) => {
     const currentKey = `${currentStage}-${currentSubStage}`;
@@ -182,134 +256,111 @@ const Scaffolding = ({
   const handleSubmitTask = async (e) => {
     e.preventDefault();
 
-    // 使用 SweetAlert2 彈出對話框
-    const result = await Swal.fire({
-      title: "是否完成？",
-      text: "確定要進入下一階段嗎？",
-      icon: "question",
+    const resultUpload = await Swal.fire({
+      title: "成果上傳",
+      text: "是否有成果要上傳？",
+      icon: "warning",
       showCancelButton: true,
-      cancelButtonText: "取消",
-      confirmButtonText: "確定",
+      cancelButtonText: "沒有",
+      confirmButtonText: "上傳",
     });
 
-    // 如果用戶確定，則問是否有成果要上傳
-    if (result.isConfirmed) {
-      const resultUpload = await Swal.fire({
-        title: "成果上傳",
-        text: "是否有成果要上傳？",
-        icon: "warning",
-        showCancelButton: true,
-        cancelButtonText: "沒有",
-        confirmButtonText: "上傳",
-      });
-
-      // 按下取消，則執行提交操作
-      if (resultUpload.isDismissed) {
-        const formData = new FormData();
-        formData.append("projectId", projectId);
-        formData.append("currentStage", currentStage);
-        formData.append("currentSubStage", currentSubStage);
-        formData.append("content", " ");
-
-        try {
-          await mutate(formData);
-        } catch (error) {
-          console.error("Error during submission:", error);
-        }
-      } else {
-        // 如果用戶確定上傳成果，執行另外的操作
-        // 此處添加上傳成果的邏輯或進一步操作
-        // 如果用戶確定上傳成果，則跳轉到 SubmitTask 頁面
-        navigate(`/project/${projectId}/submitTask`);
-        console.log("進行上傳成果的操作");
-      }
+    if (resultUpload.isConfirmed) {
+      navigate(`/project/${projectId}/submitTask`);
+      console.log("進行上傳成果的操作");
     }
   };
 
-
-   // socket
-  //  useEffect(() => {
-  //   function KanbanUpdateEvent(data) {
-  //     if (data) {
-  //       console.log(data);
-  //       queryClient.invalidateQueries(["kanbanDatas", projectId]);
-  //     }
-  //   }
-  //   function kanbanDragEvent(data) {
-  //     if (data) {
-  //       console.log(data);
-  //       setKanbanData(data);
-  //     }
-  //   }
-  //   socket.connect();
-
-  //   socket.on("taskItems", KanbanUpdateEvent);
-  //   socket.on("taskItem", KanbanUpdateEvent);
-  //   socket.on("dragtaskItem", kanbanDragEvent);
-  //   return () => {
-  //     socket.disconnect();
-  //   };
-  // }, [socket]);
+  useEffect(() => {
+    const tasksInProgress =
+      kanbanData.find((column) => column.name === "進行中")?.task || [];
+    setInProgressTasks(tasksInProgress);
+    console.log("進行中的任務:", tasksInProgress);
+    console.log("kanbanData:", kanbanData);
+  }, [currentStage, currentSubStage, kanbanData, socket]); // 確保當 kanbanData 更新時重新運行此效果
 
   return (
     <div className=" w-64 p-6 bg-white rounded-lg shadow-md divide-y divide-gray-200 fixed top-20 right-2 h-4/5  z-20  overflow-y-auto overflow-x-hidden scrollbar-none ">
       <div className="pb-2">
         <div className="flex">
-          <img className="w-5 h-5 bg-transparent" src={Tag} alt="/" />
-          <h4 className="font-bold text-[#83A7A9] pl-2 ">
-            {currentStage}-{currentSubStage}
-            {stagesMap[`${currentStage}-${currentSubStage}`] || "Unknown Stage"}
-          </h4>
-        </div>
-
-        {inProgressTasks.length > 0 ? (
-          <h2 className="text-lg font-semibold text-gray-900 cursor-pointer">
-            當前子任務-
-            <span className="text-[#3279ca] font-bold">
-              {inProgressTasks[0].content}
+          <div className="flex fixed top-[70px] left-20 text-[#446269] cursor-default">
+            <AiFillTag className="w-6 h-6" />
+            <span className="justify-center items-center translate-x-2 font-semibold">
+              主題 : {projectname}
             </span>
-          </h2>
-        ) : (
-          <h2 className="text-lg font-semibold text-gray-900">
-            進行中的子任務皆已完成
-          </h2>
-        )}
-        <p className="mt-1 text-sm text-gray-600">
-          請點擊左側導航欄，並依照步驟開始製作。
-        </p>
-        <h2 className="text-base font-semibold text-gray-900">建議</h2>
-        <p className="mt-1 text-sm text-gray-600">
-          請點擊左側導航欄，並依照步驟開始製作.。
-        </p>
-        <div className="flex justify-end">
-          {inProgressTasks.length > 0 ? (
-            <button
-              className=" text-neutral-50 font-bold text-sm 2xl:font-semibold 2xl:text-base px-1 py-1 rounded-md transition ease-in-out bg-[#4b7fbb] hover:-translate-y-1  hover:scale-110 duration-100 ..."
-              onClick={completeTask}
-            >
-              子任務完成
-            </button>
-          ) : (
-            <div className="flex text-sm w-full ">
-              <div className="my-auto font-semibold justify-start text-xs">
-                進入下個子階段-
-              </div>
-              <div
-                className=" cursor-pointer text-neutral-50 font-bold text-xs 2xl:font-semibold 2xl:text-base px-1 py-1 rounded-md transition ease-in-out bg-[#4ECDC5] hover:-translate-y-1  hover:scale-110 duration-100 ..."
-                onClick={handleSubmitTask}
-              >
-                {nextStageDescription}
-              </div>
-            </div>
-          )}
+          </div>
+          {/* <div className="flex -translate-x-3">
+            <AiFillPushpin className=" text-[#787c85] w-7 h-5" />
+            <h4 className="font-bold text-[#83A7A9] pl-2 ">
+              {currentStage}-{currentSubStage}
+              {stagesMap[`${currentStage}-${currentSubStage}`] ||
+                "Unknown Stage"}
+            </h4>
+          </div> */}
         </div>
+        {projectEnd ? (
+          <>
+            <span className="font-semibold text-teal-700 text-xl">
+              恭喜你! 全都完成了!{" "}
+            </span>
+            <Lottie className="w-40 h-40" animationData={welldone} />
+          </>
+        ) : (
+          <>
+            {inProgressTasks.length > 0 ? (
+              <h2 className="text-base font-semibold text-gray-900  truncate w-[200px] cursor-default">
+                當前子任務-
+                <span
+                  className="text-[#3279ca] font-bold whitespace-nowrap "
+                  title={inProgressTasks[0].content}
+                >
+                  {inProgressTasks[0].content}
+                </span>
+              </h2>
+            ) : (
+              <h2 className="text-lg font-semibold text-gray-900">
+                進行中的子任務皆已完成
+              </h2>
+            )}
+            <p className="mt-1 text-sm text-gray-600">
+              請點擊左側導航欄，並依照步驟開始製作。
+            </p>
+            <h2 className="text-base font-semibold text-gray-900">建議</h2>
+            <p className="mt-1 text-sm text-gray-600">
+              請點擊左側導航欄，並依照步驟開始製作.。
+            </p>
+            <div className="flex justify-end">
+              {inProgressTasks.length > 0 ? (
+                <button
+                  className=" text-neutral-50 font-bold text-sm 2xl:font-semibold 2xl:text-base px-1 py-1 rounded-md transition ease-in-out bg-[#4b7fbb] hover:-translate-y-1  hover:scale-110 duration-100 ..."
+                  onClick={completeTask}
+                >
+                  子任務完成
+                </button>
+              ) : (
+                <div className="flex text-sm w-full ">
+                  <div className="my-auto font-semibold justify-start text-xs">
+                    進入下個子階段-
+                  </div>
+                  <div
+                    className=" cursor-pointer text-neutral-50 font-bold text-xs 2xl:font-semibold 2xl:text-base px-1 py-1 rounded-md transition ease-in-out bg-[#4ECDC5] hover:-translate-y-1  hover:scale-110 duration-100 ..."
+                    onClick={handleSubmitTask}
+                  >
+                    {nextStageDescription}
+                  </div>
+                </div>
+              )}
+            </div>
+          </>
+        )}
       </div>
+
       <div className="pt-2">
-        <section className=" left-[37px] flex flex-col items-start justify-start gap-[1px] text-left text-mini text-cyan-500 font-inter">
+        <section className=" left-[37px] flex flex-col items-start justify-start gap-[1px] text-left text-mini text-cyan-500 font-inter cursor-default">
           <div className="w-full flex gap-[2px] justify-around">
             <div
               className={
-                getStageColor("1") +
+                getStageColor(1) +
                 " rounded text-white font-semibold flex items-center h-[30px] min-w-[30px] px-1"
               }
             >
@@ -317,7 +368,7 @@ const Scaffolding = ({
             </div>
             <div
               className={
-                getStageColor("2") +
+                getStageColor(2) +
                 " rounded text-white font-semibold flex items-center h-[30px] min-w-[30px] px-1"
               }
             >
@@ -325,7 +376,7 @@ const Scaffolding = ({
             </div>
             <div
               className={
-                getStageColor("3") +
+                getStageColor(3) +
                 " rounded text-white font-semibold flex items-center h-[30px] min-w-[30px] px-1"
               }
             >
@@ -333,7 +384,7 @@ const Scaffolding = ({
             </div>
             <div
               className={
-                getStageColor("4") +
+                getStageColor(4) +
                 " rounded text-white font-semibold flex items-center h-[30px] min-w-[30px] px-1"
               }
             >
@@ -341,7 +392,7 @@ const Scaffolding = ({
             </div>
             <div
               className={
-                getStageColor("5") +
+                getStageColor(5) +
                 " rounded text-white font-semibold flex items-center h-[30px] min-w-[30px] px-1"
               }
             >
@@ -349,14 +400,14 @@ const Scaffolding = ({
             </div>
           </div>
 
-          <div className="w-full flex flex-row items-start justify-start py-0  box-border text-lg text-gray">
-            <div className="flex-1 flex flex-col items-start justify-start  w-full">
+          <div className="w-full flex flex-row py-0  box-border text-lg text-gray">
+            <div className="flex-1 flex flex-col ">
               {/* <div className="w-[90px] h-4 relative">
                 <div className="absolute top-[14px] left-[0px] box-border w-[92px] h-0.5 z-[2] border-t-[2px] border-solid border-gainsboro" />
                 <div className="absolute top-[0px] left-[0px] box-border w-0.5 h-[17px] z-[3] border-r-[2px] border-solid border-gainsboro" />
               </div> */}
-              <div className=" self-stretch flex flex-row items-start justify-start w-full">
-                <div className=" flex-1 flex flex-col items-center justify-start ">
+              <div className=" self-stretch flex flex-row  ">
+                <div className=" flex-1 flex flex-col ">
                   {/* <div key={index} className="flex flex-col items-center justify-center">
                     <div className="bg-[#4ECDC5] h-[14px] w-[14px] rounded-full z-[2]" />
                     <div className="relative leading-[21px] font-semibold z-[1] text-base">
@@ -392,38 +443,35 @@ const Scaffolding = ({
                               inProgressTasks.map((task, taskIndex) => (
                                 <div
                                   key={taskIndex}
-                                  className="flex flex-col w-full items-end justify-end"
+                                  className="flex flex-col w-full items-end translate-x-8 "
                                 >
                                   {taskIndex === 0 && (
-                                    <div className="w-[80px] h-4 relative">
-                                      <div className="absolute top-[14px] left-[0px] box-border w-[80px] h-0.5 z-[2] border-t-[2px] border-solid border-gainsboro" />
+                                    <div className="w-[110px] h-4 relative">
+                                      <div className="absolute top-[14px] left-[0px] box-border w-[110px] h-0.5 z-[2] border-t-[2px] border-solid border-gainsboro" />
                                       <div className="absolute top-[0px] left-[0px] box-border w-0.5 h-[17px] z-[3] border-r-[2px] border-solid border-gainsboro" />
                                     </div>
                                   )}
                                   <div className="bg-slate-300 w-[2px] h-9"></div>
 
                                   <div
-                                    className={`h-[10px] w-[10px] pl-3 rounded-full ${
-                                      taskIndex === 0
-                                        ? "bg-[#3279ca] animate-pulse"
-                                        : "bg-gray-400"
-                                    }`}
-                                  ></div>
-                                  <div
-                                    className={` text-xs font-bold text-center ${
-                                      taskIndex === 0
-                                        ? "text-[#3279ca] "
-                                        : "text-gray-400"
-                                    }`}
+                                    className="flex flex-col items-end justify-between w-full cursor-default"
+                                    title={task.content}
                                   >
-                                    <span className="pl-16 font-semibold">
-                                      子任務:{task.content}
+                                    <div
+                                      className={`h-[10px] w-[10px] rounded-full ${
+                                        taskIndex === 0
+                                          ? "bg-[#3279ca] animate-pulse"
+                                          : "bg-gray-400"
+                                      }`}
+                                    ></div>
+                                    <span className="pl-14 font-semibold truncate w-[160px] text-xs text-right">
+                                      {task.content}
                                     </span>
                                   </div>
                                   {taskIndex === inProgressTasks.length - 1 && (
-                                    <div className="w-[60px] h-4 relative">
-                                      <div className="absolute top-[0px] left-[0px] box-border w-[60px] h-[17px] z-[3] border-r-[2px] border-solid border-gainsboro" />
-                                      <div className="absolute top-[14px] left-[-23px] box-border w-[80px] h-0.5 z-[2] border-t-[2px] border-solid border-gainsboro" />
+                                    <div className="w-[110px] h-4 relative">
+                                      <div className="absolute top-[0px] left-[0px] box-border w-[110px] h-[15px] z-[3] border-r-[2px] border-solid border-gainsboro" />
+                                      <div className="absolute top-[14px] left-[0px] box-border w-[110px] h-0.5 z-[2] border-t-[2px] border-solid border-gainsboro" />
                                     </div>
                                   )}
                                 </div>
@@ -437,9 +485,18 @@ const Scaffolding = ({
                       No sub-stages available for this stage.
                     </p>
                   )}
-                  <div className="bg-slate-300 w-[2px] h-12"></div>
-                  <div className=" text-base font-semibold text-slate-400">
-                    進入下個子階段...
+                  <div className="flex flex-col w-full justify-center items-center">
+                    <div className="bg-slate-300 w-[2px] h-10 "></div>
+
+                    {projectEnd ? (
+                      <div className=" text-base font-semibold text-teal-400 animate-bounce">
+                        END! Congratulations!
+                      </div>
+                    ) : (
+                      <div className=" text-base font-semibold text-slate-400">
+                        進入下個子階段...
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
