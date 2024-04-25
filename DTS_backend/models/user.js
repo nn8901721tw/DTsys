@@ -17,7 +17,11 @@ const User = sequelize.define('user', {
     role: {
         type: DataTypes.TEXT,
         allowNull:false
-    },  
+    },
+    nickname: {
+        type: DataTypes.TEXT,
+        allowNull:false
+    }  
 });
 
 

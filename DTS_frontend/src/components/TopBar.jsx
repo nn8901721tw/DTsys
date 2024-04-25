@@ -14,6 +14,12 @@ export default function TopBar() {
   const [projectInfo, setProjectInfo] = useState({});
   const [referralCodeModalOpen, setReferralCodeModalOpen] = useState(false);
   const { projectId } = useParams();
+  const [userId, setUserId] = useState(
+    localStorage.getItem("id")
+  );
+  const [nickname, setNickname] = useState(
+    localStorage.getItem("nickname")
+  );
   const navigate = useNavigate();
 
   const getProjectUserQuery = useQuery(
@@ -36,6 +42,9 @@ export default function TopBar() {
     enabled: !!projectId,
   });
 
+     // 找出用户在数组中的索引
+     const userIndex = projectUsers.findIndex(user => user.id === parseInt(userId));
+
   const cleanStage = () => {
     localStorage.removeItem("currentStage");
     localStorage.removeItem("currentSubStage");
@@ -50,21 +59,12 @@ export default function TopBar() {
   };
 
   const colors = [
-    "bg-cyan-700",
-    "bg-green-500",
-    "bg-blue-500",
-    "bg-cyan-500",
-    "bg-teal-500",
-    "bg-blue-700",
-    "bg-teal-700",
-    "bg-cyan-600",
-    "bg-indigo-500",
-    "bg-lime-500",
-    "bg-emerald-500",
-    "bg-cyan-500",
-    "bg-amber-500",
-    "bg-violet-500",
-    "bg-fuchsia-500",
+    "bg-[#0E7490]",
+    "bg-[#16A34A]",
+    "bg-[#3B82F6]",
+    "bg-[#06B6D4]",
+    "bg-[#115E59]",
+
   ];
 
   console.log("projectUsers::::" ,projectUsers);
@@ -74,7 +74,7 @@ export default function TopBar() {
       <Link to="/lobypage" onClick={cleanStage} className="">
         <img src="/images/DTlabel.png" className="w-40 mt-1" />
       </Link>
-      <div className="div"></div>
+      <div className="div bg-[#0E7490]"></div>
       <div className="flex items-center">
         <ul className="flex items-center justify-center space-x-1">
           {getProjectUserQuery.isLoading || projectId === undefined ? (
@@ -99,16 +99,19 @@ export default function TopBar() {
 
                 <div key={index} className="relative group">
                   <div
-                    className={`${bgColor} -mx-1 w-8 h-8 rounded-full flex items-center justify-center shadow-lg cursor-pointer`}
+                    className={`${bgColor} -mx-1  rounded-full flex items-center justify-center shadow-lg cursor-default`}
                   >
-                    <BsPersonCircle className="w-full h-full text-white" />
+                    <BsPersonCircle className=" w-8 h-8 text-white" />
                   </div>
                   {/* Tooltip */}
+                  <div className="transition-all duration-200 opacity-0 group-hover:opacity-100 group-hover:translate-y-1 group-hover:scale-105 hidden group-hover:block ease-in-out transform">
                   <div
-                    className={`${bgColor} absolute opacity-0 group-hover:opacity-100 bg-black text-white text-xs rounded-lg p-2 z-10 transition-all duration-200 ease-in-out transform group-hover:translate-y-20 group-hover:scale-105 hidden group-hover:block bottom-full mb-2`}
+                    className={`${bgColor} w-14 text-center absolute text-white text-xs rounded-lg p-2 z-10 `}
                   >
-                    {projectUser.username}
+                    {projectUser.nickname}
                   </div>
+                  </div>
+               
                 </div>
               );
             })
@@ -135,11 +138,11 @@ export default function TopBar() {
         </ul>
 
         {/* <IoIosNotificationsOutline size={30} className="cursor-pointer mx-3" /> */}
-        <h3 className="font-bold cursor-pointer p-1 mr-2 rounded-lg">
-          {localStorage.getItem("username")}
+        <h3 className="font-bold cursor-default p-1 mr-2 rounded-lg">
+          {localStorage.getItem("nickname")}
         </h3>
         <h3
-          className="font-bold cursor-pointer p-1 mr-2 hover:bg-slate-900 rounded-lg"
+          className="font-bold cursor-pointer p-1 mr-2 hover:bg-teal-800 hover:text-slate-100 rounded-lg"
           onClick={handleLogout}
         >
           登出

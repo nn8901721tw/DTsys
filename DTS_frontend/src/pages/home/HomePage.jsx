@@ -19,7 +19,6 @@ import { useNavigate } from "react-router-dom";
 import { FaArrowLeft } from "react-icons/fa"; // 引入返回圖標
 import { AiTwotoneTrophy } from "react-icons/ai";
 
-
 export default function HomePage() {
   const [projectData, setProjectData] = useState([]);
   const [createprojectData, setCreateProjectData] = useState({
@@ -169,7 +168,7 @@ export default function HomePage() {
             <AnimatedDropdown handleSortChange={handleSortChange} />
           </div>
         </div>
-        
+
         {/* <div className=' flex flex-row justify-between items-center w-full sm:w-2/3 my-5'>
           <div className='flex  '>
             
@@ -213,7 +212,7 @@ export default function HomePage() {
                   whileHover={{ scale: 1.1 }} // 添加悬停效果
                   transition={{ type: "spring", stiffness: 2000 }} // 可以调整transition来改变动画效果
                   className={`rounded-lg w-full h-[150px] hover:shadow-2xl ${
-                    projectItem.ProjectEnd ? "bg-[#dae2e2]" : "bg-[#80c9cc]"
+                    projectItem.ProjectEnd ? "bg-[#3d9696]" : "bg-[#b1ccce]"
                   } shadow-md duration-150`}
                   // onClick={() => handleClick(projectItem)}
                   style={{ cursor: "pointer" }} // 添加样式改变光标为点击样式
@@ -224,34 +223,32 @@ export default function HomePage() {
                     </div>
                   
                   )} */}
-                  {projectItem.ProjectEnd?(
-                    <div className=" flex font-bold text-gray-700">
-                    <AiTwotoneTrophy  />已完成
-                  </div>
-                  
-                  ) : (
-                    <div className=" flex font-bold text-white">
-                      未完成
+                  {projectItem.ProjectEnd ? (
+                    <div className=" flex font-bold text-[#fdfdfd] translate-x-3">
+                      <AiTwotoneTrophy className=" translate-y-1"/>
+                      已完成
                     </div>
-                  
+                  ) : (
+                    <div className=" flex font-bold text-white translate-x-3">未完成</div>
                   )}
                   <div
-                    className="flex flex-col w-full h-full justify-center items-center"
+                    className="flex flex-col w-full h-full justify-center items-center p-4 bg-slate-100 shadow-xl hover:bg-gray-50 transition duration-150 ease-in-out rounded-2xl cursor-pointer"
                     onClick={() => handleClick(projectItem)}
                   >
-                    <div className="-translate-y-6 text-base md:text-lg font-bold text-center truncate ...">
+                    <div className="text-sm md:text-base lg:text-lg font-bold text-gray-800 text-center truncate w-full px-2">
                       {projectItem?.name}
                     </div>
-                    <div className="w-1/2 text-center md:text-xs font-normal  truncate ...">
+                    <div className="text-xs md:text-sm text-gray-600 text-center truncate w-full px-2 py-1">
                       {projectItem?.describe}
                     </div>
-                    {/* <div className='flex-1 text-base md:text-lg font-bold text-center py-3  truncate ...'>{projectItem?.describe}</div> */}
-                    {/* <div className='flex-1 py-3 '>
-                      <BsBoxArrowInRight size={30} className='ml-[35%] cursor-pointer text-blue-500 hover:text-blue-700' onClick={() => {navigate(`/project/${projectItem.id}/kanban`)}}/>
-                    </div>  */}
 
-                    <div className="translate-y-3 flex w-full justify-end md:text-xs font-normal  truncate ...">
-                      指導老師:{projectItem?.mentor}
+                    <div className="flex items-center justify-between w-full pt-2">
+                      <div className="text-xs md:text-sm text-gray-500 truncate w-1/2 px-2">
+                        {projectItem?.referral_code}
+                      </div>
+                      <div className="text-xs text-gray-500 font-semibold truncate w-1/2 px-2 text-right">
+                        指導老師:{projectItem?.mentor}
+                      </div>
                     </div>
                   </div>
                 </motion.div>
@@ -270,7 +267,7 @@ export default function HomePage() {
               duration: 1, // 控制动画持续时间
               delay: projectData.length * 0.1, // 根据项目数量设置延迟，确保这是最后一个飞入的项目
             }}
-            className="rounded-lg w-full max-h-[150px] min-h-[150px] bg-[#f1f8f0] shadow-md duration-150 flex justify-center items-center text-slate-400 text-xl font-bold"
+            className="rounded-lg w-full max-h-[150px] min-h-[150px] bg-slate-100 shadow-xl duration-150 flex justify-center items-center text-slate-400 text-xl font-bold"
             style={{ cursor: "default" }} // 使光标保持默认样式
             onClick={() => setCreateProjectModalOpen(true)}
           >
@@ -304,7 +301,7 @@ export default function HomePage() {
           <h3 className=" font-bold text-base mb-3">建立專案</h3>
           <p className=" font-bold text-base mb-3">專案名稱</p>
           <input
-            className=" rounded outline-none ring-2 p-1 ring-customgreen w-full mb-3"
+            className=" rounded w-full mb-3"
             type="text"
             placeholder="專案名稱..."
             name="projectName"
@@ -313,7 +310,7 @@ export default function HomePage() {
           />
           <p className=" font-bold text-base mb-3">專案描述</p>
           <textarea
-            className=" rounded outline-none ring-2 ring-customgreen w-full p-1"
+            className=" rounded  w-full p-1"
             rows={3}
             placeholder="描述名稱"
             name="projectdescribe"
@@ -343,7 +340,7 @@ export default function HomePage() {
               setCreateProjectModalOpen(false);
             }}
             type="submit"
-            className="mx-auto w-full h-7 mb-2 bg-customgreen rounded font-bold text-xs sm:text-sm text-white"
+            className="mx-auto w-full h-7 mb-2  rounded font-bold text-xs sm:text-sm text-white"
           >
             儲存
           </button>
@@ -364,7 +361,7 @@ export default function HomePage() {
         <div className="flex flex-col p-3">
           <h3 className=" font-bold text-base mb-3">專案邀請碼</h3>
           <input
-            className=" rounded outline-none ring-2 p-1 ring-customgreen w-full mb-3 "
+            className=" rounded  w-full mb-3 "
             type="text"
             minLength="6"
             placeholder="輸入專案邀請碼..."
@@ -432,7 +429,7 @@ export default function HomePage() {
         <div className="flex justify-end m-2">
           <button
             onClick={() => setCreateProjectModalOpen(false)}
-            className="mx-auto w-full h-9 mb-2 bg-[#bdcdce] rounded font-bold text-xs sm:text-sm xl:text-base text-black/60 mr-2"
+            className="mx-auto w-full h-9 mb-2 bg-[#c5c8c9] rounded font-bold text-xs sm:text-sm xl:text-base text-black/60 mr-2"
           >
             取消
           </button>
@@ -442,7 +439,7 @@ export default function HomePage() {
               setCreateProjectModalOpen(false);
             }}
             type="submit"
-            className="mx-auto w-full h-9  mb-2 bg-[#7fd4d8] rounded font-bold text-xs sm:text-sm  xl:text-base text-white"
+            className="mx-auto w-full h-9  mb-2 bg-cyan-600 rounded font-bold text-xs sm:text-sm  xl:text-base text-white"
           >
             儲存
           </button>

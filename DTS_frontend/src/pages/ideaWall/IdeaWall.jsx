@@ -8,7 +8,7 @@ import { Network } from "vis-network";
 import { visNetworkOptions as option } from "../../utils/visNetworkOptions";
 import svgConvertUrl from "../../utils/svgConvertUrl";
 import { useParams } from "react-router-dom";
-import { useQuery,useQueryClient  } from "react-query";
+import { useQuery, useQueryClient } from "react-query";
 import { getIdeaWall } from "../../api/ideaWall";
 import { getNodes, getNodeRelation } from "../../api/nodes";
 import { socket } from "../../utils/socket";
@@ -17,9 +17,8 @@ import {
   getKanbanTasks,
   addCardItem,
 } from "../../api/kanban";
-
-
-
+import { getProjectUser } from "../../api/users";
+import { AiOutlineBulb } from "react-icons/ai";
 
 export default function IdeaWall() {
   const container = useRef(null);
@@ -36,9 +35,33 @@ export default function IdeaWall() {
   const [kanbanData, setKanbanData] = useState([]);
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
-
+  const [projectUsers, setProjectUsers] = useState([{ id: "", username: "" }]);
+  // 将 currentStage 和 currentSubStage 保存在状态中
+  const [userId, setUserId] = useState(localStorage.getItem("id"));
 
   const queryClient = useQueryClient(); // 使用 useQueryClient 鉤子
+
+  const colors = ["#0E7490", "#16A34A", "#3B82F6", "#06B6D4", "#115E59"];
+
+  // const userColor = getColorForUser(userId); // 獲取顏色
+  // 在元件內部
+
+  const getProjectUserQuery = useQuery(
+    "getProjectUser",
+    () => getProjectUser(projectId),
+    {
+      onSuccess: setProjectUsers,
+      enabled: !!projectId,
+    }
+  );
+
+  // 找出用户在数组中的索引
+  const userIndex = projectUsers.findIndex(
+    (user) => user.id === parseInt(userId)
+  );
+
+  console.log("userIndex", userIndex);
+
   const {
     isLoading: kanbanIsLoading,
     isError: kanbansIsError,
@@ -55,8 +78,6 @@ export default function IdeaWall() {
     },
   });
 
-
-
   const [ideaWallInfo, setIdealWallInfo] = useState({
     id: "1",
     name: "",
@@ -68,7 +89,7 @@ export default function IdeaWall() {
     content: "",
     owner: "",
     ideaWallId: "",
-    projectId:""
+    projectId: "",
   });
   const [buildOnNodeId, setBuildOnId] = useState("");
   const [tempid, setTempId] = useState("");
@@ -117,9 +138,15 @@ export default function IdeaWall() {
   useEffect(() => {
     const temp = [];
     nodes.map((item) => {
-      item.image = svgConvertUrl(item.title,item.owner);
+      const nodeColor = colors[item.colorindex - (1 % colors.length)]; // Use modulo to cycle through colors if index exceeds array length
 
-      
+      item.image = svgConvertUrl(
+        item.title,
+        item.owner,
+        item.createdAt,
+        nodeColor
+      );
+
       item.shape = "image";
       temp.push(item);
     });
@@ -147,21 +174,18 @@ export default function IdeaWall() {
       }
     }
     const handleRefreshKanban = (newStages) => {
-      queryClient.invalidateQueries('getProject');
-      queryClient.invalidateQueries('getSubStage');
-      
-  };
+      queryClient.invalidateQueries("getProject");
+      queryClient.invalidateQueries("getSubStage");
+    };
     socket.connect();
     socket.emit("joinProject", projectId);
     socket.on("nodeUpdated", nodeUpdateEvent);
     // socket.on("taskItems", KanbanUpdateEvent);
     // socket.on("taskItem", KanbanUpdateEvent);
     // socket.on("dragtaskItem", kanbanDragEvent);
-    socket.on('refreshKanban', handleRefreshKanban);
-    return () => {
-
-    };
-  }, [socket, projectId,kanbanData]);
+    socket.on("refreshKanban", handleRefreshKanban);
+    return () => {};
+  }, [socket, projectId, kanbanData]);
 
   // vis network
   useEffect(() => {
@@ -220,14 +244,14 @@ export default function IdeaWall() {
       setContent(value);
     }
 
-
     setNodeData((prevData) => ({
       ...prevData,
       [name]: value,
       ideaWallId: ideaWallInfo.id,
-      owner: localStorage.getItem("username"),
+      owner: localStorage.getItem("nickname"),
       from_id: buildOnNodeId,
-      projectId:projectId
+      projectId: projectId,
+      colorindex: userId,
     }));
   };
 
@@ -237,8 +261,9 @@ export default function IdeaWall() {
       ...prevData,
       [name]: value,
       ideaWallId: ideaWallInfo.id,
-      owner: localStorage.getItem("username"),
-      projectId:projectId
+      owner: localStorage.getItem("nickname"),
+      projectId: projectId,
+      colorindex: userId,
     }));
   };
 
@@ -249,7 +274,6 @@ export default function IdeaWall() {
     setBuildOnId("");
     setTitle("");
     setContent("");
-
   };
   const handleUpdateSubmit = (e) => {
     e.preventDefault();
@@ -262,9 +286,6 @@ export default function IdeaWall() {
     setUpdateNodeModalOpen(false);
     socket.emit("nodeDelete", selectNodeInfo);
   };
-
-
-  
 
   return (
     <div className="z-10">
@@ -345,7 +366,12 @@ export default function IdeaWall() {
         position={"justify-center items-center"}
       >
         <div className="flex flex-col p-3">
+          <div className="flex">
+
           <h3 className=" font-bold text-base mb-3">建立想法節點</h3>
+          <AiOutlineBulb className="w-6 h-6 text-[#b1a93d]" />
+          </div>
+   
           <p className=" font-bold text-base mb-3">標題</p>
           <input
             className=" rounded  p-1 w-full mb-3 shadow-lg hover:shadow-2xl"
@@ -415,7 +441,7 @@ export default function IdeaWall() {
               建立者: {selectNodeInfo.owner}
             </p>
           </div>
-          {localStorage.getItem("username") === selectNodeInfo.owner ? (
+          {localStorage.getItem("nickname") === selectNodeInfo.owner ? (
             <div className="flex flex-row justify-between m-2">
               <button
                 onClick={handleDelete}

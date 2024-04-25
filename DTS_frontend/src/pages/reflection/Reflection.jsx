@@ -202,7 +202,7 @@ export default function Reflection() {
       </div>
       <div className="flex flex-col my-16 pl-28 pr-10 py-11 w-full h-screen justify-start items-start">
         <h3 className="text-2xl ml-4 mt-3 font-bold text-orange-900">
-          個人日誌
+          個人檔案空間
         </h3>
         <hr className="w-full h-[5px] my-2 rounded-xl bg-gray-200 border-0 dark:bg-gray-700" />
 
@@ -212,7 +212,7 @@ export default function Reflection() {
               onClick={() => setPersonalDailyModalOpen(true)}
               className="skew-y-3 bg-teal-500 hover:bg-teal-700 text-white font-semibold rounded-lg p-1 text-base w-[230px] h-[100px] shadow-2xl shadow-teal-400"
             >
-              新增日誌
+              新增資料
             </button>
           </div>
           {isLoading ? (
@@ -246,7 +246,7 @@ export default function Reflection() {
         </div>
 
         <h3 className="mt-6 text-2xl font-extrabold text-orange-900">
-          小組討論日誌
+          小組檔案空間
         </h3>
         <hr className="w-full h-[5px] rounded-xl bg-gray-200 border-0 dark:bg-gray-700" />
 
@@ -262,7 +262,7 @@ export default function Reflection() {
               }}
               className=" skew-y-3 bg-cyan-500 hover:bg-cyan-700 text-white font-semibold rounded-lg text-base w-[230px] h-[100px] shadow-2xl shadow-cyan-400"
             >
-              新增日誌
+              新增資料
             </button>
             {teamDailyQuery.isLoading ? (
               <Loader />
@@ -311,7 +311,7 @@ export default function Reflection() {
           <GrFormClose className=" w-6 h-6" />
         </button>
         <div className="flex flex-col px-1">
-          <h3 className=" font-bold text-lg mb-3 text-center">反思日誌</h3>
+          <h3 className=" font-bold text-lg mb-3 text-center">個人檔案空間</h3>
           {/* <p className=' font-bold text-base '>日誌內容可以撰寫以下項目:</p> */}
 
           <p className=" font-bold text-base mb-3">設計思考階段 ex: 1-1</p>
@@ -323,7 +323,7 @@ export default function Reflection() {
             onChange={handleChange}
             required
           />
-          <p className=" font-bold text-base mb-3">日誌內容</p>
+          <p className=" font-bold text-base mb-3">內容</p>
           <textarea
             className=" rounded   w-full mb-3 p-1"
             rows={3}
@@ -343,7 +343,7 @@ export default function Reflection() {
         <div className="flex justify-end m-2">
           <button
             onClick={() => setPersonalDailyModalOpen(false)}
-            className="mx-auto w-full h-7 mb-2 bg-customgray rounded font-bold text-xs sm:text-sm text-black/60 mr-2"
+            className="mx-auto w-full h-7 mb-2 bg-zinc-200 rounded font-bold text-xs sm:text-sm text-black/60 mr-2"
           >
             取消
           </button>
@@ -373,7 +373,7 @@ export default function Reflection() {
           <GrFormClose className=" w-6 h-6" />
         </button>
         <div className="flex flex-col px-1">
-          <h3 className=" font-bold text-lg mb-3 text-center">小組反思日誌</h3>
+          <h3 className=" font-bold text-lg mb-3 text-center">小組檔案空間</h3>
           {/* <p className=' font-bold text-base '>日誌內容可以撰寫以下項目:</p>
                     <p className=' font-bold text-base '>1.最近完成的進度內容。</p>
                     <p className=' font-bold text-base '>2.完成的完成的心得反思。</p>
@@ -392,16 +392,16 @@ export default function Reflection() {
           <input
             className=" rounded outline-none p-1 w-full mb-3 shadow-lg"
             type="text"
-            placeholder="日誌名稱..."
+            placeholder="名稱..."
             name="title"
             onChange={handleTeamDailyChange}
             required
           />
-          <p className=" font-bold text-base mb-3">子任務內容</p>
+          <p className=" font-bold text-base mb-3">內容</p>
           <textarea
             className=" rounded outline-none w-full mb-3 p-1 shadow-lg"
             rows={3}
-            placeholder="日誌內容"
+            placeholder="內容"
             name="content"
             onChange={handleTeamDailyChange}
           />
@@ -417,7 +417,7 @@ export default function Reflection() {
         <div className="flex justify-end m-2">
           <button
             onClick={() => setTeamDailyModalOpen(false)}
-            className="mx-auto w-full h-7 mb-2 bg-customgray rounded font-bold text-xs sm:text-sm text-black/60 mr-2"
+            className="mx-auto w-full h-7 mb-2 bg-zinc-200 rounded font-bold text-xs sm:text-sm text-black/60 mr-2"
           >
             取消
           </button>
@@ -427,7 +427,7 @@ export default function Reflection() {
               setTeamDailyModalOpen(false);
             }}
             type="submit"
-            className="mx-auto w-full h-7 mb-2 bg-customgreen rounded font-bold text-xs sm:text-sm text-white"
+            className="mx-auto w-full h-7 mb-2 bg-teal-600 rounded font-bold text-xs sm:text-sm text-white"
           >
             儲存
           </button>
@@ -442,10 +442,10 @@ export default function Reflection() {
           position={"justify-center items-center"}
         >
           <div className="flex flex-col p-3">
-            <h3 className=" font-bold text-base mb-3">檢視日誌</h3>
+            <h3 className=" font-bold text-base mb-3">檢視資料</h3>
             <p className=" font-bold text-base mb-3">標題</p>
             <input
-              className=" rounded outline-none ring-2 p-1 ring-customgreen w-full mb-3"
+              className=" rounded shadow-xl w-full mb-3"
               type="text"
               placeholder="標題"
               name="title"
@@ -454,7 +454,7 @@ export default function Reflection() {
             />
             <p className=" font-bold text-base mb-3">內容</p>
             <textarea
-              className=" rounded outline-none ring-2 ring-customgreen w-full p-1"
+              className=" rounded w-full p-1 shadow-2xl"
               rows={3}
               placeholder="內容"
               name="content"
@@ -465,7 +465,7 @@ export default function Reflection() {
           <div className="flex justify-end m-2">
             <button
               onClick={() => setInspectDailyModalOpen(false)}
-              className="mx-auto w-1/3 h-7 mb-2 bg-customgreen rounded font-bold text-xs sm:text-base text-white mr-2"
+              className="mx-auto w-1/3 h-7 mb-2 bg-teal-800 rounded font-bold text-xs sm:text-base text-white mr-2"
             >
               關閉
             </button>

@@ -41,11 +41,12 @@ exports.loginUser = (req, res) => {
                     if(response){
                         const username = result[0].username;
                         const id = result[0].id;
+                        const nickname = result[0].nickname;
                         const accessToken = sign(
                                 {username: username, id:id}, 
                                 "importantsecret"
                         );
-                        res.json({accessToken, username, id});
+                        res.json({accessToken, username, id,nickname});
                     }else{
                         res.status(404).json({message: 'Wrong Username or Password!'});
                         console.log(err);
@@ -64,6 +65,7 @@ exports.registerUser = (req, res) => {
     const username = req.body.username;
     const password = req.body.password;
     const role = req.body.role;
+    const nickname = req.body.nickname;
     console.log("Received username:", username);
     console.log("Received password:", password);
     console.log("Received role:", role);
@@ -88,17 +90,19 @@ exports.registerUser = (req, res) => {
                     User.create({
                         username: username,
                         password: hash,
-                        role: role
+                        role: role,
+                        nickname:nickname
                     })
                     .then(result => {
                         const username = result.username;
                         const id = result.id;
+                        const nickname = result.nickname;  // 获取返回的 nickname
                         const accessToken = sign(
                             { username: username, id: id },
                             "importantsecret"
                         );
                         console.log(result);
-                        res.status(201).json({ accessToken, username, id });
+                        res.status(201).json({ accessToken, username, id , nickname});
                     })
                     .catch(err => {
                         console.log(err);
@@ -143,7 +147,7 @@ exports.registerUser = (req, res) => {
 exports.getProjectUsers = async(req, res) => {
     const projectId = req.params.projectId;
     await User.findAll({
-        attributes: ['id', 'username'],
+        attributes: ['id', 'username', 'nickname'],
         include: [{
             model:Project,
             attributes:[],

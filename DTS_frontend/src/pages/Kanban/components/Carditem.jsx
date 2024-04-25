@@ -34,6 +34,9 @@ export default function Carditem({
   const [projectEnd, setProjectEnd] = useState(
     localStorage.getItem("ProjectEnd")
   );
+  const [userId, setUserId] = useState(
+    localStorage.getItem("id")
+  );
 console.log("projectEnd",projectEnd);
   const [cardData, setCardData] = useState({
     id: "",
@@ -117,21 +120,12 @@ console.log("projectEnd",projectEnd);
   };
 
   const colors = [
-    "bg-cyan-700",
-    "bg-green-500",
-    "bg-blue-500",
-    "bg-cyan-500",
-    "bg-teal-500",
-    "bg-blue-700",
-    "bg-teal-700",
-    "bg-cyan-600",
-    "bg-indigo-500",
-    "bg-lime-500",
-    "bg-emerald-500",
-    "bg-cyan-500",
-    "bg-amber-500",
-    "bg-violet-500",
-    "bg-fuchsia-500",
+    "bg-[#0E7490]",
+    "bg-[#16A34A]",
+    "bg-[#3B82F6]",
+    "bg-[#06B6D4]",
+    "bg-[#115E59]",
+
   ];
 
   return (
@@ -188,14 +182,25 @@ console.log("projectEnd",projectEnd);
                 </div>
                 <div className="flex justify-end items-center space-x-1">
                   {data.assignees &&
-                    data?.assignees.map((assignee, index) => (
-                      <div
-                        key={index}
-                        className={`w-8 h-8 bg-slate-100 border-[1px] border-slate-400 rounded-full flex items-center text-center p-2 shadow-xl text-xs overflow-hidden cursor-default`}
-                      >
-                        {assignee.username}
-                      </div>
-                    ))}
+                    data?.assignees.map((assignee, index) => {
+                      const bgColor = colors[(assignee.id - 1) % colors.length]; // 使用用户 ID 取模来获取颜色
+                      return (
+  
+                        <div key={index} className="relative group z-[150]">
+                          <div
+                            className={`${bgColor} -mx-1 w-8 h-8 rounded-full flex items-center justify-center shadow-lg cursor-pointer`}
+                          >
+                            <BsPersonCircle className="w-full h-full text-white" />
+                          </div>
+                          {/* Tooltip */}
+                          <div
+                            className={`${bgColor} absolute opacity-0 group-hover:opacity-100 bg-black text-white text-xs rounded-lg p-2  transition-all duration-200 ease-in-out transform group-hover:translate-y-20 group-hover:scale-105 hidden group-hover:block bottom-full mb-2`}
+                          >
+                            {assignee.username}
+                          </div>
+                        </div>
+                      );
+                    })}
                 </div>
               </div>
             </div>
@@ -271,12 +276,6 @@ console.log("projectEnd",projectEnd);
                   cardData.assignees.map((assignee, index) => {
                     const bgColor = colors[(assignee.id - 1) % colors.length]; // 使用用户 ID 取模来获取颜色
                     return (
-                      // <div
-                      //   key={index}
-                      //   className={`w-8 h-8 border-[1px] border-slate-400 bg-slate-100 rounded-full flex items-center text-center p-2 shadow-xl text-xs cursor-default`}
-                      // >
-                      //   {assignee.username}
-                      // </div>
 
                       <div key={index} className="relative group">
                         <div
@@ -286,9 +285,9 @@ console.log("projectEnd",projectEnd);
                         </div>
                         {/* Tooltip */}
                         <div
-                          className={`${bgColor} absolute opacity-0 group-hover:opacity-100 bg-black text-white text-xs rounded-lg p-2 z-10 transition-all duration-200 ease-in-out transform group-hover:translate-y-20 group-hover:scale-105 hidden group-hover:block bottom-full mb-2`}
+                          className={`${bgColor} absolute opacity-0 group-hover:opacity-100 text-white text-xs rounded-lg p-2 z-10 transition-all duration-200 ease-in-out transform group-hover:translate-y-28 group-hover:scale-105 hidden group-hover:block bottom-full mb-2`}
                         >
-                          {assignee.username}
+                          {assignee.nickname}
                         </div>
                       </div>
                     );

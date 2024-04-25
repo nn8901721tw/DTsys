@@ -868,7 +868,7 @@ export default function Kanban() {
                                   className="w-8 h-8 rotate-45"
                                   animationData={arrow}
                                 />
-                                <span className="font-semibold text-teal-700 ">
+                                <span className="font-semibold text-[#0891B2] ">
                                   當前任務
                                 </span>
                               </div>
@@ -889,7 +889,7 @@ export default function Kanban() {
 
                             {column.name === "進行中" &&
                               column.task.length === 0 && (
-                                <div className="flex items-center justify-center min-h-[80px] top-0 border-2 border-teal-700 rounded-md bg-transparent pointer-events-none text-teal-700 font-semibold">
+                                <div className="flex items-center justify-center min-h-[80px] top-0 border-2 border-[#0891B2] rounded-md bg-transparent pointer-events-none text-[#0891B2] font-semibold">
                                   <span>目前尚無進行中的任務</span>
                                 </div>
                               )}

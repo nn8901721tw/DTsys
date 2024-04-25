@@ -46,7 +46,7 @@ export default function ChatRoom({chatRoomOpen, setChatRoomOpen}) {
     }, [socket, chatRoomOpen]);
     return (
         <div className={`z-50 w-[350px]  h-[460px] fixed left-16 bottom-0 border-2 p-0 rounded-lg shadow-xl bg-slate-100 transform transition-all duration-500 ${chatRoomOpen ? "translate-x-0 translate-y-0 visible" : "-translate-x-full translate-y-full invisible"}`}>
-            <div className='h-[31px] w-full flex justify-between text-base font-semibold p-1 rounded-t-lg bg-teal-200 text-slate-600'>
+            <div className='h-[31px] w-full flex justify-between text-base font-bold p-1 rounded-t-lg bg-[#B2DBDB] text-slate-600'>
                 <span className='pl-2 '>組隊討論區</span>
                 <button onClick={()=>{setChatRoomOpen(false)}} className='cursor-pointer rounded-lg hover:bg-teal-400 '>
                     <GrFormClose size={20} />

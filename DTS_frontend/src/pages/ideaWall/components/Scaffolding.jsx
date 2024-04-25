@@ -219,7 +219,7 @@ const Scaffolding = ({ onTaskComplete }) => {
   // Determine the background color based on active sub-stage
   const getTextColor = (subStageId) => {
     return `${currentStage}-${currentSubStage}` === subStageId
-      ? "text-[#4ECDC5]"
+      ? "text-[#4ECDC5]  animate-pulse"
       : "text-[#C4D8D9]";
   };
   // Get the list of sub-stages for the current stage
@@ -343,7 +343,7 @@ const Scaffolding = ({ onTaskComplete }) => {
                     進入下個子階段-
                   </div>
                   <div
-                    className=" cursor-pointer text-neutral-50 font-bold text-xs 2xl:font-semibold 2xl:text-base px-1 py-1 rounded-md transition ease-in-out bg-[#4ECDC5] hover:-translate-y-1  hover:scale-110 duration-100 ..."
+                    className=" cursor-pointer text-neutral-50 text-xs 2xl:font-semibold  px-1 py-1 rounded-md transition ease-in-out bg-[#4ECDC5] hover:-translate-y-1  hover:scale-110 duration-100 ..."
                     onClick={handleSubmitTask}
                   >
                     {nextStageDescription}
@@ -464,7 +464,11 @@ const Scaffolding = ({ onTaskComplete }) => {
                                           : "bg-gray-400"
                                       }`}
                                     ></div>
-                                    <span className="pl-14 font-semibold truncate w-[160px] text-xs text-right">
+                                    <span className={`pl-14 font-semibold truncate w-[160px] text-xs text-right ${
+                                        taskIndex === 0
+                                          ? "text-[#3279ca] animate-pulse"
+                                          : "text-gray-400"
+                                      }`}>
                                       {task.content}
                                     </span>
                                   </div>

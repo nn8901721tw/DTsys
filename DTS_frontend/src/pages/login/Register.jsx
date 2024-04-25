@@ -39,6 +39,7 @@ export default function Register() {
       localStorage.setItem("accessToken", res.data.accessToken);
       localStorage.setItem("username", res.data.username);
       localStorage.setItem("id", res.data.id);
+      localStorage.setItem("nickname", res.data.nickname);
       setUserContext((prev) => ({
         ...prev,
         username: res.data.username,
@@ -170,6 +171,19 @@ export default function Register() {
                 minLength="6"
                 onChange={handleChange}
                 onBlur={validateInput}
+                className="text-base w-full px-4 py-4 bg-transparent border-b border-gray-500 focus:outline-none"
+                required
+              />
+              {error && <span className="text-xs text-red-600">{error}</span>}
+            </div>
+            <div>
+              <input
+                type="accound"
+                name="nickname"
+                placeholder="nickname"
+                minLength="6"
+                onChange={handleChange}
+      
                 className="text-base w-full px-4 py-4 bg-transparent border-b border-gray-500 focus:outline-none"
                 required
               />

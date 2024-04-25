@@ -29,11 +29,13 @@ export default function Login() {
       localStorage.setItem("accessToken", res.data.accessToken);
       localStorage.setItem("username", res.data.username);
       localStorage.setItem("id", res.data.id);
+      localStorage.setItem("nickname", res.data.nickname);
       setUserContext((prev) => ({
         ...prev,
         username: res.data.username,
         id: res.data.id,
         accessToken: res.data.accessToken,
+        nickname: res.data.nickname,
       }));
       navigate("/lobypage");
       // 成功登錄時彈出 SweetAlert 提示
@@ -66,7 +68,7 @@ export default function Login() {
     <section className="flex flex-col md:flex-row h-screen items-center">
       <div className="hidden bg-[#8AB3B6] w-full md:w-1/2 xl:w-1/2 h-screen md:flex md:items-center md:justify-center">
         <div className="flex flex-col -m-56">
-          <h1 className=" md:mx-auto md:text-xl xl:text-5xl xl:font-semibold mx-auto text-gray-200  mb-2">
+          <h1 className=" md:mx-auto text-4xl xl:text-5xl font-semibold mx-auto text-gray-200  mb-2">
             {/* 
               Network Learning <br/>Technology
               <br/> */}
@@ -91,7 +93,7 @@ export default function Login() {
           />      */}
 
           <Lottie
-            className="xl:w-72 2xl:w-96 mx-auto mt-10"
+            className="w-72 2xl:w-96 mx-auto mt-10"
             animationData={signup}
           />
           {/* <img src="/images/design-thinking_2.png"className="w-48 mx-auto mt-10"  /> */}

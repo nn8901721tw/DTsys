@@ -22,8 +22,8 @@ export default function SideBar() {
         { name: "想法牆", link: `/project/${projectId}/ideaWall`, icon: AiOutlineBulb  },
         // { name: "管理階段", link: `/project/${projectId}/managePhase`, icon: BsBezier2 },
         // { name: "繳交任務", link: `/project/${projectId}/submitTask`, icon: GrCompliance },
-        { name: "撰寫日誌", link: `/project/${projectId}/reflection`, icon: AiOutlineEdit  },
-        { name: "學習歷程", link:`/project/${projectId}/protfolio`, icon:AiOutlineFolderOpen}
+        { name: "檔案空間", link: `/project/${projectId}/reflection`, icon: AiOutlineFolderOpen  },
+        { name: "學習歷程", link:`/project/${projectId}/protfolio`, icon:AiOutlineEdit}
     ]
 
     return (
@@ -41,7 +41,7 @@ export default function SideBar() {
                         <h2 style={{transitionDelay: `${i + 1}00ms`,}} className={`whitespace-pre duration-500 ${!open && "opacity-0 translate-x-28 overflow-hidden"}`}>
                         {menu?.name}
                         </h2>
-                        <h2 className= {`${ open && 'hidden'} absolute left-14 bg-white font-semibold whitespace-pre text-gray-900 rounded-md drop-shadow-lg p-0 w-0  overflow-hidden group-hover:p-1  group-hover:w-fit`}>
+                        <h2 className= {`${ open && 'hidden'} absolute left-14 bg-white  whitespace-pre text-gray-900 rounded-md drop-shadow-lg p-0 w-0  overflow-hidden group-hover:p-1  group-hover:w-fit`}>
                         {menu?.name}
                         </h2>
                     </Link>

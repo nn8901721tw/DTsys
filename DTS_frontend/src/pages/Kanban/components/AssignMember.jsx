@@ -49,7 +49,7 @@ export default function AssignMember({menberData, setMenberData, setCardData }) 
 
                     return(
                         <div key={index} className='flex flex-row  justify-between bg-customgray w-full p-2 mb-2'>
-                            <div className=' text-base'>{member.username}</div>
+                            <div className=' text-base'>{member.nickname}</div>
                             <input 
                                 type="checkbox" 
                                 className="w-4 h-4 m-1 bg-gray-100 border-gray-300 rounded checked:bg-blue-500" 
