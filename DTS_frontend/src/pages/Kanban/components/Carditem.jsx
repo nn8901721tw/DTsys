@@ -37,7 +37,7 @@ export default function Carditem({
   const [userId, setUserId] = useState(
     localStorage.getItem("id")
   );
-console.log("projectEnd",projectEnd);
+// console.log("projectEnd",projectEnd);
   const [cardData, setCardData] = useState({
     id: "",
     title: "",
@@ -119,14 +119,7 @@ console.log("projectEnd",projectEnd);
     });
   };
 
-  const colors = [
-    "bg-[#0E7490]",
-    "bg-[#16A34A]",
-    "bg-[#3B82F6]",
-    "bg-[#06B6D4]",
-    "bg-[#115E59]",
-
-  ];
+  const colors = ["bg-[#C47D09]", "bg-[#D2B800]", "bg-[#578082]", "bg-[#16A34A]", "bg-[#115E59]","bg-[#4ECDC5]"];
 
   return (
     <>
@@ -139,7 +132,7 @@ console.log("projectEnd",projectEnd);
             ref={provided.innerRef}
             {...provided.draggableProps}
             {...provided.dragHandleProps}
-            className={`${borderStyle} rounded-md p-3 truncate min-h-[100px] max-w-full shadow-md  font-semibold hover:shadow-xl mt-1 hover:skew-y-1 ${
+            className={`${borderStyle} rounded-md p-3 truncate min-h-[100px] max-w-full shadow-md  font-semibold hover:shadow-xl mt-1 hover:skew-y-1  ${
               snapshot.isDragging ? "bg-sky-300 " : "bg-white"
             }`}
           >
@@ -186,7 +179,7 @@ console.log("projectEnd",projectEnd);
                       const bgColor = colors[(assignee.id - 1) % colors.length]; // 使用用户 ID 取模来获取颜色
                       return (
   
-                        <div key={index} className="relative group z-[150]">
+                        <div key={index} className="relative group z-0">
                           <div
                             className={`${bgColor} -mx-1 w-8 h-8 rounded-full flex items-center justify-center shadow-lg cursor-pointer`}
                           >
@@ -194,7 +187,7 @@ console.log("projectEnd",projectEnd);
                           </div>
                           {/* Tooltip */}
                           <div
-                            className={`${bgColor} absolute opacity-0 group-hover:opacity-100 bg-black text-white text-xs rounded-lg p-2  transition-all duration-200 ease-in-out transform group-hover:translate-y-20 group-hover:scale-105 hidden group-hover:block bottom-full mb-2`}
+                            className={`${bgColor} absolute opacity-0 group-hover:opacity-100 text-white text-xs rounded-lg p-2  transition-all duration-200 ease-in-out transform group-hover:translate-y-20 group-hover:scale-105 hidden group-hover:block bottom-full mb-2`}
                           >
                             {assignee.username}
                           </div>

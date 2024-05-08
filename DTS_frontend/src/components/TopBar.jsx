@@ -8,6 +8,9 @@ import { useParams, Link, useNavigate } from "react-router-dom";
 import { GrFormClose } from "react-icons/gr";
 import Modal from "./Modal";
 import { BsPersonCircle } from "react-icons/bs";
+import Swal from 'sweetalert2';
+import { FaCrown } from "react-icons/fa";
+import { FaRibbon } from "react-icons/fa";
 
 export default function TopBar() {
   const [projectUsers, setProjectUsers] = useState([{ id: "", username: "" }]);
@@ -16,6 +19,9 @@ export default function TopBar() {
   const { projectId } = useParams();
   const [userId, setUserId] = useState(
     localStorage.getItem("id")
+  );
+  const [teamLeader, setTeamLeader] = useState(
+    localStorage.getItem("teamLeader")
   );
   const [nickname, setNickname] = useState(
     localStorage.getItem("nickname")
@@ -38,6 +44,7 @@ export default function TopBar() {
       localStorage.setItem("currentSubStage", data.currentSubStage);
       localStorage.setItem("name", data.name);
       localStorage.setItem("ProjectEnd", data.ProjectEnd);
+      localStorage.setItem("teamLeader", data.teamLeader);
     },
     enabled: !!projectId,
   });
@@ -51,6 +58,8 @@ export default function TopBar() {
     localStorage.removeItem("name");
     localStorage.removeItem("stageEnd");
     localStorage.removeItem("ProjectEnd");
+    localStorage.removeItem("taskSubmitted");
+    localStorage.removeItem("teamLeader");
   };
 
   const handleLogout = () => {
@@ -58,22 +67,39 @@ export default function TopBar() {
     navigate("/");
   };
 
-  const colors = [
-    "bg-[#0E7490]",
-    "bg-[#16A34A]",
-    "bg-[#3B82F6]",
-    "bg-[#06B6D4]",
-    "bg-[#115E59]",
+  const colors = ["bg-[#C47D09]", "bg-[#D2B800]", "bg-[#578082]", "bg-[#16A34A]", "bg-[#115E59]","bg-[#4ECDC5]"];
 
-  ];
 
   console.log("projectUsers::::" ,projectUsers);
 
+
+  const handleShowReferralCode = () => {
+    Swal.fire({
+      title: '<h3 style="font-size: 28px;">組隊邀請碼:</h3>',
+      html: `
+
+        <div style="background-color: #47a8bd; color: white; padding: 10px; border-radius: 6px; margin-top: 10px;">
+          ${projectInfo.referral_code}
+        </div>
+      `,
+      confirmButtonText: '關閉',
+      confirmButtonColor: '#5698A0',
+      focusConfirm: false,
+      customClass: {
+        popup: 'custom-swal'
+      }
+    });
+  };
+
+
   return (
-    <div className="fixed h-16 w-full pl-20 bg-[#b2dbdb] flex items-center justify-between pr-5 border-b-2 text-slate-700 font-bold">
+    <div className="fixed h-16 w-full pl-20 bg-[#b2dbdb] flex items-center justify-between pr-5 border-b-2 text-slate-700 font-bold z-30">
       <Link to="/lobypage" onClick={cleanStage} className="">
         <img src="/images/DTlabel.png" className="w-40 mt-1" />
       </Link>
+
+      
+
       <div className="div bg-[#0E7490]"></div>
       <div className="flex items-center">
         <ul className="flex items-center justify-center space-x-1">
@@ -84,37 +110,27 @@ export default function TopBar() {
           ) : (
             projectUsers.map((projectUser, index) => {
               const bgColor = colors[(projectUser.id - 1) % colors.length]; // 使用用户 ID 取模来获取颜色
+              const isTeamLeader = projectUser.id.toString() === localStorage.getItem("teamLeader"); // 檢查是否為組長
               return (
-                // <div className="div">
-                //   <li
-                //     key={index}
-                //     className="-mx-2 w-8 h-8 bg-teal-600 border-[1px] border-slate-400 rounded-full flex items-center justify-center text-center p-2 shadow-xl text-xs overflow-hidden cursor-default"
-                //     title={`User ${projectUser.username}`} // 添加圖例顯示用戶名
-                //   >
-                //     <BsPersonCircle  className="-mx-3 w-8 h-8 bg-teal-600 border-[1px] border-slate-400 rounded-full flex items-center justify-center text-center p-2 shadow-xl text-xs overflow-hidden cursor-default"/>
-                //     {/* {projectUser.username} */}
-
-                //   </li>
-                // </div>
-
                 <div key={index} className="relative group">
                   <div
-                    className={`${bgColor} -mx-1  rounded-full flex items-center justify-center shadow-lg cursor-default`}
+                    className={`${bgColor} -mx-1 rounded-full flex items-center justify-center shadow-lg cursor-default relative`}
                   >
-                    <BsPersonCircle className=" w-8 h-8 text-white" />
+                    {isTeamLeader && <FaCrown className="absolute -top-3 text-[#fae848] text-lg" />}
+                    <BsPersonCircle className="w-8 h-8 text-white" />
                   </div>
                   {/* Tooltip */}
                   <div className="transition-all duration-200 opacity-0 group-hover:opacity-100 group-hover:translate-y-1 group-hover:scale-105 hidden group-hover:block ease-in-out transform">
-                  <div
-                    className={`${bgColor} w-14 text-center absolute text-white text-xs rounded-lg p-2 z-10 `}
-                  >
-                    {projectUser.nickname}
+                    <div
+                      className={`${bgColor} w-14 text-center absolute text-white text-xs rounded-lg p-2 z-10`}
+                    >
+                      {projectUser.nickname}
+                    </div>
                   </div>
-                  </div>
-               
                 </div>
               );
             })
+            
           )}
           
           {getProjectUserQuery.isLoading || projectId === undefined ? (
@@ -125,19 +141,16 @@ export default function TopBar() {
               <BsPlusCircleDotted
                 size={32}
                 className=" text-gray-500"
-                onClick={() => setReferralCodeModalOpen(true)}
+                onClick={handleShowReferralCode}
+             
               />
             </button>
+
           </li>
-          ) }
-
-          
-
-
-          
+          ) }  
         </ul>
 
-        {/* <IoIosNotificationsOutline size={30} className="cursor-pointer mx-3" /> */}
+
         <h3 className="font-bold cursor-default p-1 mr-2 rounded-lg">
           {localStorage.getItem("nickname")}
         </h3>
@@ -148,28 +161,7 @@ export default function TopBar() {
           登出
         </h3>
       </div>
-      <Modal
-        open={referralCodeModalOpen}
-        onClose={() => setReferralCodeModalOpen(false)}
-        opacity={true}
-        position={"justify-center items-center"}
-        className="z-50"
-      >
-        <button
-          onClick={() => setReferralCodeModalOpen(false)}
-          className=" absolute top-1 right-1 rounded-lg bg-slate-100 hover:bg-slate-200"
-        >
-          <GrFormClose className=" w-6 h-6" />
-        </button>
-        <div className="flex flex-col p-3">
-          <h3 className=" font-bold text-xl mb-3 text-stone-800">
-            組隊邀請碼:
-          </h3>
-          <h3 className=" text-center font-bold text-lg py-1 bg-teal-600 rounded-md">
-            {projectInfo.referral_code}
-          </h3>
-        </div>
-      </Modal>
+
     </div>
   );
 }

@@ -47,6 +47,7 @@ const Cards = () => {
     onSuccess: (res) => {
       console.log(res);
       queryClient.invalidateQueries("projectDatas");
+      localStorage.setItem('taskSubmitted', 'true'); // 设置标志
       // sucesssReferralCodeNotify(res.message)
       Swal.fire({
         icon: "success",

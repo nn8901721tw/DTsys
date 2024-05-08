@@ -15,7 +15,7 @@ export default function SubmitTask() {
     const navigate = useNavigate();
     const {projectId} = useParams();
     const [ stageInfo ,setStageInfo ] = useState({userSubmit:{}});
-
+    const [template, setTemplate] = useState([]);
     
     const {mutate} = useMutation( submitTask, {
         onSuccess : ( res ) =>{
@@ -30,6 +30,8 @@ export default function SubmitTask() {
             socket.emit('taskUpdated'); // 廣播任務更新事件
             socket.emit('taskSubmitted', { projectId: projectId, message: 'Task updated' });
             console.log("taskSubmitted");
+            localStorage.setItem('taskSubmitted', 'true'); // 设置标志
+
             navigate(`/project/${projectId}/kanban`);
         },
         onError : (error) =>{
@@ -87,6 +89,63 @@ export default function SubmitTask() {
     }
     const errorNotify = (toastContent) => toast.error(toastContent);
     const sucesssNotify = (toastContent) => toast.success(toastContent);
+
+
+
+    const handleOneClickUse = async () => {
+        // 确保有进行中的列 ID
+        if (!doingColumnId) {
+          console.error("No doingColumnId set");
+          return;
+        }
+    
+        // 确保模板数据已加载
+        if (!template || template.length === 0) {
+          console.error("Template data is not loaded yet");
+          return;
+        }
+    
+        try {
+          // 遍歷所有模板，為每個模板創建一個新的任務
+          if (!doingColumnId) {
+            throw new Error("No doingColumnId set");
+        }
+        if (!template || template.length === 0) {
+            throw new Error("Template data is not loaded yet");
+        }
+    
+          const tasksCreationPromises = template.map((scaffoldingItem) => {
+            if (!scaffoldingItem || !scaffoldingItem.scaffolding_template) {
+              throw new Error("Invalid scaffolding item");
+            }
+            const newTask = {
+              content: scaffoldingItem.scaffolding_template,
+              columnId: doingColumnId, // 使用之前找到的進行中的列ID
+            };
+            // 使用 createTaskAndUpdateColumn 函數發起請求
+            return createTaskAndUpdateColumn(newTask);
+          });
+    
+          // 等待所有任務創建操作完成
+          const responses = await Promise.all(tasksCreationPromises);
+          console.log(
+            "All tasks created and column updated:",
+            responses.map((res) => res.data)
+          );
+          const newTasksIds = responses.map((res) => res.data.taskId);
+          // 你可能需要在这里通知服务器，比如发送一个socket事件来告知新创建的任务ID
+          socket.emit("tasksCreated", {
+            columnId: doingColumnId,
+            newTasksIds,
+            projectId,
+          });
+    
+          // 更新前端狀態或提示用戶
+          // ... 這裡可能需要更新前端的 column 狀態，取決於您的實際需求 ...
+        } catch (error) {
+          console.error("Error in handleOneClickUse:", error);
+        }
+      };
 
     return (
         localStorage.getItem('stageEnd') ? 

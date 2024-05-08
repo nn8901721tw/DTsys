@@ -162,7 +162,12 @@ io.on("connection", (socket) => {
        
         io.sockets.emit("taskItems", "2");
     })
-  
+
+   
+    socket.on("templateUpdated", async (data) => {
+       
+        io.sockets.emit("templateUpdated", "2");
+    })
 
 
     socket.on('tasksCreated', async (data) => {

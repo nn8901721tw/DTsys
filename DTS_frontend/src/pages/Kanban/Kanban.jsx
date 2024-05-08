@@ -36,6 +36,7 @@ import { getScaffoldingTemplate } from "../../api/scaffoldingtemplate";
 import { socket } from "../../utils/socket";
 import SpringModal from "./components/SpringModel"; // 確保從正確的路徑導入 SpringModal
 import { AiFillTag } from "react-icons/ai";
+import { FaRibbon } from "react-icons/fa";
 
 export default function Kanban() {
   const [kanbanData, setKanbanData] = useState([]);
@@ -78,6 +79,11 @@ export default function Kanban() {
   const [showFlyout, setShowFlyout] = useState(false);
   const [isAllStagesComplete, setIsAllStagesComplete] = useState(false);
 
+  const [userId, setUserId] = useState(localStorage.getItem("id"));
+  const [teamLeader, setTeamLeader] = useState(
+    localStorage.getItem("teamLeader")
+  );
+
   const {
     isLoading: kanbanIsLoading,
     isError: kanbansIsError,
@@ -109,7 +115,6 @@ export default function Kanban() {
           currentStage: localStorage.getItem("currentStage"),
           currentSubStage: localStorage.getItem("currentSubStage"),
         }));
-        // setcstage()
       },
       enabled: !!localStorage.getItem("currentStage"),
     }
@@ -400,6 +405,8 @@ export default function Kanban() {
 
   const handleOneClickUse = async () => {
     // 确保有进行中的列 ID
+    console.log("WWQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ");
+
     if (!doingColumnId) {
       console.error("No doingColumnId set");
       return;
@@ -413,6 +420,13 @@ export default function Kanban() {
 
     try {
       // 遍歷所有模板，為每個模板創建一個新的任務
+      if (!doingColumnId) {
+        throw new Error("No doingColumnId set");
+      }
+      if (!template || template.length === 0) {
+        throw new Error("Template data is not loaded yet");
+      }
+
       const tasksCreationPromises = template.map((scaffoldingItem) => {
         if (!scaffoldingItem || !scaffoldingItem.scaffolding_template) {
           throw new Error("Invalid scaffolding item");
@@ -439,10 +453,12 @@ export default function Kanban() {
         projectId,
       });
 
+      socket.emit("templateUpdated", { projectId: projectId });
+
       // 更新前端狀態或提示用戶
       // ... 這裡可能需要更新前端的 column 狀態，取決於您的實際需求 ...
     } catch (error) {
-      console.error("Error creating tasks:", error);
+      console.error("Error in handleOneClickUse:", error);
     }
   };
   useEffect(() => {
@@ -559,6 +575,24 @@ export default function Kanban() {
     enabled: !!projectId,
   });
 
+  const [taskSubmitted, setTaskSubmitted] = useState(
+    localStorage.getItem("taskSubmitted") === "true" // Ensure this is a boolean
+  );
+
+  useEffect(() => {
+    if (taskSubmitted && doingColumnId && template.length > 0) {
+      handleOneClickUse();
+      localStorage.removeItem("taskSubmitted");
+      console.log("One Click Use function called successfully.");
+      setTaskSubmitted(false); // Reset the state
+    } else {
+      console.log(
+        "Waiting for doingColumnId to be set or taskSubmitted is not true."
+      );
+    }
+    // This effect should only run when taskSubmitted changes
+  }, [taskSubmitted, doingColumnId, template]);
+
   return (
     <div className="bg-slate-100 h-full">
       <div className="flex fixed top-[70px] left-20 text-[#446269] cursor-default ">
@@ -567,22 +601,29 @@ export default function Kanban() {
           主題 : {projectname}
         </span>
       </div>
+ 
 
-      <DragDropContext onDragEnd={onDragEnd} className='bg-slate-100'>
+      {/* {userId !== teamLeader && (
+            <div className="absolute inset-0 bg-gray-900 top-[11rem] left-[35rem] right-0  bg-opacity-50 flex items-center justify-center text-white z-20">
+              <span>與大家討論後由組長統一操作</span>
+            </div>
+          )} */}
+
+      <DragDropContext onDragEnd={onDragEnd} className="bg-slate-100">
         <motion.div
           initial="hidden"
           animate={showContainer ? "visible" : "hidden"}
           exit="exit"
           variants={containerVariants}
           transition={{ duration: 0.5 }}
-          className="fixed top-16 left-0 right-0 z-10"
+          className="fixed top-16 left-0 right-0 z-20"
           style={{
             opacity: showContainer ? 1 : 0,
             y: showContainer ? 0 : 50,
             visibility: showContainer ? "visible" : "hidden",
           }}
         >
-          <div className="transition-all duration-500 transform flex flex-col items-center bg-slate-200 lg:mx-64 xl:mx-80 rounded-2xl opacity-100 scale-y-100 text-gray-700">
+          <div className="transition-all duration-500 transform flex flex-col items-center bg-slate-200 lg:mx-64 xl:mx-80 rounded-2xl opacity-100 scale-y-100 text-gray-700 z-20">
             <div className="wrapper">
               <div className="flex font-bold text-lg pt-1 ">階段</div>
             </div>
@@ -720,7 +761,8 @@ export default function Kanban() {
               isPreviousStageIncomplete ||
               isStageIncomplete ||
               isStagecomplete ||
-              projectEnd // 新增 isStagecomplete 到條件中
+              projectEnd ||
+              userId !== teamLeader // 添加新的逻辑判断
                 ? "bg-gray-300 cursor-not-allowed"
                 : "bg-teal-600 hover:-translate-y-1 hover:scale-110 hover:bg-teal-700 text-white"
             }`}
@@ -729,7 +771,8 @@ export default function Kanban() {
               isPreviousStageIncomplete ||
               isStageIncomplete ||
               isStagecomplete ||
-              projectEnd
+              projectEnd ||
+              userId !== teamLeader // 添加新的逻辑判断
             } // 根據 isStagecomplete 設置 disabled
           >
             {isPreviousStageIncomplete || isStageIncomplete
@@ -741,12 +784,13 @@ export default function Kanban() {
               : "完成此階段"}
           </button>
         </div>
+
         <SlideInNotifications
           notifications={notifications}
           setNotifications={setNotifications}
         />
 
-        <div className="grid grid-cols-4 gap-5 px-44 pt-2  min-w-[800px] h-fit overflow-hidden bg-slate-100  ">
+        <div className="grid grid-cols-4 gap-5 px-44 pt-2 min-w-[800px] h-fit overflow-hidden bg-slate-100  ">
           <div className="flex flex-col">
             {projectEnd ? (
               ""
@@ -766,21 +810,24 @@ export default function Kanban() {
               <div
                 onMouseEnter={() => setShowFlyout(true)}
                 onMouseLeave={() => setShowFlyout(false)}
-                className="flex mt-32"
+                className="flex mt-32 z-30"
                 onClick={handleLottieClick} // Define handleLottieClick if it has specific functionality
               >
                 <Lottie
-                  className=" w-50 h-40 z-0 scale-x-[-1] -translate-x-32  "
+                  className=" w-50 h-40  scale-x-[-1] -translate-x-32  z-30"
                   animationData={owlAnimation}
                 />
                 <Lottie
-                  className="wh-16 h-16 z-0 -translate-x-32 "
+                  className="w-16 h-16 -translate-x-44 z-10"
                   animationData={question}
                   loop={false} // Stop looping
                   autoplay={true} // Automatically start playing
                 />
                 {showFlyout && (
-                  <OwlquestionFlyoutLink onImageClick={handleImageClick} />
+                  <OwlquestionFlyoutLink
+                    onImageClick={handleImageClick}
+                    className=" z-5"
+                  />
                 )}
               </div>
             )}
@@ -799,7 +846,7 @@ export default function Kanban() {
                   <Droppable
                     droppableId="5"
                     className="cursor-help"
-                    isDropDisabled= {true}
+                    isDropDisabled={true}
                   >
                     {(provided, snapshot) => (
                       <div
@@ -807,6 +854,13 @@ export default function Kanban() {
                         ref={provided.innerRef} // Make sure innerRef is attached here
                         className="shadow-xl cursor-default" // Set cursor to default
                       >
+                        {userId !== teamLeader && (
+                          <div className="flex absolute inset-0 bg-slate-400 bg-opacity-50 items-center justify-center z-10 top-[11rem] w-7/12 left-[31%] h-[65%] rounded-xl">
+                            <span className="text-white text-3xl font-bold mb-14">
+                              與大家討論後由組長統一操作
+                            </span>
+                          </div>
+                        )}
                         <div
                           className={`bg-[#647B71] p-3 rounded-md shadow-xl flex flex-col w-full max-h-[50vh]  overflow-y-scroll scrollbar-none `}
                         >
@@ -967,3 +1021,4 @@ export default function Kanban() {
     </div>
   );
 }
+

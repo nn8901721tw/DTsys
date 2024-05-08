@@ -19,6 +19,9 @@ import {
 } from "../../api/kanban";
 import { getProjectUser } from "../../api/users";
 import { AiOutlineBulb } from "react-icons/ai";
+import toast, { Toaster } from 'react-hot-toast';
+
+
 
 export default function IdeaWall() {
   const container = useRef(null);
@@ -41,7 +44,7 @@ export default function IdeaWall() {
 
   const queryClient = useQueryClient(); // 使用 useQueryClient 鉤子
 
-  const colors = ["#0E7490", "#16A34A", "#3B82F6", "#06B6D4", "#115E59"];
+  const colors = ["#C47D09", "#D2B800", "#578082", "#16A34A", "#115E59","#4ECDC5"];
 
   // const userColor = getColorForUser(userId); // 獲取顏色
   // 在元件內部
@@ -267,19 +270,44 @@ export default function IdeaWall() {
     }));
   };
 
+  // const handleCreateSubmit = (e) => {
+  //   e.preventDefault();
+  //   setCreateNodeModalOpen(false);
+  //   socket.emit("nodeCreate", nodeData);
+  //   setBuildOnId("");
+  //   setTitle("");
+  //   setContent("");
+  // };
+  // const handleUpdateSubmit = (e) => {
+  //   e.preventDefault();
+  //   setUpdateNodeModalOpen(false);
+  //   socket.emit("nodeUpdate", selectNodeInfo);
+  // };
   const handleCreateSubmit = (e) => {
-    e.preventDefault();
-    setCreateNodeModalOpen(false);
-    socket.emit("nodeCreate", nodeData);
-    setBuildOnId("");
-    setTitle("");
-    setContent("");
-  };
-  const handleUpdateSubmit = (e) => {
-    e.preventDefault();
-    setUpdateNodeModalOpen(false);
-    socket.emit("nodeUpdate", selectNodeInfo);
-  };
+    e.preventDefault()
+    if (title.trim() !== "" && content.trim() !== "") {
+        setCreateNodeModalOpen(false);
+        socket.emit('nodeCreate', nodeData);
+        setBuildOnId("");
+        setContent("");
+        setTitle("");
+    } else {
+        toast.error("標題及內容請填寫完整!");
+    }
+}
+const handleUpdateSubmit = (e) => {
+    e.preventDefault()
+    if (selectNodeInfo.title.trim() !== "" && selectNodeInfo.content.trim() !== "") {
+        setUpdateNodeModalOpen(false)
+        socket.emit('nodeUpdate', selectNodeInfo)
+    } else {
+        toast.error("標題及內容請填寫完整!");
+    }
+}
+
+
+
+
 
   const handleDelete = (e) => {
     e.preventDefault();
@@ -295,14 +323,15 @@ export default function IdeaWall() {
         //to do ? :
         <div
           ref={container}
-          className=" h-screen w-full pl-[70px] pt-[70px] "
+          className=" h-screen w-full pl-[70px] pt-[70px]"
         ></div>
       }
-      <div className="w-full">
+      <div className="w-full ">
         <Scaffolding
           className="w-full"
           currentStage={currentStage}
           currentSubStage={currentSubStage}
+
         />
       </div>
 
@@ -403,7 +432,7 @@ export default function IdeaWall() {
           <button
             onClick={handleCreateSubmit}
             className="mx-auto w-full h-7 mb-2 bg-cyan-600 rounded font-bold text-xs sm:text-sm text-white"
-            disabled={!title}
+           
           >
             儲存
           </button>
@@ -427,6 +456,7 @@ export default function IdeaWall() {
               name="title"
               value={selectNodeInfo.title}
               onChange={handleUpdataChange}
+              disabled={localStorage.getItem("nickname") !== selectNodeInfo.owner}
             />
             <p className=" font-bold text-base mb-3">內容</p>
             <textarea
@@ -436,6 +466,7 @@ export default function IdeaWall() {
               name="content"
               value={selectNodeInfo.content}
               onChange={handleUpdataChange}
+              disabled={localStorage.getItem("nickname") !== selectNodeInfo.owner}
             />
             <p className=" font-bold text-base mt-3">
               建立者: {selectNodeInfo.owner}
@@ -475,7 +506,9 @@ export default function IdeaWall() {
             </div>
           )}
         </Modal>
+     
       )}
+         <Toaster></Toaster>
     </div>
   );
 }

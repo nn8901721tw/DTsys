@@ -130,6 +130,7 @@ const Scaffolding = ({ onTaskComplete }) => {
         setKanbanData(data);
       }
     }
+    socket.on("templateUpdated", KanbanUpdateEvent);
     socket.on("dragtaskItem", kanbanDragEvent);
     socket.on("refreshKanban", handleRefreshKanban);
     socket.on("taskItem", KanbanUpdateEvent);
@@ -229,7 +230,7 @@ const Scaffolding = ({ onTaskComplete }) => {
 
   // Get background color based on current stage
   const getStageColor = (stageNumber) => {
-    return currentStage === stageNumber ? "bg-[#63999F]" : "bg-[#C4D8D9]";
+    return currentStage === stageNumber ? "bg-[#63999F]" : "bg-[#acc7ce]";
   };
 
   const stages3 = [
@@ -279,11 +280,15 @@ const Scaffolding = ({ onTaskComplete }) => {
     console.log("kanbanData:", kanbanData);
   }, [currentStage, currentSubStage, kanbanData, socket]); // 確保當 kanbanData 更新時重新運行此效果
 
+
+
+
+
   return (
-    <div className=" w-64 p-6 bg-white rounded-lg shadow-md divide-y divide-gray-200 fixed top-20 right-2 h-4/5  z-20  overflow-y-auto overflow-x-hidden scrollbar-none ">
+    <div className=" w-64 p-6  bg-slate-700 rounded-lg shadow-md divide-y divide-gray-200 fixed top-24 right-2 h-4/5  z-20  overflow-y-auto overflow-x-hidden scrollbar-none ">
       <div className="pb-2">
         <div className="flex">
-          <div className="flex fixed top-[70px] left-20 text-[#446269] cursor-default">
+          <div className="flex fixed top-[70px] left-20 text-[#648891] cursor-default">
             <AiFillTag className="w-6 h-6" />
             <span className="justify-center items-center translate-x-2 font-semibold">
               主題 : {projectname}
@@ -308,42 +313,40 @@ const Scaffolding = ({ onTaskComplete }) => {
         ) : (
           <>
             {inProgressTasks.length > 0 ? (
-              <h2 className="text-base font-semibold text-gray-900  truncate w-[200px] cursor-default">
+              <h2 className="text-base font-semibold text-gray-200  truncate w-[200px] cursor-default">
                 當前子任務-
                 <span
-                  className="text-[#3279ca] font-bold whitespace-nowrap "
+                  className="text-[#57a5ff] font-bold whitespace-nowrap "
                   title={inProgressTasks[0].content}
                 >
                   {inProgressTasks[0].content}
                 </span>
               </h2>
             ) : (
-              <h2 className="text-lg font-semibold text-gray-900">
+              <h2 className="text-lg font-semibold text-gray-200">
                 進行中的子任務皆已完成
               </h2>
             )}
-            <p className="mt-1 text-sm text-gray-600">
-              請點擊左側導航欄，並依照步驟開始製作。
-            </p>
-            <h2 className="text-base font-semibold text-gray-900">建議</h2>
-            <p className="mt-1 text-sm text-gray-600">
-              請點擊左側導航欄，並依照步驟開始製作.。
+
+            <h2 className="text-base font-semibold text-gray-400">建議</h2>
+            <p className="mt-1 text-sm text-gray-200">
+              請使用滑鼠右鍵創建想法節點，並依照右側流程步驟製作發想。
             </p>
             <div className="flex justify-end">
               {inProgressTasks.length > 0 ? (
                 <button
-                  className=" text-neutral-50 font-bold text-sm 2xl:font-semibold 2xl:text-base px-1 py-1 rounded-md transition ease-in-out bg-[#4b7fbb] hover:-translate-y-1  hover:scale-110 duration-100 ..."
+                  className=" text-neutral-50 font-bold text-sm 2xl:font-semibold  px-1 py-1 rounded-md transition ease-in-out bg-[#4b7fbb] hover:-translate-y-1  hover:scale-110 duration-100 ..."
                   onClick={completeTask}
                 >
                   子任務完成
                 </button>
               ) : (
                 <div className="flex text-sm w-full ">
-                  <div className="my-auto font-semibold justify-start text-xs">
+                  <div className="my-auto font-semibold justify-start text-xs text-[#37a59e]">
                     進入下個子階段-
                   </div>
                   <div
-                    className=" cursor-pointer text-neutral-50 text-xs 2xl:font-semibold  px-1 py-1 rounded-md transition ease-in-out bg-[#4ECDC5] hover:-translate-y-1  hover:scale-110 duration-100 ..."
+                    className=" cursor-pointer text-neutral-50 text-xs 2xl:font-semibold  px-1 py-1 rounded-md transition ease-in-out bg-[#37a59e] hover:-translate-y-1  hover:scale-110 duration-100 ..."
                     onClick={handleSubmitTask}
                   >
                     {nextStageDescription}
@@ -466,7 +469,7 @@ const Scaffolding = ({ onTaskComplete }) => {
                                     ></div>
                                     <span className={`pl-14 font-semibold truncate w-[160px] text-xs text-right ${
                                         taskIndex === 0
-                                          ? "text-[#3279ca] animate-pulse"
+                                          ? "text-[#57a5ff] animate-pulse"
                                           : "text-gray-400"
                                       }`}>
                                       {task.content}

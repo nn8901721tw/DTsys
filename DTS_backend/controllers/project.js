@@ -50,6 +50,8 @@ exports.createProject = async(req, res) => {
     const projectName = req.body.projectName;
     const projectdescribe = req.body.projectdescribe;
     const projectMentor = req.body.projectMentor;
+    const userId = req.body.userId;
+    const teamLeaderNickname = req.body.teamLeaderNickname;
     const referral_code = shortid.generate();
     if(!projectName || !projectdescribe){
         return res.status(404).send({message: '請輸入資料!'})
@@ -61,9 +63,11 @@ exports.createProject = async(req, res) => {
         referral_code: referral_code,
         currentStage:1,
         currentSubStage:1,
-        ProjectEnd:false
+        ProjectEnd:false,
+        teamLeader: userId, // Add the teamLeader field
+        teamLeaderNickname:teamLeaderNickname
     });
-    const userId = req.body.userId;
+
     const creater = await User.findByPk(userId);
     const userProjectAssociations = await createdProject.addUser(creater);
 

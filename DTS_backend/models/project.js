@@ -38,6 +38,14 @@ const Project = sequelize.define('project', {
         type:DataTypes.BOOLEAN,
         allowNull:true
     },
+    teamLeader: {
+        type: DataTypes.INTEGER, // Assuming team leader's ID is stored here
+        allowNull: true
+    },
+    teamLeaderNickname: {
+        type:DataTypes.TEXT,
+        allowNull:true
+    },
 });
 
 Project.hasMany(Chatroom_message);

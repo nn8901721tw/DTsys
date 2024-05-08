@@ -28,9 +28,28 @@ export default function Register() {
       setError("請確認密碼");
     } else if (userData.confirmPassword !== userData.password) {
       setError("密碼不相符");
-    } else {
-      setError("");
-    }
+    } 
+    // else if (
+    //   !userData.username ||
+    //   userData.username.length < 6 ||
+    //   userData.username.length > 20
+    // ) {
+    //   setError("帳號長度應為6-20個字符");
+    // } else if (!/^[A-Za-z0-9]+$/.test(userData.username)) {
+    //   setError("帳號只能包含字母、數字");
+    // } else if (!/^[A-Za-z]/.test(userData.username)) {
+    //   setError("帳號必須以字母開頭");
+    // } else if (!userData.password || userData.password.length < 8) {
+    //   setError("密碼長度至少為8個字符");
+    // } else if (
+    //   !/\d/.test(userData.password) ||
+    //   !/[A-Z]/i.test(userData.password) ||
+    //   !/[^A-Za-z0-9]/.test(userData.password)
+    // ) {
+    //   setError("密碼必須包含字母、數字及特殊字符");
+    // } else {
+    //   setError("");
+    // }
   };
 
   const userRegisterMutation = useMutation(userRegister, {
@@ -91,40 +110,20 @@ export default function Register() {
       userRegisterMutation.mutate(userData);
     }
   };
+
   return (
     <section className="flex flex-col md:flex-row h-screen items-center">
       <div className="hidden bg-[#AFCACC] w-full md:w-1/2 xl:w-1/2 h-screen md:flex md:items-center md:justify-center">
         <div className="flex flex-col -m-56">
           <h1 className=" md:mx-auto md:text-2xl xl:text-5xl xl:font-semibold mx-auto text-gray-200  mb-2">
-            {/* 
-              Network Learning <br/>Technology
-              <br/> */}
             <span className=" text-teal-900">Design Thinking</span> <br />
             System
           </h1>
-          {/* <TypeAnimation
-                    className='text-white text-2xl font-press-start mt-2'
-                    sequence={[
-                    'Network Learning Technology', 
-                    2000,
-                    '',
-                    2000, 
-                    'NCU Wulab',
-                    2000,
-                    ]}
-                    speed={40}
-                    wrapper="span"
-                    cursor={true}
-                    repeat={Infinity}
-                    style={{ fontSize: '2em', display: 'inline-block' }}
-                />      */}
-          {/* <h1 className='text-white text-2xl font-press-start mt-2'>self-directed Learning</h1> */}
 
           <Lottie
             className="xl:w-72 2xl:w-96 mx-auto mt-10"
             animationData={login1}
           />
-          {/* <img src="/images/design-thinking.png"className="w-48 mx-auto mt-10" /> */}
         </div>
       </div>
 
@@ -133,13 +132,6 @@ export default function Register() {
       <div className=" bg-[#FCFAF8] w-full md:max-w-md lg:max-w-full md:mx-auto md:w-1/2 xl:w-1/2 h-screen px-6 lg:px-20 xl:px-28 flex items-center justify-center rounded-l-lg">
         <div className="w-full h-100">
           <h1 className="text-3xl font-bold mb-12">Sign-up</h1>
-          {/* <button type="button" className="w-full block bg-white hover:bg-gray-100 focus:bg-gray-100 text-gray-900 font-semibold rounded-lg px-4 py-3 border-2 border-customgreen">
-                    <div className="flex items-center justify-center">
-                        <span className="ml-4 ">Google</span>
-                    </div>
-                    
-                </button> */}
-          {/* <hr className="my-6 border-gray-300 w-full" /> */}
           <form className="mt-6">
             <div>
               <input
@@ -183,12 +175,23 @@ export default function Register() {
                 placeholder="nickname"
                 minLength="6"
                 onChange={handleChange}
-      
                 className="text-base w-full px-4 py-4 bg-transparent border-b border-gray-500 focus:outline-none"
                 required
               />
-              {error && <span className="text-xs text-red-600">{error}</span>}
             </div>
+            <div>
+              <select
+                name="role"
+                onChange={handleChange}
+                value={userData.role}
+                className="w-full px-4 py-4 bg-transparent border-b border-gray-500 focus:outline-none text-base"
+                required
+              >
+                <option value="student">Student</option>
+                <option value="teacher">Teacher</option>
+              </select>
+            </div>
+
             <button
               type="submit"
               onClick={handleSubmit}

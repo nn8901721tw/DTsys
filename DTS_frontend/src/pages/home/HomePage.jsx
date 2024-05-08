@@ -40,6 +40,7 @@ export default function HomePage() {
     onSuccess: (res) => {
       console.log(res);
       queryClient.invalidateQueries("projectDatas");
+      localStorage.setItem('taskSubmitted', 'true'); // 设置标志
       sucesssReferralCodeNotify(res.message);
     },
     onError: (error) => {
@@ -66,6 +67,7 @@ export default function HomePage() {
       ...prev,
       [name]: value,
       userId: localStorage.getItem("id"),
+      teamLeaderNickname: localStorage.getItem("nickname"),
     }));
   };
 
@@ -246,8 +248,11 @@ export default function HomePage() {
                       <div className="text-xs md:text-sm text-gray-500 truncate w-1/2 px-2">
                         {projectItem?.referral_code}
                       </div>
-                      <div className="text-xs text-gray-500 font-semibold truncate w-1/2 px-2 text-right">
+                      {/* <div className="text-xs text-gray-500 font-semibold truncate w-1/2 px-2 text-right">
                         指導老師:{projectItem?.mentor}
+                      </div> */}
+                      <div className="text-xs text-gray-500 font-semibold truncate w-1/2 px-2 text-right">
+                        組長:{projectItem?.teamLeaderNickname}
                       </div>
                     </div>
                   </div>
