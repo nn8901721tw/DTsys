@@ -44,7 +44,7 @@ export default function IdeaWall() {
 
   const queryClient = useQueryClient(); // 使用 useQueryClient 鉤子
 
-  const colors = ["#C47D09", "#D2B800", "#578082", "#16A34A", "#115E59","#4ECDC5"];
+  const colors = ["#C47D09", "#D2B800", "#578082", "#16A34A", "#FCB6AD","#4ECDC5"];
 
   // const userColor = getColorForUser(userId); // 獲取顏色
   // 在元件內部
@@ -141,7 +141,7 @@ export default function IdeaWall() {
   useEffect(() => {
     const temp = [];
     nodes.map((item) => {
-      const nodeColor = colors[item.colorindex - (1 % colors.length)]; // Use modulo to cycle through colors if index exceeds array length
+      const nodeColor = colors[(item.colorindex - 1) % (colors.length)]; // Use modulo to cycle through colors if index exceeds array length
 
       item.image = svgConvertUrl(
         item.title,
@@ -369,13 +369,13 @@ const handleUpdateSubmit = (e) => {
         modalCoordinate={canvasPosition}
         custom={"w-30 h-15"}
       >
-        <div>
+        <div className="font-bold">
           <button
             onClick={() => {
               setBuildOnOptionModalOpen(false);
               setCreateNodeModalOpen(true);
             }}
-            className="w-full h-full p-2 rounded-md bg-white hover:bg-slate-100"
+            className="w-full h-full p-2 rounded-md bg-cyan-500 hover:bg-slate-100"
           >
             延伸想法
           </button>
@@ -499,7 +499,7 @@ const handleUpdateSubmit = (e) => {
             <div className="flex justify-end m-2">
               <button
                 onClick={() => setUpdateNodeModalOpen(false)}
-                className="mx-auto w-1/3 h-7 mb-2 bg-zinc-300 rounded font-bold text-xs sm:text-base text-black/80 mr-2"
+                className="mx-auto w-1/3 h-7 mb-2 bg-slate-400 rounded font-bold text-xs sm:text-base text-black/80 mr-2"
               >
                 關閉
               </button>

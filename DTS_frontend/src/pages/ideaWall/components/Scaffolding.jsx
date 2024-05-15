@@ -35,6 +35,10 @@ const Scaffolding = ({ onTaskComplete }) => {
   const [projectEnd, setProjectEnd] = useState(
     localStorage.getItem("ProjectEnd")
   );
+  const [userId, setUserId] = useState(localStorage.getItem("id"));
+  const [teamLeader, setTeamLeader] = useState(
+    localStorage.getItem("teamLeader")
+  );
 
   useEffect(() => {
     if (!currentStage || !currentSubStage) {
@@ -280,10 +284,6 @@ const Scaffolding = ({ onTaskComplete }) => {
     console.log("kanbanData:", kanbanData);
   }, [currentStage, currentSubStage, kanbanData, socket]); // 確保當 kanbanData 更新時重新運行此效果
 
-
-
-
-
   return (
     <div className=" w-64 p-6  bg-slate-700 rounded-lg shadow-md divide-y divide-gray-200 fixed top-24 right-2 h-4/5  z-20  overflow-y-auto overflow-x-hidden scrollbar-none ">
       <div className="pb-2">
@@ -332,28 +332,31 @@ const Scaffolding = ({ onTaskComplete }) => {
             <p className="mt-1 text-sm text-gray-200">
               請使用滑鼠右鍵創建想法節點，並依照右側流程步驟製作發想。
             </p>
-            <div className="flex justify-end">
-              {inProgressTasks.length > 0 ? (
-                <button
-                  className=" text-neutral-50 font-bold text-sm 2xl:font-semibold  px-1 py-1 rounded-md transition ease-in-out bg-[#4b7fbb] hover:-translate-y-1  hover:scale-110 duration-100 ..."
-                  onClick={completeTask}
-                >
-                  子任務完成
-                </button>
-              ) : (
-                <div className="flex text-sm w-full ">
-                  <div className="my-auto font-semibold justify-start text-xs text-[#37a59e]">
-                    進入下個子階段-
-                  </div>
-                  <div
-                    className=" cursor-pointer text-neutral-50 text-xs 2xl:font-semibold  px-1 py-1 rounded-md transition ease-in-out bg-[#37a59e] hover:-translate-y-1  hover:scale-110 duration-100 ..."
-                    onClick={handleSubmitTask}
+
+            {userId == teamLeader && (
+              <div className="flex justify-end">
+                {inProgressTasks.length > 0 ? (
+                  <button
+                    className=" text-neutral-50 font-bold text-sm 2xl:font-semibold  px-1 py-1 rounded-md transition ease-in-out bg-[#4b7fbb] hover:-translate-y-1  hover:scale-110 duration-100 ..."
+                    onClick={completeTask}
                   >
-                    {nextStageDescription}
+                    子任務完成
+                  </button>
+                ) : (
+                  <div className="flex text-sm w-full ">
+                    <div className="my-auto font-semibold justify-start text-xs text-[#37a59e]">
+                      進入下個子階段-
+                    </div>
+                    <div
+                      className=" cursor-pointer text-neutral-50 text-xs 2xl:font-semibold  px-1 py-1 rounded-md transition ease-in-out bg-[#37a59e] hover:-translate-y-1  hover:scale-110 duration-100 ..."
+                      onClick={handleSubmitTask}
+                    >
+                      {nextStageDescription}
+                    </div>
                   </div>
-                </div>
-              )}
-            </div>
+                )}
+              </div>
+            )}
           </>
         )}
       </div>
@@ -467,11 +470,13 @@ const Scaffolding = ({ onTaskComplete }) => {
                                           : "bg-gray-400"
                                       }`}
                                     ></div>
-                                    <span className={`pl-14 font-semibold truncate w-[160px] text-xs text-right ${
+                                    <span
+                                      className={`pl-14 font-semibold truncate w-[160px] text-xs text-right ${
                                         taskIndex === 0
                                           ? "text-[#57a5ff] animate-pulse"
                                           : "text-gray-400"
-                                      }`}>
+                                      }`}
+                                    >
                                       {task.content}
                                     </span>
                                   </div>

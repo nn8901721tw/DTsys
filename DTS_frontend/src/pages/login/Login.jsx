@@ -68,10 +68,11 @@ export default function Login() {
     <section className="flex flex-col md:flex-row h-screen items-center">
       <div className="hidden bg-[#8AB3B6] w-full md:w-1/2 xl:w-1/2 h-screen md:flex md:items-center md:justify-center">
         <div className="flex flex-col -m-56">
+               <img src="/images/nlt_logo.png"className="absolute w-4 left-2 top-4"  />
+          <h3 className="absolute left-8 top-3 font-bold text-teal-900">
+            國立中央大學 網路學習科技研究所
+          </h3>
           <h1 className=" md:mx-auto text-4xl xl:text-5xl font-semibold mx-auto text-gray-200  mb-2">
-            {/* 
-              Network Learning <br/>Technology
-              <br/> */}
             <span className=" text-teal-900">Design Thinking</span> <br />
             System
           </h1>
@@ -93,7 +94,7 @@ export default function Login() {
           />      */}
 
           <Lottie
-            className="w-72 2xl:w-96 mx-auto mt-10"
+            className="w-72 2xl:w-96 mx-auto mt-8"
             animationData={signup}
           />
           {/* <img src="/images/design-thinking_2.png"className="w-48 mx-auto mt-10"  /> */}
@@ -105,7 +106,7 @@ export default function Login() {
       {/* <div className=" bg-customgray w-full md:max-w-md lg:max-w-full md:mx-auto md:w-1/2 xl:w-1/3 h-screen px-6 lg:px-16 xl:px-12 flex items-center justify-center rounded-l-lg"> */}
       <div className="  bg-[#FCFAF8] w-full md:mx-auto md:w-1/2 xl:w-1/2 h-screen px-6 lg:px-16 xl:px-28 flex items-center justify-center rounded-l-lg ">
         <div className="w-full h-100">
-          <h1 className="text-3xl font-bold mb-12">Sign-in</h1>
+          <h1 className="text-3xl font-bold mb-12">註冊</h1>
           {/* <button type="button" className="w-full block bg-white hover:bg-gray-100 focus:bg-gray-100 text-gray-900 font-semibold rounded-lg px-4 py-3 border-2 border-customgreen">
               <div className="flex items-center justify-center">
                   <span className="ml-4 ">Login with Wulab</span>
@@ -118,7 +119,7 @@ export default function Login() {
               <input
                 type="text"
                 name="username"
-                placeholder="Email"
+                placeholder="Account"
                 onChange={handleChange}
                 className="text-base w-full px-4 py-3 bg-transparent border-b border-gray-500 focus:outline-none"
                 autoFocus
@@ -143,7 +144,7 @@ export default function Login() {
               onClick={handleSubmit}
               className="w-full block bg-[#8AB3B6] hover:bg-[#578082] focus:bg-[#8AB3B6] text-white font-semibold rounded-lg px-4 py-3 mt-6 text-base"
             >
-              login
+              登入
             </button>
           </form>
           <div className="text-center mt-8">

@@ -92,7 +92,7 @@ export default function SideBar() {
                 className={`${
                   menu?.margin && "mt-5"
                 } group flex items-center text-sm gap-3.5 font-medium p-3 hover:bg-slate-100 rounded-sm ${
-                  location.pathname === menu.link ? "bg-gray-400" : ""
+                  location.pathname === menu.link ? "bg-slate-100" : ""
                 } `}
               >
                 <div>{React.createElement(menu?.icon, { size: "26" })}</div>

@@ -67,7 +67,7 @@ export default function TopBar() {
     navigate("/");
   };
 
-  const colors = ["bg-[#C47D09]", "bg-[#D2B800]", "bg-[#578082]", "bg-[#16A34A]", "bg-[#115E59]","bg-[#4ECDC5]"];
+  const colors = ["bg-[#C47D09]", "bg-[#D2B800]", "bg-[#578082]", "bg-[#16A34A]", "bg-[#FCB6AD]","bg-[#4ECDC5]"];
 
 
   console.log("projectUsers::::" ,projectUsers);
