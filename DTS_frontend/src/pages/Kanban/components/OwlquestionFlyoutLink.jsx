@@ -35,7 +35,7 @@ const OwlquestionFlyoutLink = ({ onImageClick }) => {
           .flyout-link::before {
             content: '';
             position: absolute;
-            left: -5px;
+            left: -2px;
             top: 50%;
             width: 0;
             height: 0;

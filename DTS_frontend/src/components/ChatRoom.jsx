@@ -21,7 +21,7 @@ export default function ChatRoom({chatRoomOpen, setChatRoomOpen}) {
             };
             socket.emit("send_message", messageData);
             setMessageList(prev => [...prev, messageData]);
-          
+            setCurrentMessage(""); // 清空輸入框的值
         }
     }
 
@@ -78,6 +78,7 @@ export default function ChatRoom({chatRoomOpen, setChatRoomOpen}) {
                     className='w-10/12 outline-none p-1'
                     onChange={e => setCurrentMessage(e.target.value)}
                     onKeyDown={e => {e.key === "Enter" && sendMessage()}}
+                    value={currentMessage}
                 />
                 <button 
                     className='mx-auto'

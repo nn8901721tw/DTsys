@@ -154,11 +154,14 @@ const Scaffolding = ({ onTaskComplete }) => {
         title: "是否已完成此任務?",
         text: "確認後將無法撤銷！",
         icon: "question",
+        
         showCancelButton: true,
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
+        confirmButtonColor: "#3085d6",  // 设置确认按钮颜色
+        cancelButtonColor: "#c5c8c9",   // 设置取消按钮颜色
         confirmButtonText: "是的, 已完成!",
         cancelButtonText: "取消",
+        reverseButtons: true,  // 反转按钮位置，使确认按钮在右侧
+
       }).then((result) => {
         if (result.isConfirmed) {
           moveTaskToCompleted(taskId, inProgressColumnId, completedColumnId)
@@ -266,8 +269,11 @@ const Scaffolding = ({ onTaskComplete }) => {
       text: "是否有成果要上傳？",
       icon: "warning",
       showCancelButton: true,
-      cancelButtonText: "沒有",
+      confirmButtonColor: "#3d9696",  // 设置确认按钮颜色
+      cancelButtonColor: "#c5c8c9",   // 设置取消按钮颜色
       confirmButtonText: "上傳",
+      cancelButtonText: "取消",
+      reverseButtons: true,  // 反转按钮位置，使确认按钮在右侧
     });
 
     if (resultUpload.isConfirmed) {

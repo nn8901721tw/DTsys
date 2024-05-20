@@ -1,28 +1,37 @@
 version: '3'
 services:
-  api:
-    build:
-      context: ./DTS_backend
-      dockerfile: Dockerfile
-    ports:
-      - 3000:3000
-    networks:
-      - agent_network
-  front:
-    build:
-      context: ./DTS_frontend
-      dockerfile: dockerfile
-    ports:
-      - 5173:5173
-    networks:
-      - agent_network
+  # api:
+  #   build:
+  #     context: ./DTS_backend
+  #     dockerfile: Dockerfile
+  #   depends_on:
+  #     postgres:
+  #       condition : service_healthy  
+  #   ports:
+  #     - "3000:3000"
+  #   networks:
+  #     - agent_network
+  # front:
+  #   build:
+  #     context: ./DTS_frontend
+  #     dockerfile: dockerfile
+  #   ports:
+  #     - "5173:5173"
+  #   networks:
+  #     - agent_network
   postgres:
     image: postgres
     restart: unless-stopped
+    # healthcheck:
+    #   test: ["CMD-SHELL","pg_isready -U postgres"]
+    #   interval: 10s
+    #   timeout: 5s
+    #   retries: 5
     environment:
       - POSTGRES_DB=postgres
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
+      - POSTGRES_HOST=postgres
     ports:
       - "5432:5432"
     networks:

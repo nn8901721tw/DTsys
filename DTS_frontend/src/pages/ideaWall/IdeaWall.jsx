@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 
 import Modal from "../../components/Modal";
 import IdeaWallSideBar from "./components/IdeaWallSideBar";
-import Scaffolding from "./components/scaffolding";
+import Scaffolding from "./components/Scaffolding";
 import TopBar from "../../components/TopBar";
 import { Network } from "vis-network";
 import { visNetworkOptions as option } from "../../utils/visNetworkOptions";

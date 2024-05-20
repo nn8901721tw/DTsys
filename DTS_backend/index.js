@@ -19,7 +19,7 @@ const controller = require('./controllers/kanban');
 
 const io = new Server(server, {
     cors:{
-        origin: "http://localhost:5173",
+        origin: "http://140.115.126.47:5173",
         methods: ['GET', 'PUT', 'POST'],
         credentials: true
     },
@@ -28,7 +28,7 @@ const io = new Server(server, {
 app.set('io', io);
 
 app.use(cors({
-    origin: "http://localhost:5173",
+    origin: "http://140.115.126.47:5173",
     methods: ['GET', 'PUT', 'POST'],
     credentials: true
 }));
@@ -276,7 +276,7 @@ app.use((error, req, res, next) => {
 
 
 // sync database
-sequelize.sync({ alter: true})  //{force:true} {alter:true}
+sequelize.sync()  //{force:true} {alter:true}
     .then( result => {
         controller.initializeData(); // 如果還沒有初始化過資料，則執行初始化資料的函式
     console.log("Database connected");
