@@ -244,7 +244,7 @@ export default function Kanban() {
     [
       "經驗分享與同理",
       "初步統整問題",
-      "問題聚焦",
+      "解決方案發想",
       "原型製作",
       "原型測試與分析",
     ],
@@ -375,7 +375,11 @@ export default function Kanban() {
         confirmButtonColor: "#3d9696",  // 设置确认按钮颜色
         cancelButtonColor: "#c5c8c9",   // 设置取消按钮颜色
         confirmButtonText: "上傳",
+<<<<<<< HEAD
         cancelButtonText: "沒有",
+=======
+        cancelButtonText: "取消",
+>>>>>>> origin/virtual
         reverseButtons: true,  // 反转按钮位置，使确认按钮在右侧
       });
 
@@ -405,6 +409,65 @@ export default function Kanban() {
   console.log("kanbanData:", kanbanData);
   // console.log("template:", template[0].scaffolding_template);
   console.log("doingColumnId:", doingColumnId);
+
+  // const handleOneClickUse = async () => {
+  //   // 确保有进行中的列 ID
+  //   console.log("WWQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ");
+
+  //   if (!doingColumnId) {
+  //     console.error("No doingColumnId set");
+  //     return;
+  //   }
+
+  //   // 确保模板数据已加载
+  //   if (!template || template.length === 0) {
+  //     console.error("Template data is not loaded yet");
+  //     return;
+  //   }
+
+  //   try {
+  //     // 遍歷所有模板，為每個模板創建一個新的任務
+  //     if (!doingColumnId) {
+  //       throw new Error("No doingColumnId set");
+  //     }
+  //     if (!template || template.length === 0) {
+  //       throw new Error("Template data is not loaded yet");
+  //     }
+
+  //     const tasksCreationPromises = template.map((scaffoldingItem) => {
+  //       if (!scaffoldingItem || !scaffoldingItem.scaffolding_template) {
+  //         throw new Error("Invalid scaffolding item");
+  //       }
+  //       const newTask = {
+  //         content: scaffoldingItem.scaffolding_template,
+  //         columnId: doingColumnId, // 使用之前找到的進行中的列ID
+  //       };
+  //       // 使用 createTaskAndUpdateColumn 函數發起請求
+  //       return createTaskAndUpdateColumn(newTask);
+  //     });
+
+  //     // 等待所有任務創建操作完成
+  //     const responses = await Promise.all(tasksCreationPromises);
+  //     console.log(
+  //       "All tasks created and column updated:",
+  //       responses.map((res) => res.data)
+  //     );
+  //     const newTasksIds = responses.map((res) => res.data.taskId);
+  //     // 你可能需要在这里通知服务器，比如发送一个socket事件来告知新创建的任务ID
+  //     socket.emit("tasksCreated", {
+  //       columnId: doingColumnId,
+  //       newTasksIds,
+  //       projectId,
+  //     });
+
+  //     socket.emit("templateUpdated", { projectId: projectId });
+
+  //     // 更新前端狀態或提示用戶
+  //     // ... 這裡可能需要更新前端的 column 狀態，取決於您的實際需求 ...
+  //   } catch (error) {
+  //     console.error("Error in handleOneClickUse:", error);
+  //   }
+  // };
 
   const handleOneClickUse = async () => {
     // 确保有进行中的列 ID
@@ -466,6 +529,7 @@ export default function Kanban() {
       console.error("Error in handleOneClickUse:", error);
     }
   };
+  
   useEffect(() => {
     const handleColumnUpdate = (updatedColumn) => {
       queryClient.invalidateQueries(["kanbanDatas", projectId]);
@@ -808,7 +872,7 @@ export default function Kanban() {
 
             {projectEnd ? (
               <Lottie
-                className="w-96 h-96 z-0 ml-44 "
+                className="w-96 h-96 z-0 ml-48 "
                 animationData={welldone}
               />
             ) : (
@@ -831,7 +895,7 @@ export default function Kanban() {
                 {showFlyout && (
                   <OwlquestionFlyoutLink
                     onImageClick={handleImageClick}
-                    className=" z-5"
+                    className=" z-5 "
                   />
                 )}
               </div>
@@ -859,13 +923,13 @@ export default function Kanban() {
                         ref={provided.innerRef} // Make sure innerRef is attached here
                         className="shadow-xl cursor-default" // Set cursor to default
                       >
-                        {userId !== teamLeader && (
+                        {/* {userId !== teamLeader && (
                           <div className="flex absolute inset-0 bg-slate-400 bg-opacity-50 items-center justify-center z-10 top-[11rem] w-7/12 left-[31%] h-[65%] rounded-xl">
                             <span className="text-white text-3xl font-bold mb-14">
                               與大家討論後由組長統一操作
                             </span>
                           </div>
-                        )}
+                        )} */}
                         <div
                           className={`bg-[#647B71] p-3 rounded-md shadow-xl flex flex-col w-full max-h-[50vh]  overflow-y-scroll scrollbar-none `}
                         >

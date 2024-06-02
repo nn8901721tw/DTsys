@@ -131,13 +131,13 @@ export default function Register() {
 
       <div className=" bg-[#FCFAF8] w-full md:max-w-md lg:max-w-full md:mx-auto md:w-1/2 xl:w-1/2 h-screen px-6 lg:px-20 xl:px-28 flex items-center justify-center rounded-l-lg">
         <div className="w-full h-100">
-          <h1 className="text-3xl font-bold mb-12">Sign-up</h1>
+          <h1 className="text-3xl font-bold mb-12">註冊</h1>
           <form className="mt-6">
             <div>
               <input
                 type="text"
                 name="username"
-                placeholder="account"
+                placeholder="帳號"
                 onChange={handleChange}
                 className="text-base w-full px-4 py-4 bg-transparent border-b border-gray-500 focus:outline-none"
                 autoFocus
@@ -148,7 +148,7 @@ export default function Register() {
               <input
                 type="password"
                 name="password"
-                placeholder="password"
+                placeholder="密碼"
                 minLength="6"
                 onChange={handleChange}
                 className="text-base w-full px-4 py-4 bg-transparent border-b border-gray-500 focus:outline-none"
@@ -159,7 +159,7 @@ export default function Register() {
               <input
                 type="password"
                 name="confirmPassword"
-                placeholder="confirm password"
+                placeholder="確認密碼"
                 minLength="6"
                 onChange={handleChange}
                 onBlur={validateInput}
@@ -172,7 +172,7 @@ export default function Register() {
               <input
                 type="accound"
                 name="nickname"
-                placeholder="nickname"
+                placeholder="暱稱"
                 minLength="6"
                 onChange={handleChange}
                 className="text-base w-full px-4 py-4 bg-transparent border-b border-gray-500 focus:outline-none"
@@ -187,8 +187,8 @@ export default function Register() {
                 className="w-full px-4 py-4 bg-transparent border-b border-gray-500 focus:outline-none text-base"
                 required
               >
-                <option value="student">Student</option>
-                <option value="teacher">Teacher</option>
+                <option value="student">學生</option>
+                <option value="teacher">教師</option>
               </select>
             </div>
 
@@ -197,7 +197,7 @@ export default function Register() {
               onClick={handleSubmit}
               className="w-full block bg-[#8AB3B6] hover:bg-[#578082] focus:bg-[#8AB3B6] text-white font-semibold rounded-lgpx-4 py-3 mt-6 text-base rounded-lg"
             >
-              Creat
+              創建
             </button>
           </form>
           <p className="mt-8">

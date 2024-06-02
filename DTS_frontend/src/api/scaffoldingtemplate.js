@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const scaffoldingTemplateApi = axios.create({
-    baseURL: "http://localhost:3000/getScaffoldingTemplate",
+    baseURL: "http://140.115.126.47:3000/getScaffoldingTemplate",
     headers:{
         "Content-Type":" application/json"
     },

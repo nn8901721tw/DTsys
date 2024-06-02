@@ -106,10 +106,11 @@ export default function Carditem({
       text: "確定要刪除卡片嗎?",
       icon: "question",
       showCancelButton: true,
-      confirmButtonColor: "#5BA491",
-      cancelButtonColor: "#d33",
+      confirmButtonColor: "#3d9696",  // 设置确认按钮颜色
+      cancelButtonColor: "#c5c8c9",   // 设置取消按钮颜色
       confirmButtonText: "確定",
       cancelButtonText: "取消",
+      reverseButtons: true,  // 反转按钮位置，使确认按钮在右侧
     }).then((result) => {
       if (result.isConfirmed) {
         console.log("columnId", columnId);

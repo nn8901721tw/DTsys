@@ -276,7 +276,7 @@ app.use((error, req, res, next) => {
 
 
 // sync database
-sequelize.sync({ alter: true})  //{force:true} {alter:true}
+sequelize.sync()  //{force:true} {alter:true}
     .then( result => {
         controller.initializeData(); // 如果還沒有初始化過資料，則執行初始化資料的函式
     console.log("Database connected");

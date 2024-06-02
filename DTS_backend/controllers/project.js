@@ -139,9 +139,9 @@ exports.createProject = async(req, res) => {
         name:"經驗分享與同理",
         description:"在 1-1 的階段中，回想自身經驗，或是身邊的人是否有同樣例子，並提供完整資訊分享給同組的夥伴，並再與小組討論完後，將想法張貼至想法牆中!",
         userSubmit:{
-            "成果標題":"input",
+            "發想主題":"input",
             "附加檔案":"file",
-            "文字內容":"textarea",
+            // "原因":"textarea",
         },
         stageId:stage1.id
     })
@@ -149,9 +149,9 @@ exports.createProject = async(req, res) => {
         name:"定義利害關係人",
         description:"根據剛剛所發散的想法，和組員討論並歸納出利害關係人，並定義利害關係人為哪些人?",
         userSubmit:{
-            "成果標題":"input",
-            "附加檔案":"file",
-            "文字內容":"textarea",
+            "利害關係人":"input",
+            // "附加檔案":"file",
+            // "內容":"textarea",
         },
         stageId:stage1.id
     });
@@ -159,9 +159,9 @@ exports.createProject = async(req, res) => {
         name:"進場域前的同理",
         description:"進入相關場域訪談前，必須先廣泛思考利害關係人可能遇到的問題，並和小組討論過後，再接續得出訪談的問題種類。",
         userSubmit:{
-            "成果標題":"input",
+            "列出問題":"input",
             "附加檔案":"file",
-            "文字內容":"textarea",
+            // "內容":"textarea",
         },
         stageId:stage1.id
     });
@@ -171,7 +171,7 @@ exports.createProject = async(req, res) => {
         userSubmit:{
             "成果標題":"input",
             "附加檔案":"file",
-            "文字內容":"textarea",
+            "內容":"textarea",
         },
         stageId:stage1.id
     });
@@ -186,9 +186,9 @@ exports.createProject = async(req, res) => {
         name:"初步統整問題",
         description:"將已張貼至想法牆中的 '利害關係人所遇到的問題' ，進行初步統整與統整歸類。",
         userSubmit:{
-            "成果標題":"input",
+            "討論結果(確認問題的有效性和相關性)":"input",
             "附加檔案":"file",
-            "文字內容":"textarea",
+            "內容":"textarea",
         },
         stageId:stage2.id
     });
@@ -196,9 +196,9 @@ exports.createProject = async(req, res) => {
         name:"定義問題",
         description:"根據上階段所歸類的問題，透過小組討論篩選出真正值得解決的問題，若遲遲無法得到共識，可使用公平的投票方式。",
         userSubmit:{
-            "成果標題":"input",
+            "值得解決的問題":"input",
             "附加檔案":"file",
-            "文字內容":"textarea",
+            "內容":"textarea",
         },
         stageId:stage2.id
     });
@@ -230,12 +230,12 @@ exports.createProject = async(req, res) => {
     .catch(err => console.log(err));
 
     const sub_stage_3_1 = await Sub_stage.create({
-        name:"問題聚焦",
+        name:"解決方案發想",
         description:"根據前階段得出的待解決的問題，選定一個問題，並開始發散性思考解決方案，此階段不受限任何想法。",
         userSubmit:{
-            "成果標題":"input",
+            "解決方案":"input",
             "附加檔案":"file",
-            "文字內容":"textarea",
+            "內容":"textarea",
         },
         stageId:stage3.id
     });
@@ -243,9 +243,9 @@ exports.createProject = async(req, res) => {
         name:"篩選與整合方法",
         description:"根據前階段所得的想法中，與小組成員討論，篩選並整合出最適合的解決方案。",
         userSubmit:{
-            "成果標題":"input",
+            "整合出的最終解決方案":"input",
             "附加檔案":"file",
-            "文字內容":"textarea",
+            "內容":"textarea",
         },
         stageId:stage3.id
     });
@@ -272,9 +272,9 @@ exports.createProject = async(req, res) => {
         name:"原型製作",
         description:"開始實作原型，此階段可透過Figma、draw.io等等設計工具輔助，用以快速建立原型。",
         userSubmit:{
-            "成果標題":"input",
+            "成果":"input",
             "附加檔案":"file",
-            "文字內容":"textarea",
+            "內容":"textarea",
         },
         stageId:stage4.id
     });
@@ -298,9 +298,9 @@ exports.createProject = async(req, res) => {
         name:"原型測試與分析",
         description:"將產出之原型丟入實際場域進行測試，將蒐集後的資料紀錄於想法牆中，接著旱小組成員討論並分析如何改進。",
         userSubmit:{
-            "成果標題":"input",
+            "成果":"input",
             "附加檔案":"file",
-            "文字內容":"textarea",
+            "內容":"textarea",
         },
         stageId:stage5.id
     });
@@ -308,9 +308,9 @@ exports.createProject = async(req, res) => {
         name:"開始修正",
         description:"根據前階段得出之結果，原型若是不夠完善，則跌代回先前階段，重新跑流程。",
         userSubmit:{
-            "成果標題":"input",
+            "成果":"input",
             "附加檔案":"file",
-            "文字內容":"textarea",
+            "內容":"textarea",
         },
         stageId:stage5.id
     });

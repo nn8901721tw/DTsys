@@ -405,7 +405,7 @@ const Cards = () => {
               handleSubmitReferral_Code();
               setInviteProjectModalOpen(false);
             }}
-            className="mx-auto w-full 2xl:w-1/3 h-9  mb-2 bg-[#7fd4d8] rounded font-bold text-xs sm:text-sm  xl:text-base text-white"
+            className="mx-auto w-full 2xl:w-1/3 h-9  mb-2 bg-cyan-600 rounded font-bold text-xs sm:text-sm  xl:text-base text-white"
             type="submit"
           >
             加入

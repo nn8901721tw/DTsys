@@ -2,7 +2,7 @@ import axios from "axios";
 
 
 const nodeApi = axios.create({
-    baseURL: "http://localhost:3000/node",
+    baseURL: "http://140.115.126.47:3000/node",
     headers:{
         "Content-Type":" application/json"
     },

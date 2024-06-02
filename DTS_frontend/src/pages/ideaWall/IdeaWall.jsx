@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 
 import Modal from "../../components/Modal";
 import IdeaWallSideBar from "./components/IdeaWallSideBar";
-import Scaffolding from "./components/scaffolding";
+import Scaffolding from "./components/Scaffolding";
 import TopBar from "../../components/TopBar";
 import { Network } from "vis-network";
 import { visNetworkOptions as option } from "../../utils/visNetworkOptions";
@@ -20,7 +20,11 @@ import {
 import { getProjectUser } from "../../api/users";
 import { AiOutlineBulb } from "react-icons/ai";
 import toast, { Toaster } from 'react-hot-toast';
+<<<<<<< HEAD
 import Timer from './components/Timer';  // 确保路径正确
+=======
+import Timer from "./components/Timer";
+>>>>>>> origin/virtual
 
 
 export default function IdeaWall() {
@@ -45,7 +49,10 @@ export default function IdeaWall() {
     localStorage.getItem("teamLeader")
   );
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> origin/virtual
 
   const queryClient = useQueryClient(); // 使用 useQueryClient 鉤子
 
@@ -340,7 +347,8 @@ const handleUpdateSubmit = (e) => {
         />
       </div>
       {userId == teamLeader && (
-      <Timer />)}
+        <Timer/>
+      )}
 
 
       {/* create option */}
