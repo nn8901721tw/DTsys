@@ -20,11 +20,7 @@ import {
 import { getProjectUser } from "../../api/users";
 import { AiOutlineBulb } from "react-icons/ai";
 import toast, { Toaster } from 'react-hot-toast';
-<<<<<<< HEAD
 import Timer from './components/Timer';  // 确保路径正确
-=======
-import Timer from "./components/Timer";
->>>>>>> origin/virtual
 
 
 export default function IdeaWall() {
@@ -49,10 +45,6 @@ export default function IdeaWall() {
     localStorage.getItem("teamLeader")
   );
 
-<<<<<<< HEAD
-
-=======
->>>>>>> origin/virtual
 
   const queryClient = useQueryClient(); // 使用 useQueryClient 鉤子
 

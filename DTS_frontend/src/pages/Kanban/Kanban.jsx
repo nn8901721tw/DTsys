@@ -375,11 +375,7 @@ export default function Kanban() {
         confirmButtonColor: "#3d9696",  // 设置确认按钮颜色
         cancelButtonColor: "#c5c8c9",   // 设置取消按钮颜色
         confirmButtonText: "上傳",
-<<<<<<< HEAD
-        cancelButtonText: "沒有",
-=======
         cancelButtonText: "取消",
->>>>>>> origin/virtual
         reverseButtons: true,  // 反转按钮位置，使确认按钮在右侧
       });
 
@@ -923,13 +919,13 @@ export default function Kanban() {
                         ref={provided.innerRef} // Make sure innerRef is attached here
                         className="shadow-xl cursor-default" // Set cursor to default
                       >
-                        {/* {userId !== teamLeader && (
+                        {userId !== teamLeader && (
                           <div className="flex absolute inset-0 bg-slate-400 bg-opacity-50 items-center justify-center z-10 top-[11rem] w-7/12 left-[31%] h-[65%] rounded-xl">
                             <span className="text-white text-3xl font-bold mb-14">
                               與大家討論後由組長統一操作
                             </span>
                           </div>
-                        )} */}
+                        )}
                         <div
                           className={`bg-[#647B71] p-3 rounded-md shadow-xl flex flex-col w-full max-h-[50vh]  overflow-y-scroll scrollbar-none `}
                         >

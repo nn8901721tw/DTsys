@@ -2,7 +2,7 @@ import axios from "axios";
 
 axios.defaults.withCredentials = true; 
 const dailyApi = axios.create({
-    baseURL: "http://140.115.126.47:3000/daily",
+    baseURL: "http://localhost:3000/daily",
     headers:{
         "Content-Type": "multipart/form-data"
     },
