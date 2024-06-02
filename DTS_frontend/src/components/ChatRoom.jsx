@@ -15,9 +15,9 @@ export default function ChatRoom({chatRoomOpen, setChatRoomOpen}) {
         if(currentMessage !== ""){
             const messageData = {
                 room: projectId,
-                author: localStorage.getItem("username"),
+                author: localStorage.getItem("nickname"),
                 message: currentMessage,
-                time: new Date(Date.now()).getHours() + ":" + new Date(Date.now()).getMinutes(),
+                time: new Date(Date.now()).getHours() + ":" +  String(new Date().getMinutes()).padStart(2, '0') + " by" ,
             };
             socket.emit("send_message", messageData);
             setMessageList(prev => [...prev, messageData]);
@@ -56,9 +56,9 @@ export default function ChatRoom({chatRoomOpen, setChatRoomOpen}) {
                 {
                     messageList.map((messages, index) => {
                         return (
-                            <div key={index} className={`flex h-auto p-1 ${messages.author===localStorage.getItem("username")? "justify-end": "justify-start"}`}> 
+                            <div key={index} className={`flex h-auto p-1 ${messages.author===localStorage.getItem("nickname")? "justify-end": "justify-start"}`}> 
                                 <div>
-                                    <div className={`w-fit max-w-[120px] rounded text-white flex items-center break-all px-[5px] mx-[5px] ${messages.author===localStorage.getItem("username")? "bg-[#5BA491] m-auto": "bg-sky-700"}`}>
+                                    <div className={`w-fit max-w-[120px] rounded text-white flex items-center break-all px-[5px] mx-[5px] ${messages.author===localStorage.getItem("nickname")? "bg-[#5BA491] m-auto": "bg-sky-700"}`}>
                                         {messages.message}
                                     </div>
                                     <div className='flex justify-end text-xs mx-[5px]'>

@@ -20,7 +20,7 @@ import {
 import { getProjectUser } from "../../api/users";
 import { AiOutlineBulb } from "react-icons/ai";
 import toast, { Toaster } from 'react-hot-toast';
-
+import Timer from "./components/Timer";
 
 
 export default function IdeaWall() {
@@ -41,6 +41,10 @@ export default function IdeaWall() {
   const [projectUsers, setProjectUsers] = useState([{ id: "", username: "" }]);
   // 将 currentStage 和 currentSubStage 保存在状态中
   const [userId, setUserId] = useState(localStorage.getItem("id"));
+  const [teamLeader, setTeamLeader] = useState(
+    localStorage.getItem("teamLeader")
+  );
+
 
   const queryClient = useQueryClient(); // 使用 useQueryClient 鉤子
 
@@ -334,6 +338,10 @@ const handleUpdateSubmit = (e) => {
 
         />
       </div>
+      {userId == teamLeader && (
+        <Timer/>
+      )}
+
 
       {/* create option */}
       <Modal

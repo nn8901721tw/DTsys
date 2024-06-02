@@ -39,7 +39,7 @@ export default function SideBar() {
       link: `/project/${projectId}/ideaWall`,
       icon: AiOutlineBulb,
     },
-    // { name: "管理階段", link: `/project/${projectId}/managePhase`, icon: BsBezier2 },
+    { name: "資料分析", link: `/project/${projectId}/managePhase`, icon: BsBezier2 },
     // { name: "繳交任務", link: `/project/${projectId}/submitTask`, icon: GrCompliance },
     {
       name: "檔案空間",

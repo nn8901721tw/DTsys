@@ -141,7 +141,7 @@ exports.createProject = async(req, res) => {
         userSubmit:{
             "發想主題":"input",
             "附加檔案":"file",
-            "原因":"textarea",
+            // "原因":"textarea",
         },
         stageId:stage1.id
     })
@@ -161,7 +161,7 @@ exports.createProject = async(req, res) => {
         userSubmit:{
             "列出問題":"input",
             "附加檔案":"file",
-            "內容":"textarea",
+            // "內容":"textarea",
         },
         stageId:stage1.id
     });
@@ -230,10 +230,10 @@ exports.createProject = async(req, res) => {
     .catch(err => console.log(err));
 
     const sub_stage_3_1 = await Sub_stage.create({
-        name:"問題聚焦",
+        name:"解決方案發想",
         description:"根據前階段得出的待解決的問題，選定一個問題，並開始發散性思考解決方案，此階段不受限任何想法。",
         userSubmit:{
-            "聚焦的問題":"input",
+            "解決方案":"input",
             "附加檔案":"file",
             "內容":"textarea",
         },
