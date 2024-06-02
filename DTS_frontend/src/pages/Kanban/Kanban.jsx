@@ -372,8 +372,11 @@ export default function Kanban() {
         text: "進入成果上傳頁面",
         icon: "warning",
         showCancelButton: true,
-        cancelButtonText: "沒有",
+        confirmButtonColor: "#3d9696",  // 设置确认按钮颜色
+        cancelButtonColor: "#c5c8c9",   // 设置取消按钮颜色
         confirmButtonText: "上傳",
+        cancelButtonText: "沒有",
+        reverseButtons: true,  // 反转按钮位置，使确认按钮在右侧
       });
 
       if (resultUpload.isConfirmed) {
@@ -426,37 +429,39 @@ export default function Kanban() {
       if (!template || template.length === 0) {
         throw new Error("Template data is not loaded yet");
       }
-
-      const tasksCreationPromises = template.map((scaffoldingItem) => {
-        if (!scaffoldingItem || !scaffoldingItem.scaffolding_template) {
-          throw new Error("Invalid scaffolding item");
+      console.log("template@@@:",template);
+      async function createTasksSequentially() {
+        const successfulTasks = [];
+        for (const scaffoldingItem of template) {
+          if (!scaffoldingItem || !scaffoldingItem.scaffolding_template) {
+            console.log("Invalid scaffolding item, skipping...");
+            continue;
+          }
+          const newTask = {
+            content: scaffoldingItem.scaffolding_template,
+            columnId: doingColumnId,
+          };
+          try {
+            const result = await createTaskAndUpdateColumn(newTask);
+            console.log("Task created successfully:", result);
+            successfulTasks.push(result.data.taskId);
+          } catch (error) {
+            console.log("Failed to create task:", error);
+          }
         }
-        const newTask = {
-          content: scaffoldingItem.scaffolding_template,
-          columnId: doingColumnId, // 使用之前找到的進行中的列ID
-        };
-        // 使用 createTaskAndUpdateColumn 函數發起請求
-        return createTaskAndUpdateColumn(newTask);
-      });
-
-      // 等待所有任務創建操作完成
-      const responses = await Promise.all(tasksCreationPromises);
-      console.log(
-        "All tasks created and column updated:",
-        responses.map((res) => res.data)
-      );
-      const newTasksIds = responses.map((res) => res.data.taskId);
-      // 你可能需要在这里通知服务器，比如发送一个socket事件来告知新创建的任务ID
-      socket.emit("tasksCreated", {
-        columnId: doingColumnId,
-        newTasksIds,
-        projectId,
-      });
-
-      socket.emit("templateUpdated", { projectId: projectId });
-
-      // 更新前端狀態或提示用戶
-      // ... 這裡可能需要更新前端的 column 狀態，取決於您的實際需求 ...
+      
+        if (successfulTasks.length > 0) {
+          socket.emit("tasksCreated", {
+            columnId: doingColumnId,
+            newTasksIds: successfulTasks,
+            projectId,
+          });
+          socket.emit("templateUpdated", { projectId: projectId });
+        }
+      }
+      
+      createTasksSequentially();
+      
     } catch (error) {
       console.error("Error in handleOneClickUse:", error);
     }

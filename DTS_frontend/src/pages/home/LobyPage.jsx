@@ -110,6 +110,7 @@ const Cards = () => {
       ...prev,
       [name]: value,
       userId: localStorage.getItem("id"),
+      teamLeaderNickname: localStorage.getItem("nickname"),
     }));
   };
 
@@ -122,6 +123,7 @@ const Cards = () => {
     setInviteProjectData({
       [name]: value,
       userId: localStorage.getItem("id"),
+      
     });
   };
 
@@ -351,7 +353,7 @@ const Cards = () => {
         <div className="flex justify-end m-2">
           <button
             onClick={() => setCreateProjectModalOpen(false)}
-            className="mx-auto w-full h-9 mb-2 bg-[#bdcdce] rounded font-bold text-xs sm:text-sm xl:text-base text-black/60 mr-2"
+            className="mx-auto w-full h-9 mb-2 bg-[#c5c8c9] rounded font-bold text-xs sm:text-sm xl:text-base text-black/60 mr-2"
           >
             取消
           </button>
@@ -361,7 +363,7 @@ const Cards = () => {
               setCreateProjectModalOpen(false);
             }}
             type="submit"
-            className="mx-auto w-full h-9  mb-2 bg-[#7fd4d8] rounded font-bold text-xs sm:text-sm  xl:text-base text-white"
+            className="mx-auto w-full h-9  mb-2 bg-cyan-600 rounded font-bold text-xs sm:text-sm  xl:text-base text-white"
           >
             儲存
           </button>

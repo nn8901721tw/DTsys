@@ -100,8 +100,8 @@ export default function HomePage() {
       title: `確定要進入 ${projectItem.name} 活動?`,
       icon: "warning",
       showCancelButton: true,
-      confirmButtonColor: "bg-[#7fd4d8]",
-      cancelButtonColor: "bg-[#F7F6F6]",
+      confirmButtonColor: "#3d9696",
+      cancelButtonColor: "#c5c8c9",
       cancelButtonText: "取消",
       confirmButtonText: "確定",
       reverseButtons: true, // 將取消在左側，確定在右側
@@ -381,7 +381,7 @@ export default function HomePage() {
               handleSubmitReferral_Code();
               setInviteProjectModalOpen(false);
             }}
-            className="mx-auto w-1/4 h-7 mb-2 bg-customgreen rounded font-bold text-xs sm:text-sm text-white"
+            className="mx-auto w-1/4 h-7 mb-2 bg-cyan-600 rounded font-bold text-xs sm:text-sm text-white"
             type="submit"
           >
             加入

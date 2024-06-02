@@ -18,6 +18,7 @@ import { AiFillPushpin } from "react-icons/ai";
 import Lottie from "lottie-react";
 import welldone from "../../../assets/welldone.json";
 
+
 const Scaffolding = ({ onTaskComplete }) => {
   const navigate = useNavigate();
 
@@ -286,6 +287,7 @@ const Scaffolding = ({ onTaskComplete }) => {
 
   return (
     <div className=" w-64 p-6  bg-slate-700 rounded-lg shadow-md divide-y divide-gray-200 fixed top-24 right-2 h-4/5  z-20  overflow-y-auto overflow-x-hidden scrollbar-none ">
+
       <div className="pb-2">
         <div className="flex">
           <div className="flex fixed top-[70px] left-20 text-[#648891] cursor-default">
@@ -510,6 +512,7 @@ const Scaffolding = ({ onTaskComplete }) => {
                       </div>
                     )}
                   </div>
+               
                 </div>
               </div>
             </div>
