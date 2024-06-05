@@ -5,6 +5,7 @@ import Modal from "../../components/Modal";
 import toast, { Toaster } from "react-hot-toast";
 import { GrFormClose } from "react-icons/gr";
 import { FaSortDown } from "react-icons/fa";
+import { AiFillTool } from "react-icons/ai"; // 引入设置图标
 import Swal from "sweetalert2";
 import AnimatedDropdown from "./ui/AnimatedDropdown";
 import { motion } from "framer-motion";
@@ -18,18 +19,23 @@ import {
 import { useNavigate } from "react-router-dom";
 import { FaArrowLeft } from "react-icons/fa"; // 引入返回圖標
 import { AiTwotoneTrophy } from "react-icons/ai";
+import { updateProject, deleteProject } from "../../api/project"; // 确保正确导入 API 函数
 
 export default function HomePage() {
   const [projectData, setProjectData] = useState([]);
   const [createprojectData, setCreateProjectData] = useState({
     projectMentor: "吳老師",
   });
+  const [editProjectModalOpen, setEditProjectModalOpen] = useState(false);
+  const [currentProject, setCurrentProject] = useState({});
+
   const [inviteprojectData, setInviteProjectData] = useState({});
   const [createProjectModalOpen, setCreateProjectModalOpen] = useState(false);
   const [inviteProjectModalOpen, setInviteProjectModalOpen] = useState(false);
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-
+  const [nickname, setNickname] = useState(localStorage.getItem("nickname"));
+  const [hoveredIndex, setHoveredIndex] = useState(null); // 追踪鼠标悬停的卡片索引
   const { isLoading, isError, error, data } = useQuery(
     "projectDatas",
     () => getAllProject({ params: { userId: localStorage.getItem("id") } }),
@@ -40,7 +46,7 @@ export default function HomePage() {
     onSuccess: (res) => {
       console.log(res);
       queryClient.invalidateQueries("projectDatas");
-      localStorage.setItem('taskSubmitted', 'true'); // 设置标志
+      localStorage.setItem("taskSubmitted", "true"); // 设置标志
       sucesssReferralCodeNotify(res.message);
     },
     onError: (error) => {
@@ -60,6 +66,99 @@ export default function HomePage() {
       errorReferralCodeNotify(error.response.data.message);
     },
   });
+// 处理更新项目
+const handleUpdateProject = async () => {
+  if (currentProject && currentProject.id) {
+    try {
+      const updatedData = {
+        name: currentProject.name,
+        describe: currentProject.describe,
+        mentor: currentProject.mentor // 确保mentor字段名称与后端预期一致
+      };
+      const response = await updateProject(currentProject.id, updatedData);
+      console.log("更新成功:", response);
+      Swal.fire({
+        icon: 'success',
+        title: '更新成功！',
+        showConfirmButton: true,
+        confirmButtonColor: "#0891B2",  // 设置确认按钮颜色
+
+
+      });
+      queryClient.invalidateQueries('projectDatas'); // 重新获取项目列表
+      setEditProjectModalOpen(false); // 关闭编辑模态窗口
+    } catch (error) {
+      console.error("更新失敗:", error);
+      Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        text: '更新失敗' + error.message
+      });
+    }
+  } else {
+    Swal.fire({
+      icon: 'error',
+      title: 'Oops...',
+      text: '無效'
+    });
+  }
+};
+
+// 处理删除项目
+const handleDeleteProject = () => {
+  if (currentProject && currentProject.id) {
+    Swal.fire({
+      title: '確定要刪除此設計思考活動嗎?',
+      text: "此操作不可逆!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: "#0891B2",  // 设置确认按钮颜色
+      cancelButtonColor: "#c5c8c9",   // 设置取消按钮颜色
+      confirmButtonText: '是的, 我要刪除!',
+      cancelButtonText: '取消',
+      reverseButtons: true,  // 反转按钮位置，使确认按钮在右侧
+    }).then((result) => {
+      if (result.isConfirmed) {
+        deleteProjectMutation.mutate(currentProject.id);
+      }
+    });
+  } else {
+    Swal.fire({
+      icon: 'error',
+      title: 'Oops...',
+      text: '無效'
+    });
+  }
+};
+
+const deleteProjectMutation = useMutation(projectId => {
+  console.log("Deleting project with ID:", projectId);
+  return deleteProject(projectId);
+}, {
+onSuccess: () => {
+  Swal.fire({
+    icon: 'success',
+    title: '刪除成功！',
+    showConfirmButton: true,
+    confirmButtonColor: "#0891B2",  // 设置确认按钮颜色
+
+
+  });
+  queryClient.invalidateQueries("projectDatas");
+  setEditProjectModalOpen(false);
+},
+onError: (error) => {
+  console.log("Delete error:", error);
+  Swal.fire({
+    icon: 'error',
+    title: '刪除失敗',
+    text: error.response ? error.response.data.message : error.message
+  });
+},
+});
+
+
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -100,7 +199,7 @@ export default function HomePage() {
       title: `確定要進入 ${projectItem.name} 活動?`,
       icon: "warning",
       showCancelButton: true,
-      confirmButtonColor: "#3d9696",
+      confirmButtonColor: "#0891B2",
       cancelButtonColor: "#c5c8c9",
       cancelButtonText: "取消",
       confirmButtonText: "確定",
@@ -208,30 +307,41 @@ export default function HomePage() {
               return (
                 <motion.div
                   key={index}
+                  onMouseEnter={() => setHoveredIndex(index)} // 更改为 onMouseEnter
+                  onMouseLeave={() => setHoveredIndex(null)} // 更改为 onMouseLeave
                   variants={containerVariants}
                   initial="hidden"
                   animate="visible"
                   whileHover={{ scale: 1.1 }} // 添加悬停效果
-                  transition={{ type: "spring", stiffness: 2000 }} // 可以调整transition来改变动画效果
+                  transition={{ type: "spring", stiffness: 1000 }} // 可以调整transition来改变动画效果
                   className={`rounded-lg w-full h-[150px] hover:shadow-2xl ${
-                    projectItem.ProjectEnd ? "bg-[#3d9696]" : "bg-[#b1ccce]"
+                    projectItem.ProjectEnd ? "bg-[#0891B2]" : "bg-[#b1ccce]"
                   } shadow-md duration-150`}
                   // onClick={() => handleClick(projectItem)}
                   style={{ cursor: "pointer" }} // 添加样式改变光标为点击样式
                 >
-                  {/* {projectItem.ProjectEnd && (
-                    <div className=" flex font-bold text-white">
-                      <AiTwotoneTrophy />已完成
-                    </div>
-                  
-                  )} */}
+                  {projectItem.teamLeaderNickname === nickname &&
+                    hoveredIndex === index && (
+                      <AiFillTool
+                        className="text-cyan-700 absolute top-7 right-3 font-bold"
+                        size={24}
+                        onClick={(e) => {
+                          e.stopPropagation(); // 防止事件冒泡到卡片的点击事件
+                          // Handle settings click
+                          setCurrentProject(projectItem); // 设置当前项目数据
+                          setEditProjectModalOpen(true); // 打开编辑模态窗口
+                        }}
+                      />
+                    )}
                   {projectItem.ProjectEnd ? (
                     <div className=" flex font-bold text-[#fdfdfd] translate-x-3">
-                      <AiTwotoneTrophy className=" translate-y-1"/>
+                      <AiTwotoneTrophy className=" translate-y-1" />
                       已完成
                     </div>
                   ) : (
-                    <div className=" flex font-bold text-white translate-x-3">未完成</div>
+                    <div className=" flex font-bold text-white translate-x-3">
+                      未完成
+                    </div>
                   )}
                   <div
                     className="flex flex-col w-full h-full justify-center items-center p-4 bg-slate-100 shadow-xl hover:bg-gray-50 transition duration-150 ease-in-out rounded-2xl cursor-pointer"
@@ -450,6 +560,70 @@ export default function HomePage() {
           </button>
         </div>
       </Modal>
+
+      <Modal
+        open={editProjectModalOpen}
+        onClose={() => setEditProjectModalOpen(false)}
+        opacity={true}
+        position={"justify-center items-center"}
+      >
+      <h1 className="font-bold text-2xl mb-3">編輯設計思考活動</h1>
+        <div className="flex flex-col p-3">
+          <h3 className="font-bold text-base mb-3">活動名稱</h3>
+          <input
+            className="rounded w-full mb-3"
+            type="text"
+            placeholder="活動名稱..."
+            value={currentProject.name || ""}
+            onChange={(e) =>
+              setCurrentProject({ ...currentProject, name: e.target.value })
+            }
+          />
+          <h3 className="font-bold text-base mb-3">活動詳情</h3>
+          <textarea
+            className="rounded w-full mb-3"
+            placeholder="活動詳情..."
+            value={currentProject.describe || ""}
+            onChange={(e) =>
+              setCurrentProject({ ...currentProject, describe: e.target.value })
+            }
+          />
+          <select
+            value={currentProject.projectMentor || ""}
+            onChange={(e) =>
+              setCurrentProject({
+                ...currentProject,
+                projectMentor: e.target.value,
+              })
+            }
+            className="text-base w-full px-4 py-3 rounded-lg bg-white mt-2 border focus:border-blue-500 focus:bg-white focus:outline-none"
+          >
+            <option value="吳老師">吳老師</option>
+            {/* 添加其他导师选项 */}
+          </select>
+          <button
+          onClick={() => setEditProjectModalOpen(false)}
+          className=" absolute top-1 right-1 rounded-lg bg-white hover:bg-slate-200"
+        >
+          <GrFormClose className=" w-6 h-6" />
+        </button>
+          <div className="flex justify-between mt-4">
+            <button
+              className="mx-auto w-full h-9 mb-2 bg-[#ec6755] rounded font-bold text-xs sm:text-sm  text-white mr-2"
+              onClick={handleDeleteProject}
+            >
+              刪除活動
+            </button>
+            <button
+              className="mx-auto w-full h-9  mb-2 bg-cyan-600 rounded font-bold text-xs sm:text-sm  text-white"
+              onClick={handleUpdateProject}
+            >
+              儲存變更
+            </button>
+          </div>
+        </div>
+      </Modal>
+
       <Toaster />
     </div>
   );

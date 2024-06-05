@@ -13,7 +13,7 @@ import { AiOutlineFolderOpen } from "react-icons/ai";
 import { AiTwotoneEdit } from "react-icons/ai";
 import { AiOutlineEdit } from "react-icons/ai";
 import { FaRibbon } from "react-icons/fa";
-
+import { AiOutlinePartition } from "react-icons/ai";
 
 export default function SideBar() {
   const [open, setOpen] = useState(false);
@@ -39,7 +39,7 @@ export default function SideBar() {
       link: `/project/${projectId}/ideaWall`,
       icon: AiOutlineBulb,
     },
-    { name: "資料分析", link: `/project/${projectId}/managePhase`, icon: BsBezier2 },
+    { name: "資料分析", link: `/project/${projectId}/managePhase`, icon: AiOutlinePartition },
     // { name: "繳交任務", link: `/project/${projectId}/submitTask`, icon: GrCompliance },
     {
       name: "檔案空間",

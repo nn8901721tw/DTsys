@@ -20,7 +20,7 @@ const controller = require('./controllers/kanban');
 const io = new Server(server, {
     cors:{
         origin: ["http://localhost:5173"],
-        methods: ['GET', 'PUT', 'POST'],
+        methods: ['GET', 'PUT', 'POST', 'DELETE'],
         credentials: true
     },
 });
@@ -29,7 +29,7 @@ app.set('io', io);
 
 app.use(cors({
     origin: ["http://localhost:5173"],
-    methods: ['GET', 'PUT', 'POST'],
+    methods: ['GET', 'PUT', 'POST', 'DELETE'],
     credentials: true
 }));
 app.use(bodyParser.json());  

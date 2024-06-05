@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
-
+import Lottie from "lottie-react";
 import Modal from "../../components/Modal";
 import IdeaWallSideBar from "./components/IdeaWallSideBar";
 import Scaffolding from "./components/Scaffolding";
@@ -19,8 +19,9 @@ import {
 } from "../../api/kanban";
 import { getProjectUser } from "../../api/users";
 import { AiOutlineBulb } from "react-icons/ai";
-import toast, { Toaster } from 'react-hot-toast';
-import Timer from './components/Timer';  // 确保路径正确
+import toast, { Toaster } from "react-hot-toast";
+import Timer from "./components/Timer"; // 确保路径正确
+import Adding_icon from "../../assets/AnimationAddingNode.json";
 
 
 export default function IdeaWall() {
@@ -45,13 +46,29 @@ export default function IdeaWall() {
     localStorage.getItem("teamLeader")
   );
 
-
+  
+  const [hovering, setHovering] = useState(false);
   const queryClient = useQueryClient(); // 使用 useQueryClient 鉤子
 
-  const colors = ["#C47D09", "#D2B800", "#578082", "#16A34A", "#FCB6AD","#4ECDC5"];
+  const colors = [
+    "#C47D09",
+    "#D2B800",
+    "#578082",
+    "#16A34A",
+    "#FCB6AD",
+    "#4ECDC5",
+  ];
 
   // const userColor = getColorForUser(userId); // 獲取顏色
   // 在元件內部
+
+  const handleMouseEnter = () => {
+    setHovering(true);
+};
+
+const handleMouseLeave = () => {
+    setHovering(false);
+};
 
   const getProjectUserQuery = useQuery(
     "getProjectUser",
@@ -145,7 +162,7 @@ export default function IdeaWall() {
   useEffect(() => {
     const temp = [];
     nodes.map((item) => {
-      const nodeColor = colors[(item.colorindex - 1) % (colors.length)]; // Use modulo to cycle through colors if index exceeds array length
+      const nodeColor = colors[(item.colorindex - 1) % colors.length]; // Use modulo to cycle through colors if index exceeds array length
 
       item.image = svgConvertUrl(
         item.title,
@@ -288,30 +305,29 @@ export default function IdeaWall() {
   //   socket.emit("nodeUpdate", selectNodeInfo);
   // };
   const handleCreateSubmit = (e) => {
-    e.preventDefault()
+    e.preventDefault();
     if (title.trim() !== "" && content.trim() !== "") {
-        setCreateNodeModalOpen(false);
-        socket.emit('nodeCreate', nodeData);
-        setBuildOnId("");
-        setContent("");
-        setTitle("");
+      setCreateNodeModalOpen(false);
+      socket.emit("nodeCreate", nodeData);
+      setBuildOnId("");
+      setContent("");
+      setTitle("");
     } else {
-        toast.error("標題及內容請填寫完整!");
+      toast.error("標題及內容請填寫完整!");
     }
-}
-const handleUpdateSubmit = (e) => {
-    e.preventDefault()
-    if (selectNodeInfo.title.trim() !== "" && selectNodeInfo.content.trim() !== "") {
-        setUpdateNodeModalOpen(false)
-        socket.emit('nodeUpdate', selectNodeInfo)
+  };
+  const handleUpdateSubmit = (e) => {
+    e.preventDefault();
+    if (
+      selectNodeInfo.title.trim() !== "" &&
+      selectNodeInfo.content.trim() !== ""
+    ) {
+      setUpdateNodeModalOpen(false);
+      socket.emit("nodeUpdate", selectNodeInfo);
     } else {
-        toast.error("標題及內容請填寫完整!");
+      toast.error("標題及內容請填寫完整!");
     }
-}
-
-
-
-
+  };
 
   const handleDelete = (e) => {
     e.preventDefault();
@@ -335,13 +351,9 @@ const handleUpdateSubmit = (e) => {
           className="w-full"
           currentStage={currentStage}
           currentSubStage={currentSubStage}
-
         />
       </div>
-      {userId == teamLeader && (
-        <Timer/>
-      )}
-
+      {userId == teamLeader && <Timer/>}
 
       {/* create option */}
       <Modal
@@ -404,11 +416,10 @@ const handleUpdateSubmit = (e) => {
       >
         <div className="flex flex-col p-3">
           <div className="flex">
-
-          <h3 className=" font-bold text-base mb-3">建立想法節點</h3>
-          <AiOutlineBulb className="w-6 h-6 text-[#b1a93d]" />
+            <h3 className=" font-bold text-base mb-3">建立想法節點</h3>
+            <AiOutlineBulb className="w-6 h-6 text-[#b1a93d]" />
           </div>
-   
+
           <p className=" font-bold text-base mb-3">標題</p>
           <input
             className=" rounded  p-1 w-full mb-3 shadow-lg hover:shadow-2xl"
@@ -440,7 +451,6 @@ const handleUpdateSubmit = (e) => {
           <button
             onClick={handleCreateSubmit}
             className="mx-auto w-full h-7 mb-2 bg-cyan-600 rounded font-bold text-xs sm:text-sm text-white"
-           
           >
             儲存
           </button>
@@ -464,7 +474,9 @@ const handleUpdateSubmit = (e) => {
               name="title"
               value={selectNodeInfo.title}
               onChange={handleUpdataChange}
-              disabled={localStorage.getItem("nickname") !== selectNodeInfo.owner}
+              disabled={
+                localStorage.getItem("nickname") !== selectNodeInfo.owner
+              }
             />
             <p className=" font-bold text-base mb-3">內容</p>
             <textarea
@@ -474,7 +486,9 @@ const handleUpdateSubmit = (e) => {
               name="content"
               value={selectNodeInfo.content}
               onChange={handleUpdataChange}
-              disabled={localStorage.getItem("nickname") !== selectNodeInfo.owner}
+              disabled={
+                localStorage.getItem("nickname") !== selectNodeInfo.owner
+              }
             />
             <p className=" font-bold text-base mt-3">
               建立者: {selectNodeInfo.owner}
@@ -514,9 +528,24 @@ const handleUpdateSubmit = (e) => {
             </div>
           )}
         </Modal>
-     
       )}
-         <Toaster></Toaster>
+
+      <button
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+        onClick={() => {
+          setNodeData({}); // 重置 nodeData 状态
+          setTitle("");
+          setContent("");
+          setCreateOptionModalOpen(false);
+          setCreateNodeModalOpen(true);
+        }}
+        className="fixed bottom-5 left-16 flex items-center justify-center text-base"
+        aria-label="新增節點"
+      >
+        <Lottie className="w-22" animationData={Adding_icon} loop={hovering} />
+      </button>
+      <Toaster></Toaster>
     </div>
   );
 }

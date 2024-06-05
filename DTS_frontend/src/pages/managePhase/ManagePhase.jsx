@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect } from "react";
 
 function ManagePhase() {
   useEffect(() => {
@@ -7,25 +7,31 @@ function ManagePhase() {
   }, []);
 
   const initTableauViz = () => {
-    const vizUrl = "https://public.tableau.com/views/_17171431116760/1";
+    const vizUrl =
+      "https://public.tableau.com/views/_17171431116760/1?:language=zh-TW&publish=yes&:sid=&:display_count=n&:origin=viz_share_link";
 
     const options = {
       hideTabs: true,
       hideToolbar: true,
-      onFirstInteractive: function() {
+      onFirstInteractive: function () {
         console.log("Tableau Viz has finished loading.");
-      }
+      },
     };
 
-    const vizContainer = document.getElementById('vizContainer');
-    if (vizContainer && !vizContainer.viz) { // 避免重複加載
+    const vizContainer = document.getElementById("vizContainer");
+    if (vizContainer && !vizContainer.viz) {
+      // 避免重複加載
       const viz = new window.tableau.Viz(vizContainer, vizUrl, options);
       vizContainer.viz = viz; // 存儲以防止重複創建
     }
   };
 
   return (
-    <div id="vizContainer" style={{ width: '1000px', height: '800px' }}></div>
+<div className="flex flex-col h-screen overflow-y-auto">
+            <div className="flex justify-center ml-10 mt-14 items-center flex-grow">
+                <div id="vizContainer"></div>
+            </div>
+        </div>
   );
 }
 

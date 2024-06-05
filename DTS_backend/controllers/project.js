@@ -390,6 +390,46 @@ exports.inviteForProject = async (req, res) => {
     }
 };
 
+
+exports.updateProject = async (req, res) => {
+    const projectId = req.params.projectId; // 从 URL 中获取 projectId
+    const { name, describe, mentor } = req.body; // 从请求体中获取其他数据
+
+    try {
+        const project = await Project.findByPk(projectId);
+        if (!project) {
+            return res.status(404).json({ message: '项目不存在!' });
+        }
+        project.name = name;
+        project.describe = describe;
+        project.mentor = mentor;
+        await project.save();
+        res.status(200).json({ message: '项目更新成功!', project });
+    } catch (error) {
+        console.error("更新项目错误:", error);
+        res.status(500).json({ message: '内部服务器错误!' });
+    }
+};
+
+
+// controllers/project.js
+exports.deleteProject = async (req, res) => {
+    const { projectId } = req.params;
+    try {
+        const project = await Project.findByPk(projectId);
+        if (!project) {
+            return res.status(404).json({ message: '项目不存在!' });
+        }
+        await project.destroy();
+        res.status(200).json({ message: '项目删除成功!' });
+    } catch (error) {
+        console.error("删除项目错误:", error);
+        res.status(500).json({ message: '内部服务器错误!' });
+    }
+};
+
+
+
 // exports.inviteForProject = async( req, res) => {
 //     const referral_Code = req.body.referral_Code;
 //     const userId = req.body.userId;

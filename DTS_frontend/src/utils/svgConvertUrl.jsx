@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from "react";
 import ReactDOMServer from "react-dom/server";
 import { AiOutlineBulb } from "react-icons/ai";
-import dateFormat from 'dateformat';
+import dateFormat from "dateformat";
 
-
-export default function svgConvertUrl(title, owner, createdAt,userColor) {
+export default function svgConvertUrl(title, owner, createdAt, userColor) {
   const svg = (
     <svg xmlns="http://www.w3.org/2000/svg" width="400" height="150">
       <rect x="0" y="0" width="100%" height="100%" fill="#F8FAFB" />
@@ -27,20 +26,24 @@ export default function svgConvertUrl(title, owner, createdAt,userColor) {
               style={{ width: "80px", height: "80px", color: userColor }}
             />
             <span
-              style={{ fontSize: `48px`, fontWeight: "bold", maxWidth: "300px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}
+              style={{
+                fontSize: `48px`,
+                fontWeight: "bold",
+                maxWidth: "300px",
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+              }}
             >
               {title}
             </span>
           </div>
-          <div style={{ fontSize:"30px" ,marginTop: "10px", display: "flex" }}>
-                        <span  style={{ marginRight: "15px"}}>
-                            {owner}
-                        </span>
-                        <span>
-                            {dateFormat(createdAt,"mm/dd HH:MM")}
-                        </span>
-                    </div>
+          <div style={{ fontSize: "30px", marginTop: "10px", display: "flex" }}>
+            <span style={{ marginRight: "15px" }}>{owner}</span>
+            <span>{dateFormat(createdAt, "mm/dd HH:MM")}</span>
+          </div>
         </div>
+        
       </foreignObject>
     </svg>
   );

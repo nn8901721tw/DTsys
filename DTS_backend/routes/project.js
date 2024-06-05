@@ -8,5 +8,10 @@ router.post('/', controller.createProject);
 router.post('/referral', controller.inviteForProject)
 // router.put('/:projectId', controller.updateProject);
 // router.delete('/:projectId', controller.deleteProject);
+// routes/project.js
+router.put('/:projectId', controller.updateProject);
+router.delete('/:projectId', controller.deleteProject);
+
+
 
 module.exports = router;

@@ -26,3 +26,24 @@ export const inviteForProject = async (data) => {
     const response = await projectApi.post("/referral", data)
     return response.data
 }
+
+export const updateProject = async (projectId, data) => {
+    try {
+        const response = await projectApi.put(`/${projectId}`, data);
+        return response.data;
+    } catch (error) {
+        console.error("更新项目错误:", error);
+        throw error;
+    }
+}
+
+export const deleteProject = async (projectId) => {
+    try {
+        const response = await projectApi.delete(`/${projectId}`);
+        return response.data;
+    } catch (error) {
+        console.error("删除项目错误:", error);
+        throw error;
+    }
+}
+

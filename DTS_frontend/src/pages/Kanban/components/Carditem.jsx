@@ -19,6 +19,7 @@ import cardarrow from "../../../assets/cardarrow.json";
 import { BsPersonCircle } from "react-icons/bs";
 import { useNavigate } from "react-router-dom";
 
+
 export default function Carditem({
   data,
   index,
@@ -136,6 +137,7 @@ export default function Carditem({
             className={`${borderStyle} rounded-md p-3 truncate min-h-[100px] max-w-full shadow-md  font-semibold hover:shadow-xl mt-1 hover:skew-y-1  ${
               snapshot.isDragging ? "bg-sky-300 " : "bg-white"
             }`}
+   
           >
             <div className="truncate">
               <span className=" text-md my-3 text-base leading-6 w-3/5 ">
@@ -353,6 +355,7 @@ export default function Carditem({
           />
         </Modal>
       }
+      
     </>
   );
 }
