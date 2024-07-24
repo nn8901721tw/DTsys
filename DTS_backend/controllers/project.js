@@ -428,7 +428,25 @@ exports.deleteProject = async (req, res) => {
     }
 };
 
+exports.getProjectsByMentor = async (req, res) => {
+    console.log(req)
+    const mentorName = req.params.mentor; // 從 URL 參數中獲取 mentor 名字
+    console.log("mentorName:",mentorName)
+    try {
+        const projects = await Project.findAll({
+            where: { mentor: mentorName }
+        });
 
+        if (projects.length === 0) {
+            return res.status(404).json({ message: '沒有找到該導師的項目' });
+        }
+
+        res.status(200).json(projects);
+    } catch (error) {
+        console.error('Error:', error);
+        res.status(500).json({ message: '內部服務器錯誤' });
+    }
+};
 
 // exports.inviteForProject = async( req, res) => {
 //     const referral_Code = req.body.referral_Code;

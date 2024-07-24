@@ -23,3 +23,8 @@ export const  getProjectUser = async (projectId) => {
     const response = await usersApi.get(`/project/${projectId}`)
     return response.data
 }
+
+export const getTeachers = async () => {
+    const response = await usersApi.get(`/teachers`);
+    return response.data;
+}

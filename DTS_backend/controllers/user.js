@@ -4,8 +4,22 @@ const bcypt  = require('bcrypt');
 const saltRounds = 10;
 const {sign} = require('jsonwebtoken');
 
+// Get teachers
+exports.getTeachers = (req, res) =>{
+    console.log("GET /teachers controller hit~~~~~");
+    // Assuming 'role' field distinguishes between users and teachers
+    User.findAll({
+        where: { role: 'teacher' }
+    })
+        .then(users =>{
+            res.status(200).json({ user: users })
+        })
+        .catch(err => console.log(err));
+}
+
 //get all users
 exports.getUsers = (req, res) =>{
+    console.log("GET /getUsersgetUsersgetUsersteachers controller hit");
     User.findAll()
         .then(users =>{
             res.status(200).json({ user: users})
@@ -182,3 +196,4 @@ exports.getProjectUsers = async(req, res) => {
 //         })
 //         .catch(err => console.log(err));
 // }
+

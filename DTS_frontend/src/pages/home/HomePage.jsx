@@ -20,15 +20,16 @@ import { useNavigate } from "react-router-dom";
 import { FaArrowLeft } from "react-icons/fa"; // 引入返回圖標
 import { AiTwotoneTrophy } from "react-icons/ai";
 import { updateProject, deleteProject } from "../../api/project"; // 确保正确导入 API 函数
+import { getTeachers } from "../../api/users";
 
 export default function HomePage() {
   const [projectData, setProjectData] = useState([]);
   const [createprojectData, setCreateProjectData] = useState({
-    projectMentor: "吳老師",
+    projectMentor: "",
   });
   const [editProjectModalOpen, setEditProjectModalOpen] = useState(false);
   const [currentProject, setCurrentProject] = useState({});
-
+  const [mentors, setMentors] = useState([]); // 新增這行
   const [inviteprojectData, setInviteProjectData] = useState({});
   const [createProjectModalOpen, setCreateProjectModalOpen] = useState(false);
   const [inviteProjectModalOpen, setInviteProjectModalOpen] = useState(false);
@@ -66,99 +67,95 @@ export default function HomePage() {
       errorReferralCodeNotify(error.response.data.message);
     },
   });
-// 处理更新项目
-const handleUpdateProject = async () => {
-  if (currentProject && currentProject.id) {
-    try {
-      const updatedData = {
-        name: currentProject.name,
-        describe: currentProject.describe,
-        mentor: currentProject.mentor // 确保mentor字段名称与后端预期一致
-      };
-      const response = await updateProject(currentProject.id, updatedData);
-      console.log("更新成功:", response);
+  // 处理更新项目
+  const handleUpdateProject = async () => {
+    if (currentProject && currentProject.id) {
+      try {
+        const updatedData = {
+          name: currentProject.name,
+          describe: currentProject.describe,
+          mentor: currentProject.mentor, // 确保mentor字段名称与后端预期一致
+        };
+        const response = await updateProject(currentProject.id, updatedData);
+        console.log("更新成功:", response);
+        Swal.fire({
+          icon: "success",
+          title: "更新成功！",
+          showConfirmButton: true,
+          confirmButtonColor: "#0891B2", // 设置确认按钮颜色
+        });
+        queryClient.invalidateQueries("projectDatas"); // 重新获取项目列表
+        setEditProjectModalOpen(false); // 关闭编辑模态窗口
+      } catch (error) {
+        console.error("更新失敗:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Oops...",
+          text: "更新失敗" + error.message,
+        });
+      }
+    } else {
       Swal.fire({
-        icon: 'success',
-        title: '更新成功！',
-        showConfirmButton: true,
-        confirmButtonColor: "#0891B2",  // 设置确认按钮颜色
-
-
-      });
-      queryClient.invalidateQueries('projectDatas'); // 重新获取项目列表
-      setEditProjectModalOpen(false); // 关闭编辑模态窗口
-    } catch (error) {
-      console.error("更新失敗:", error);
-      Swal.fire({
-        icon: 'error',
-        title: 'Oops...',
-        text: '更新失敗' + error.message
+        icon: "error",
+        title: "Oops...",
+        text: "無效",
       });
     }
-  } else {
-    Swal.fire({
-      icon: 'error',
-      title: 'Oops...',
-      text: '無效'
-    });
-  }
-};
+  };
 
-// 处理删除项目
-const handleDeleteProject = () => {
-  if (currentProject && currentProject.id) {
-    Swal.fire({
-      title: '確定要刪除此設計思考活動嗎?',
-      text: "此操作不可逆!",
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: "#0891B2",  // 设置确认按钮颜色
-      cancelButtonColor: "#c5c8c9",   // 设置取消按钮颜色
-      confirmButtonText: '是的, 我要刪除!',
-      cancelButtonText: '取消',
-      reverseButtons: true,  // 反转按钮位置，使确认按钮在右侧
-    }).then((result) => {
-      if (result.isConfirmed) {
-        deleteProjectMutation.mutate(currentProject.id);
-      }
-    });
-  } else {
-    Swal.fire({
-      icon: 'error',
-      title: 'Oops...',
-      text: '無效'
-    });
-  }
-};
+  // 处理删除项目
+  const handleDeleteProject = () => {
+    if (currentProject && currentProject.id) {
+      Swal.fire({
+        title: "確定要刪除此設計思考活動嗎?",
+        text: "此操作不可逆!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#0891B2", // 设置确认按钮颜色
+        cancelButtonColor: "#c5c8c9", // 设置取消按钮颜色
+        confirmButtonText: "是的, 我要刪除!",
+        cancelButtonText: "取消",
+        reverseButtons: true, // 反转按钮位置，使确认按钮在右侧
+      }).then((result) => {
+        if (result.isConfirmed) {
+          deleteProjectMutation.mutate(currentProject.id);
+        }
+      });
+    } else {
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "無效",
+      });
+    }
+  };
 
-const deleteProjectMutation = useMutation(projectId => {
-  console.log("Deleting project with ID:", projectId);
-  return deleteProject(projectId);
-}, {
-onSuccess: () => {
-  Swal.fire({
-    icon: 'success',
-    title: '刪除成功！',
-    showConfirmButton: true,
-    confirmButtonColor: "#0891B2",  // 设置确认按钮颜色
-
-
-  });
-  queryClient.invalidateQueries("projectDatas");
-  setEditProjectModalOpen(false);
-},
-onError: (error) => {
-  console.log("Delete error:", error);
-  Swal.fire({
-    icon: 'error',
-    title: '刪除失敗',
-    text: error.response ? error.response.data.message : error.message
-  });
-},
-});
-
-
-
+  const deleteProjectMutation = useMutation(
+    (projectId) => {
+      console.log("Deleting project with ID:", projectId);
+      return deleteProject(projectId);
+    },
+    {
+      onSuccess: () => {
+        Swal.fire({
+          icon: "success",
+          title: "刪除成功！",
+          showConfirmButton: true,
+          confirmButtonColor: "#0891B2", // 设置确认按钮颜色
+        });
+        queryClient.invalidateQueries("projectDatas");
+        setEditProjectModalOpen(false);
+      },
+      onError: (error) => {
+        console.log("Delete error:", error);
+        Swal.fire({
+          icon: "error",
+          title: "刪除失敗",
+          text: error.response ? error.response.data.message : error.message,
+        });
+      },
+    }
+  );
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -256,6 +253,19 @@ onError: (error) => {
     handleSortChange(sortOrder);
   }, [sortOrder]);
 
+  useEffect(() => {
+    const fetchMentors = async () => {
+      try {
+        const response = await getTeachers();
+        setMentors(response);
+      } catch (error) {
+        console.error("Error fetching mentors:", error);
+      }
+    };
+
+    fetchMentors();
+  }, []);
+
   return (
     <div className="min-w-full min-h-screen h-screen overflow-hidden overflow-x-scroll">
       <TopBar />
@@ -269,32 +279,6 @@ onError: (error) => {
             <AnimatedDropdown handleSortChange={handleSortChange} />
           </div>
         </div>
-
-        {/* <div className=' flex flex-row justify-between items-center w-full sm:w-2/3 my-5'>
-          <div className='flex  '>
-            
-            <button onClick={()=>setCreateProjectModalOpen(true)} className=" bg-customgreen hover:bg-customgreen/80 text-white font-semibold rounded-2xl p-1 mr-1 sm:px-4 sm:mr-4 sm:py-1 text-base">建立專案</button>
-            <button onClick={()=>setInviteProjectModalOpen(true)} className=" bg-customgreen hover:bg-customgreen/80 text-white font-semibold rounded-2xl p-1 sm:px-4 sm:py-1 text-base">加入專案</button>
-          </div>
-          <div className='flex'>
-            <span className=' text-sm mr-3 font-bold cursor-pointer'>已開啟</span>
-            <span className=' text-sm mr-3 font-bold cursor-pointer'>已關閉</span>
-            <span className=' text-sm font-bold cursor-pointer'>日期</span>
-            <FaSortDown size={15} className=' cursor-pointer'/>
-          </div>
-        </div> */}
-
-        {/* <div className="flex justify-center my-6">
-          <select
-            className="border border-gray-300 rounded-md p-2"
-            value={sortOrder}
-            onChange={(e) => handleSortChange(e.target.value)}
-          >
-            <option value="未完成">未完成</option>
-            <option value="已完成">已完成</option>
-            <option value="時間">依時間</option>
-          </select>
-        </div> */}
 
         {/* item */}
         <div className="mt-3  w-[75%] 2xl:w-[65%] grid gap-x-4 gap-y-4 sm:gap-x-6 sm:gap-y-4  lg:gap-x-8 lg:gap-y-8  grid-cols-3  mx-auto  content-start h-screen overflow-y-scroll scrollbar-none  scrollbar-thumb-slate-400/70 scrollbar-thumb-rounded-full scrollbar-track-rounded-full">
@@ -533,9 +517,14 @@ onError: (error) => {
           <div className="mt-4">
             <label className="block text-gray-700 text-base">指導老師</label>
             <select
-              name="projectMentor"
-              onChange={handleChange}
-              className=" text-base w-full px-4 py-3 rounded-lg bg-white mt-2 border focus:border-blue-500 focus:bg-white focus:outline-none"
+              value={currentProject.projectMentor || ""}
+              onChange={(e) =>
+                setCurrentProject({
+                  ...currentProject,
+                  projectMentor: e.target.value,
+                })
+              }
+              className="text-base w-full px-4 py-3 rounded-lg bg-white mt-2 border focus:border-blue-500 focus:bg-white focus:outline-none"
             >
               <option value="吳老師">吳老師</option>
             </select>
@@ -567,7 +556,7 @@ onError: (error) => {
         opacity={true}
         position={"justify-center items-center"}
       >
-      <h1 className="font-bold text-2xl mb-3">編輯設計思考活動</h1>
+        <h1 className="font-bold text-2xl mb-3">編輯設計思考活動</h1>
         <div className="flex flex-col p-3">
           <h3 className="font-bold text-base mb-3">活動名稱</h3>
           <input
@@ -602,11 +591,11 @@ onError: (error) => {
             {/* 添加其他导师选项 */}
           </select>
           <button
-          onClick={() => setEditProjectModalOpen(false)}
-          className=" absolute top-1 right-1 rounded-lg bg-white hover:bg-slate-200"
-        >
-          <GrFormClose className=" w-6 h-6" />
-        </button>
+            onClick={() => setEditProjectModalOpen(false)}
+            className=" absolute top-1 right-1 rounded-lg bg-white hover:bg-slate-200"
+          >
+            <GrFormClose className=" w-6 h-6" />
+          </button>
           <div className="flex justify-between mt-4">
             <button
               className="mx-auto w-full h-9 mb-2 bg-[#ec6755] rounded font-bold text-xs sm:text-sm  text-white mr-2"

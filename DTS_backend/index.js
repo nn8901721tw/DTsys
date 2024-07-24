@@ -19,6 +19,7 @@ const controller = require('./controllers/kanban');
 
 const io = new Server(server, {
     cors:{
+
         origin: ["http://localhost:5173"],
         methods: ['GET', 'PUT', 'POST', 'DELETE'],
         credentials: true
@@ -26,6 +27,8 @@ const io = new Server(server, {
 });
 // 將 io 實例附加到 app 上
 app.set('io', io);
+// Set strict routing
+app.set('strict routing', true);
 
 app.use(cors({
     origin: ["http://localhost:5173"],
@@ -34,6 +37,12 @@ app.use(cors({
 }));
 app.use(bodyParser.json());  
 app.use(bodyParser.urlencoded({ extended: false }));
+
+// Debugging middleware to log requests
+app.use((req, res, next) => {
+    console.log(`${req.method} request for '${req.url}'`);
+    next();
+});
 
 
 //every socket.io thing is inside here 
@@ -253,18 +262,21 @@ io.on("connection", (socket) => {
         console.log(`${socket.id} a user disconnected`)
     });
 });
-
+// app.get('/users/teachers', (req, res) => {
+//     console.log('GET /users/test endpoint hit!!!!!!');
+//     res.send('Test route working');
+// });
 //api routes
 app.use('/users', require('./routes/user'));
-app.use('/projects', require('./routes/project'))
-app.use('/kanbans', require('./routes/kanban'))
-app.use('/ideaWall', require('./routes/ideaWall'))
-app.use('/node', require('./routes/node'))
-app.use('/daily', require('./routes/daily'))
-app.use('/submit', require('./routes/submit'))
-app.use('/stage', require('./routes/stage'))
-app.use('/getScaffoldingTemplate', require('./routes/getScaffoldingTemplate'))
-app.use('/task', require('./routes/task'))
+app.use('/projects', require('./routes/project'));
+app.use('/kanbans', require('./routes/kanban'));
+app.use('/ideaWall', require('./routes/ideaWall'));
+app.use('/node', require('./routes/node'));
+app.use('/daily', require('./routes/daily'));
+app.use('/submit', require('./routes/submit'));
+app.use('/stage', require('./routes/stage'));
+app.use('/getScaffoldingTemplate', require('./routes/getScaffoldingTemplate'));
+app.use('/task', require('./routes/task'));
 
 //error handling
 app.use((error, req, res, next) => {
@@ -276,11 +288,12 @@ app.use((error, req, res, next) => {
 
 
 // sync database
-sequelize.sync()  //{force:true} {alter:true}
-    .then( result => {
-        controller.initializeData(); // 如果還沒有初始化過資料，則執行初始化資料的函式
-    console.log("Database connected");
-    server.listen(3000);
+sequelize.sync()  // { force: true } { alter: true }
+    .then(result => {
+        console.log("Database connected");
+        server.listen(3000, () => {
+            console.log('server is running on port 3000');
+        });
     })
     .catch(err => console.log(err));
 

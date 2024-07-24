@@ -113,6 +113,10 @@ export default function Register() {
 
   return (
     <section className="flex flex-col md:flex-row h-screen items-center">
+      <img src="/images/nlt_logo.png" className="absolute w-4 left-2 top-4" />
+          <h3 className="absolute left-8 top-3 font-bold text-teal-900">
+            國立中央大學 網路學習科技研究所
+          </h3>
       <div className="hidden bg-[#AFCACC] w-full md:w-1/2 xl:w-1/2 h-screen md:flex md:items-center md:justify-center">
         <div className="flex flex-col -m-56">
           <h1 className=" md:mx-auto md:text-2xl xl:text-5xl xl:font-semibold mx-auto text-gray-200  mb-2">

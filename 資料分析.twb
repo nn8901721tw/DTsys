@@ -105,7 +105,6 @@
           <map key='[updatedAt (tasks)]' value='[tasks].[updatedAt]' />
           <map key='[updatedAt]' value='[projects].[updatedAt]' />
         </cols>
-        <refresh increment-key='' incremental-refresh-mode='' incremental-updates='' />
         <metadata-records>
           <metadata-record class='column'>
             <remote-name>id</remote-name>
@@ -899,7 +898,7 @@
       <column-instance column='[name (columns)]' derivation='None' name='[none:name (columns):nk]' pivot='key' type='nominal' />
       <column-instance column='[owner]' derivation='None' name='[none:owner:nk]' pivot='key' type='nominal' />
       <extract _.fcp.ObjectModelExtractV2.true...object-id='' _.fcp.VConnDownstreamExtractsWithWarnings.true...user-specific='false' count='-1' enabled='true' units='records'>
-        <connection access_mode='readonly' authentication='auth-none' author-locale='zh_TW' class='hyper' dbname='C:/Users/wulab002/Desktop/設計思考/DesignThinkingSystem/projects+ (postgres).hyper' default-settings='yes' schema='Extract' sslmode='' tablename='Extract' update-time='06/03/2024 04:57:14 PM' username='tableau_internal_user'>
+        <connection access_mode='readonly' authentication='auth-none' author-locale='zh_TW' class='hyper' dbname='C:/Users/wulab002/Desktop/設計思考/DesignThinkingSystem/projects+ (postgres).hyper' default-settings='yes' schema='Extract' sslmode='' tablename='Extract' update-time='06/07/2024 06:02:09 AM' username='tableau_internal_user'>
           <_.fcp.ObjectModelEncapsulateLegacy.false...relation name='columns_8EDF2FAE875049AAAABC353ACD34F93B' table='[Extract].[columns_8EDF2FAE875049AAAABC353ACD34F93B]' type='table' />
           <_.fcp.ObjectModelEncapsulateLegacy.true...relation type='collection'>
             <relation name='projects_5074D2359D0A4935B15294A8982CBBBF' table='[Extract].[projects_5074D2359D0A4935B15294A8982CBBBF]' type='table' />
@@ -964,8 +963,8 @@
             <map key='[updatedAt (tasks)]' value='[tasks_61CC1525960843EDBB0703245D627A53].[updatedAt]' />
             <map key='[updatedAt]' value='[projects_5074D2359D0A4935B15294A8982CBBBF].[updatedAt]' />
           </cols>
-          <refresh increment-key='' incremental-refresh-mode='' incremental-updates=''>
-            <refresh-event add-from-file-path='projects+ (postgres)' increment-value='%null%' refresh-type='create' rows-inserted='56' timestamp-start='2024-06-03 16:57:11.999' />
+          <refresh>
+            <refresh-event add-from-file-path='projects+ (postgres)' increment-value='%null%' refresh-type='create' rows-inserted='207' timestamp-start='2024-06-07 06:02:07.501' />
           </refresh>
           <metadata-records>
             <metadata-record class='column'>
@@ -978,7 +977,7 @@
               <family>projects</family>
               <local-type>integer</local-type>
               <aggregation>Sum</aggregation>
-              <approx-count>3</approx-count>
+              <approx-count>5</approx-count>
               <contains-null>false</contains-null>
               <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[projects_5074D2359D0A4935B15294A8982CBBBF]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
             </metadata-record>
@@ -992,7 +991,7 @@
               <family>projects</family>
               <local-type>string</local-type>
               <aggregation>Count</aggregation>
-              <approx-count>3</approx-count>
+              <approx-count>5</approx-count>
               <contains-null>true</contains-null>
               <collation flag='0' name='LEN_RUS' />
               <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[projects_5074D2359D0A4935B15294A8982CBBBF]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
@@ -1007,7 +1006,7 @@
               <family>projects</family>
               <local-type>string</local-type>
               <aggregation>Count</aggregation>
-              <approx-count>3</approx-count>
+              <approx-count>5</approx-count>
               <contains-null>true</contains-null>
               <collation flag='0' name='LEN_RUS' />
               <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[projects_5074D2359D0A4935B15294A8982CBBBF]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
@@ -1037,7 +1036,7 @@
               <family>projects</family>
               <local-type>string</local-type>
               <aggregation>Count</aggregation>
-              <approx-count>3</approx-count>
+              <approx-count>5</approx-count>
               <contains-null>true</contains-null>
               <collation flag='0' name='LEN_RUS' />
               <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[projects_5074D2359D0A4935B15294A8982CBBBF]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
@@ -1094,7 +1093,7 @@
               <family>projects</family>
               <local-type>integer</local-type>
               <aggregation>Sum</aggregation>
-              <approx-count>2</approx-count>
+              <approx-count>4</approx-count>
               <contains-null>true</contains-null>
               <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[projects_5074D2359D0A4935B15294A8982CBBBF]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
             </metadata-record>
@@ -1108,7 +1107,7 @@
               <family>projects</family>
               <local-type>string</local-type>
               <aggregation>Count</aggregation>
-              <approx-count>2</approx-count>
+              <approx-count>4</approx-count>
               <contains-null>true</contains-null>
               <collation flag='0' name='LEN_RUS' />
               <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[projects_5074D2359D0A4935B15294A8982CBBBF]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
@@ -1123,7 +1122,7 @@
               <family>projects</family>
               <local-type>datetime</local-type>
               <aggregation>Year</aggregation>
-              <approx-count>3</approx-count>
+              <approx-count>5</approx-count>
               <contains-null>true</contains-null>
               <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[projects_5074D2359D0A4935B15294A8982CBBBF]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
             </metadata-record>
@@ -1137,7 +1136,7 @@
               <family>projects</family>
               <local-type>datetime</local-type>
               <aggregation>Year</aggregation>
-              <approx-count>3</approx-count>
+              <approx-count>5</approx-count>
               <contains-null>true</contains-null>
               <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[projects_5074D2359D0A4935B15294A8982CBBBF]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
             </metadata-record>
@@ -1151,7 +1150,7 @@
               <family>idea_walls</family>
               <local-type>integer</local-type>
               <aggregation>Sum</aggregation>
-              <approx-count>6</approx-count>
+              <approx-count>22</approx-count>
               <contains-null>false</contains-null>
               <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[idea_walls_C55ED7538187455F9E0E8CB5625294B2]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
             </metadata-record>
@@ -1210,7 +1209,7 @@
               <family>idea_walls</family>
               <local-type>datetime</local-type>
               <aggregation>Year</aggregation>
-              <approx-count>6</approx-count>
+              <approx-count>22</approx-count>
               <contains-null>true</contains-null>
               <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[idea_walls_C55ED7538187455F9E0E8CB5625294B2]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
             </metadata-record>
@@ -1224,7 +1223,7 @@
               <family>idea_walls</family>
               <local-type>datetime</local-type>
               <aggregation>Year</aggregation>
-              <approx-count>6</approx-count>
+              <approx-count>22</approx-count>
               <contains-null>true</contains-null>
               <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[idea_walls_C55ED7538187455F9E0E8CB5625294B2]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
             </metadata-record>
@@ -1238,7 +1237,7 @@
               <family>idea_walls</family>
               <local-type>integer</local-type>
               <aggregation>Sum</aggregation>
-              <approx-count>3</approx-count>
+              <approx-count>6</approx-count>
               <contains-null>true</contains-null>
               <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[idea_walls_C55ED7538187455F9E0E8CB5625294B2]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
             </metadata-record>
@@ -1252,7 +1251,7 @@
               <family>nodes</family>
               <local-type>integer</local-type>
               <aggregation>Sum</aggregation>
-              <approx-count>15</approx-count>
+              <approx-count>63</approx-count>
               <contains-null>false</contains-null>
               <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[nodes_8ADA9AF2F4004E1AA3ACE4AB1C1FE91B]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
             </metadata-record>
@@ -1266,7 +1265,7 @@
               <family>nodes</family>
               <local-type>string</local-type>
               <aggregation>Count</aggregation>
-              <approx-count>12</approx-count>
+              <approx-count>51</approx-count>
               <contains-null>true</contains-null>
               <collation flag='0' name='LEN_RUS' />
               <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[nodes_8ADA9AF2F4004E1AA3ACE4AB1C1FE91B]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
@@ -1281,7 +1280,7 @@
               <family>nodes</family>
               <local-type>string</local-type>
               <aggregation>Count</aggregation>
-              <approx-count>13</approx-count>
+              <approx-count>53</approx-count>
               <contains-null>true</contains-null>
               <collation flag='0' name='LEN_RUS' />
               <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[nodes_8ADA9AF2F4004E1AA3ACE4AB1C1FE91B]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
@@ -1296,7 +1295,7 @@
               <family>nodes</family>
               <local-type>string</local-type>
               <aggregation>Count</aggregation>
-              <approx-count>2</approx-count>
+              <approx-count>6</approx-count>
               <contains-null>true</contains-null>
               <collation flag='0' name='LEN_RUS' />
               <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[nodes_8ADA9AF2F4004E1AA3ACE4AB1C1FE91B]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
@@ -1311,7 +1310,7 @@
               <family>nodes</family>
               <local-type>integer</local-type>
               <aggregation>Sum</aggregation>
-              <approx-count>2</approx-count>
+              <approx-count>6</approx-count>
               <contains-null>true</contains-null>
               <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[nodes_8ADA9AF2F4004E1AA3ACE4AB1C1FE91B]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
             </metadata-record>
@@ -1325,7 +1324,7 @@
               <family>nodes</family>
               <local-type>datetime</local-type>
               <aggregation>Year</aggregation>
-              <approx-count>15</approx-count>
+              <approx-count>63</approx-count>
               <contains-null>true</contains-null>
               <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[nodes_8ADA9AF2F4004E1AA3ACE4AB1C1FE91B]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
             </metadata-record>
@@ -1339,7 +1338,7 @@
               <family>nodes</family>
               <local-type>datetime</local-type>
               <aggregation>Year</aggregation>
-              <approx-count>15</approx-count>
+              <approx-count>63</approx-count>
               <contains-null>true</contains-null>
               <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[nodes_8ADA9AF2F4004E1AA3ACE4AB1C1FE91B]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
             </metadata-record>
@@ -1353,7 +1352,7 @@
               <family>nodes</family>
               <local-type>integer</local-type>
               <aggregation>Sum</aggregation>
-              <approx-count>2</approx-count>
+              <approx-count>7</approx-count>
               <contains-null>true</contains-null>
               <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[nodes_8ADA9AF2F4004E1AA3ACE4AB1C1FE91B]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
             </metadata-record>
@@ -1367,7 +1366,7 @@
               <family>node_relations</family>
               <local-type>integer</local-type>
               <aggregation>Sum</aggregation>
-              <approx-count>9</approx-count>
+              <approx-count>40</approx-count>
               <contains-null>false</contains-null>
               <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[node_relations_C8D344FF74C34D8B944EDA44E0A55A44]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
             </metadata-record>
@@ -1381,7 +1380,7 @@
               <family>node_relations</family>
               <local-type>integer</local-type>
               <aggregation>Sum</aggregation>
-              <approx-count>2</approx-count>
+              <approx-count>19</approx-count>
               <contains-null>true</contains-null>
               <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[node_relations_C8D344FF74C34D8B944EDA44E0A55A44]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
             </metadata-record>
@@ -1395,7 +1394,7 @@
               <family>node_relations</family>
               <local-type>integer</local-type>
               <aggregation>Sum</aggregation>
-              <approx-count>9</approx-count>
+              <approx-count>40</approx-count>
               <contains-null>true</contains-null>
               <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[node_relations_C8D344FF74C34D8B944EDA44E0A55A44]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
             </metadata-record>
@@ -1409,7 +1408,7 @@
               <family>node_relations</family>
               <local-type>datetime</local-type>
               <aggregation>Year</aggregation>
-              <approx-count>9</approx-count>
+              <approx-count>40</approx-count>
               <contains-null>true</contains-null>
               <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[node_relations_C8D344FF74C34D8B944EDA44E0A55A44]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
             </metadata-record>
@@ -1423,7 +1422,7 @@
               <family>node_relations</family>
               <local-type>datetime</local-type>
               <aggregation>Year</aggregation>
-              <approx-count>9</approx-count>
+              <approx-count>40</approx-count>
               <contains-null>true</contains-null>
               <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[node_relations_C8D344FF74C34D8B944EDA44E0A55A44]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
             </metadata-record>
@@ -1437,7 +1436,7 @@
               <family>node_relations</family>
               <local-type>integer</local-type>
               <aggregation>Sum</aggregation>
-              <approx-count>1</approx-count>
+              <approx-count>5</approx-count>
               <contains-null>true</contains-null>
               <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[node_relations_C8D344FF74C34D8B944EDA44E0A55A44]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
             </metadata-record>
@@ -1451,7 +1450,7 @@
               <family>kanbans</family>
               <local-type>integer</local-type>
               <aggregation>Sum</aggregation>
-              <approx-count>3</approx-count>
+              <approx-count>12</approx-count>
               <contains-null>false</contains-null>
               <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[kanbans_97702CD1828B4B5184669360510D3A2E]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
             </metadata-record>
@@ -1465,7 +1464,7 @@
               <family>kanbans</family>
               <local-type>string</local-type>
               <aggregation>Count</aggregation>
-              <approx-count>3</approx-count>
+              <approx-count>12</approx-count>
               <contains-null>true</contains-null>
               <collation flag='0' name='LEN_RUS' />
               <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[kanbans_97702CD1828B4B5184669360510D3A2E]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
@@ -1480,7 +1479,7 @@
               <family>kanbans</family>
               <local-type>datetime</local-type>
               <aggregation>Year</aggregation>
-              <approx-count>3</approx-count>
+              <approx-count>12</approx-count>
               <contains-null>true</contains-null>
               <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[kanbans_97702CD1828B4B5184669360510D3A2E]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
             </metadata-record>
@@ -1494,7 +1493,7 @@
               <family>kanbans</family>
               <local-type>datetime</local-type>
               <aggregation>Year</aggregation>
-              <approx-count>3</approx-count>
+              <approx-count>12</approx-count>
               <contains-null>true</contains-null>
               <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[kanbans_97702CD1828B4B5184669360510D3A2E]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
             </metadata-record>
@@ -1508,7 +1507,7 @@
               <family>kanbans</family>
               <local-type>integer</local-type>
               <aggregation>Sum</aggregation>
-              <approx-count>3</approx-count>
+              <approx-count>6</approx-count>
               <contains-null>true</contains-null>
               <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[kanbans_97702CD1828B4B5184669360510D3A2E]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
             </metadata-record>
@@ -1522,7 +1521,7 @@
               <family>columns</family>
               <local-type>integer</local-type>
               <aggregation>Sum</aggregation>
-              <approx-count>6</approx-count>
+              <approx-count>24</approx-count>
               <contains-null>false</contains-null>
               <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[columns_8EDF2FAE875049AAAABC353ACD34F93B]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
             </metadata-record>
@@ -1551,7 +1550,7 @@
               <family>columns</family>
               <local-type>string</local-type>
               <aggregation>Count</aggregation>
-              <approx-count>6</approx-count>
+              <approx-count>17</approx-count>
               <contains-null>true</contains-null>
               <collation flag='0' name='LEN_RUS' />
               <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[columns_8EDF2FAE875049AAAABC353ACD34F93B]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
@@ -1566,7 +1565,7 @@
               <family>columns</family>
               <local-type>datetime</local-type>
               <aggregation>Year</aggregation>
-              <approx-count>3</approx-count>
+              <approx-count>12</approx-count>
               <contains-null>true</contains-null>
               <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[columns_8EDF2FAE875049AAAABC353ACD34F93B]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
             </metadata-record>
@@ -1580,7 +1579,7 @@
               <family>columns</family>
               <local-type>datetime</local-type>
               <aggregation>Year</aggregation>
-              <approx-count>5</approx-count>
+              <approx-count>17</approx-count>
               <contains-null>true</contains-null>
               <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[columns_8EDF2FAE875049AAAABC353ACD34F93B]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
             </metadata-record>
@@ -1594,7 +1593,7 @@
               <family>columns</family>
               <local-type>integer</local-type>
               <aggregation>Sum</aggregation>
-              <approx-count>3</approx-count>
+              <approx-count>12</approx-count>
               <contains-null>true</contains-null>
               <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[columns_8EDF2FAE875049AAAABC353ACD34F93B]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
             </metadata-record>
@@ -1608,7 +1607,7 @@
               <family>tasks</family>
               <local-type>integer</local-type>
               <aggregation>Sum</aggregation>
-              <approx-count>14</approx-count>
+              <approx-count>41</approx-count>
               <contains-null>false</contains-null>
               <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[tasks_61CC1525960843EDBB0703245D627A53]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
             </metadata-record>
@@ -1622,7 +1621,7 @@
               <family>tasks</family>
               <local-type>string</local-type>
               <aggregation>Count</aggregation>
-              <approx-count>1</approx-count>
+              <approx-count>2</approx-count>
               <contains-null>true</contains-null>
               <collation flag='0' name='LEN_RUS' />
               <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[tasks_61CC1525960843EDBB0703245D627A53]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
@@ -1637,7 +1636,7 @@
               <family>tasks</family>
               <local-type>string</local-type>
               <aggregation>Count</aggregation>
-              <approx-count>8</approx-count>
+              <approx-count>10</approx-count>
               <contains-null>true</contains-null>
               <collation flag='0' name='LEN_RUS' />
               <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[tasks_61CC1525960843EDBB0703245D627A53]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
@@ -1652,7 +1651,7 @@
               <family>tasks</family>
               <local-type>string</local-type>
               <aggregation>Count</aggregation>
-              <approx-count>1</approx-count>
+              <approx-count>2</approx-count>
               <contains-null>true</contains-null>
               <collation flag='0' name='LEN_RUS' />
               <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[tasks_61CC1525960843EDBB0703245D627A53]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
@@ -1667,7 +1666,7 @@
               <family>tasks</family>
               <local-type>string</local-type>
               <aggregation>Count</aggregation>
-              <approx-count>1</approx-count>
+              <approx-count>2</approx-count>
               <contains-null>true</contains-null>
               <collation flag='0' name='LEN_RUS' />
               <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[tasks_61CC1525960843EDBB0703245D627A53]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
@@ -1682,7 +1681,7 @@
               <family>tasks</family>
               <local-type>datetime</local-type>
               <aggregation>Year</aggregation>
-              <approx-count>8</approx-count>
+              <approx-count>23</approx-count>
               <contains-null>true</contains-null>
               <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[tasks_61CC1525960843EDBB0703245D627A53]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
             </metadata-record>
@@ -1696,7 +1695,7 @@
               <family>tasks</family>
               <local-type>datetime</local-type>
               <aggregation>Year</aggregation>
-              <approx-count>13</approx-count>
+              <approx-count>37</approx-count>
               <contains-null>true</contains-null>
               <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[tasks_61CC1525960843EDBB0703245D627A53]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
             </metadata-record>
@@ -1710,7 +1709,7 @@
               <family>tasks</family>
               <local-type>integer</local-type>
               <aggregation>Sum</aggregation>
-              <approx-count>5</approx-count>
+              <approx-count>16</approx-count>
               <contains-null>true</contains-null>
               <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[tasks_61CC1525960843EDBB0703245D627A53]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
             </metadata-record>
@@ -1720,20 +1719,20 @@
       <layout _.fcp.SchemaViewerObjectModel.false...dim-percentage='0.5' _.fcp.SchemaViewerObjectModel.false...measure-percentage='0.4' dim-ordering='alphabetic' measure-ordering='alphabetic' show-structure='true' />
       <style>
         <style-rule element='mark'>
-          <encoding attr='color' field='[none:owner:nk]' palette='blue_10_0' type='palette'>
-            <map to='#2a5783'>
-              <bucket>&quot;789&quot;</bucket>
-            </map>
-            <map to='#b9ddf1'>
-              <bucket>&quot;123&quot;</bucket>
-            </map>
-          </encoding>
           <encoding attr='color' field='[none:name (columns):nk]' palette='blue_10_0' type='palette'>
             <map to='#2a5783'>
               <bucket>&quot;進行中&quot;</bucket>
             </map>
             <map to='#b9ddf1'>
               <bucket>&quot;完成&quot;</bucket>
+            </map>
+          </encoding>
+          <encoding attr='color' field='[none:owner:nk]' palette='blue_10_0' type='palette'>
+            <map to='#2a5783'>
+              <bucket>&quot;789&quot;</bucket>
+            </map>
+            <map to='#b9ddf1'>
+              <bucket>&quot;123&quot;</bucket>
             </map>
           </encoding>
         </style-rule>
@@ -2491,18 +2490,14 @@
       <zones>
         <zone h='100000' id='4' type-v2='layout-basic' w='100000' x='0' y='0'>
           <zone h='97630' id='15' param='horz' type-v2='layout-flow' w='98666' x='667' y='1185'>
-            <zone h='97630' id='11' param='horz' type-v2='layout-flow' w='98666' x='667' y='1185'>
-              <zone h='97630' id='7' param='horz' type-v2='layout-flow' w='98666' x='667' y='1185'>
-                <zone h='97630' id='5' type-v2='layout-basic' w='98666' x='667' y='1185'>
-                  <zone h='97630' id='41' is-scaled='1' param='C:/Users/wulab002/Downloads/比較表 的複本 (3).png' type-v2='bitmap' w='98666' x='667' y='1185'>
-                    <zone-style>
-                      <format attr='border-color' value='#000000' />
-                      <format attr='border-style' value='none' />
-                      <format attr='border-width' value='0' />
-                      <format attr='margin' value='4' />
-                    </zone-style>
-                  </zone>
-                </zone>
+            <zone h='97630' id='5' type-v2='layout-basic' w='98666' x='667' y='1185'>
+              <zone h='97630' id='41' is-scaled='1' param='C:/Users/wulab002/Downloads/比較表 的複本 (3).png' type-v2='bitmap' w='98666' x='667' y='1185'>
+                <zone-style>
+                  <format attr='border-color' value='#000000' />
+                  <format attr='border-style' value='none' />
+                  <format attr='border-width' value='0' />
+                  <format attr='margin' value='4' />
+                </zone-style>
               </zone>
             </zone>
           </zone>
@@ -2515,7 +2510,7 @@
         </zone>
         <zone h='30222' id='12' name='想法節點建立頻率' w='98333' x='1500' y='68889' />
         <zone fixed-size='160' friendly-name='篩選器' h='43556' id='14' is-fixed='true' param='vert' type-v2='layout-flow' w='21167' x='69917' y='18222'>
-          <zone h='8296' id='16' mode='dropdown' name='想法節點延伸參與度' param='[federated.1nfi1zc0wq7mmc11rfpjc08c5yro].[none:name:nk]' type-v2='filter' w='21167' x='69917' y='18222'>
+          <zone h='9037' id='16' mode='dropdown' name='想法節點延伸參與度' param='[federated.1nfi1zc0wq7mmc11rfpjc08c5yro].[none:name:nk]' type-v2='filter' w='21167' x='69917' y='18222'>
             <zone-style>
               <format attr='border-color' value='#000000' />
               <format attr='border-style' value='none' />
@@ -2523,7 +2518,7 @@
               <format attr='margin' value='4' />
             </zone-style>
           </zone>
-          <zone h='15555' id='30' name='想法節點建立參與度' param='[federated.1nfi1zc0wq7mmc11rfpjc08c5yro].[none:owner:nk]' type-v2='filter' w='21167' x='69917' y='26518'>
+          <zone h='29185' id='30' name='想法節點建立參與度' param='[federated.1nfi1zc0wq7mmc11rfpjc08c5yro].[none:owner:nk]' type-v2='filter' w='21167' x='69917' y='27259'>
             <zone-style>
               <format attr='border-color' value='#000000' />
               <format attr='border-style' value='none' />
@@ -2540,8 +2535,8 @@
         <devicelayout auto-generated='true' name='Phone'>
           <size maxheight='1250' minheight='1250' sizing-mode='vscroll' />
           <zones>
-            <zone h='100000' id='55' type-v2='layout-basic' w='100000' x='0' y='0'>
-              <zone h='97630' id='54' param='vert' type-v2='layout-flow' w='98666' x='667' y='1185'>
+            <zone h='100000' id='57' type-v2='layout-basic' w='100000' x='0' y='0'>
+              <zone h='97630' id='56' param='vert' type-v2='layout-flow' w='98666' x='667' y='1185'>
                 <zone fixed-size='280' h='97630' id='41' is-fixed='true' is-scaled='1' param='C:/Users/wulab002/Downloads/比較表 的複本 (3).png' type-v2='bitmap' w='98666' x='667' y='1185'>
                   <zone-style>
                     <format attr='border-color' value='#000000' />
@@ -2551,7 +2546,7 @@
                     <format attr='padding' value='0' />
                   </zone-style>
                 </zone>
-                <zone h='15555' id='30' mode='checkdropdown' name='想法節點建立參與度' param='[federated.1nfi1zc0wq7mmc11rfpjc08c5yro].[none:owner:nk]' type-v2='filter' w='21167' x='69917' y='26518'>
+                <zone h='29185' id='30' mode='checkdropdown' name='想法節點建立參與度' param='[federated.1nfi1zc0wq7mmc11rfpjc08c5yro].[none:owner:nk]' type-v2='filter' w='21167' x='69917' y='27259'>
                   <zone-style>
                     <format attr='border-color' value='#000000' />
                     <format attr='border-style' value='none' />
@@ -2578,7 +2573,7 @@
                     <format attr='padding' value='0' />
                   </zone-style>
                 </zone>
-                <zone h='8296' id='16' mode='dropdown' name='想法節點延伸參與度' param='[federated.1nfi1zc0wq7mmc11rfpjc08c5yro].[none:name:nk]' type-v2='filter' w='21167' x='69917' y='18222'>
+                <zone h='9037' id='16' mode='dropdown' name='想法節點延伸參與度' param='[federated.1nfi1zc0wq7mmc11rfpjc08c5yro].[none:name:nk]' type-v2='filter' w='21167' x='69917' y='18222'>
                   <zone-style>
                     <format attr='border-color' value='#000000' />
                     <format attr='border-style' value='none' />
@@ -2658,8 +2653,8 @@
         <devicelayout auto-generated='true' name='Phone'>
           <size maxheight='1100' minheight='1100' sizing-mode='vscroll' />
           <zones>
-            <zone h='100000' id='33' type-v2='layout-basic' w='100000' x='0' y='0'>
-              <zone h='97630' id='32' param='vert' type-v2='layout-flow' w='98666' x='667' y='1185'>
+            <zone h='100000' id='35' type-v2='layout-basic' w='100000' x='0' y='0'>
+              <zone h='84000' id='34' param='vert' type-v2='layout-flow' w='84000' x='8000' y='8000'>
                 <zone fixed-size='280' h='97630' id='19' is-fixed='true' is-scaled='1' param='C:/Users/wulab002/Downloads/比較表 的複本 (2).png' type-v2='bitmap' w='98666' x='667' y='1185'>
                   <zone-style>
                     <format attr='border-color' value='#000000' />
@@ -2724,17 +2719,15 @@
       <zones>
         <zone h='100000' id='2' type-v2='layout-basic' w='100000' x='0' y='0'>
           <zone h='98000' id='9' param='vert' removable='false' type-v2='layout-flow' w='98710' x='645' y='1000'>
-            <zone h='98000' id='7' param='vert' removable='false' type-v2='layout-flow' w='98710' x='645' y='1000'>
-              <zone h='98000' id='1' param='vert' removable='false' type-v2='layout-flow' w='98710' x='645' y='1000'>
-                <zone h='12625' id='4' is-fixed='true' paired-zone-id='5' removable='false' type-v2='flipboard-nav' w='98710' x='645' y='1000' />
-                <zone h='85375' id='5' paired-zone-id='4' removable='false' type-v2='flipboard' w='98710' x='645' y='13625'>
-                  <flipboard active-id='2' nav-type='caption' show-nav-arrows='true'>
-                    <story-points>
-                      <story-point caption='想法節點資料分析' captured-sheet='想法節點工作表' id='1' />
-                      <story-point caption='排程任務資料分析' captured-sheet='排程工作表' id='2' />
-                    </story-points>
-                  </flipboard>
-                </zone>
+            <zone h='98000' id='1' param='vert' removable='false' type-v2='layout-flow' w='98710' x='645' y='1000'>
+              <zone h='12625' id='4' is-fixed='true' paired-zone-id='5' removable='false' type-v2='flipboard-nav' w='98710' x='645' y='1000' />
+              <zone h='85375' id='5' paired-zone-id='4' removable='false' type-v2='flipboard' w='98710' x='645' y='13625'>
+                <flipboard active-id='2' nav-type='caption' show-nav-arrows='true'>
+                  <story-points>
+                    <story-point caption='想法節點資料分析' captured-sheet='想法節點工作表' id='1' />
+                    <story-point caption='排程任務資料分析' captured-sheet='排程工作表' id='2' />
+                  </story-points>
+                </flipboard>
               </zone>
             </zone>
           </zone>
@@ -2749,7 +2742,7 @@
       <simple-id uuid='{56FBBED4-7F29-4A0A-9CE4-78BFEDB5E147}' />
     </dashboard>
   </dashboards>
-  <windows source-height='30'>
+  <windows saved-dpi-scale-factor='1.25' source-height='37'>
     <window class='worksheet' name='想法節點建立參與度'>
       <cards>
         <edge name='left'>
@@ -2760,13 +2753,13 @@
           </strip>
         </edge>
         <edge name='top'>
-          <strip size='39'>
+          <strip size='38'>
             <card type='columns' />
           </strip>
-          <strip size='39'>
+          <strip size='38'>
             <card type='rows' />
           </strip>
-          <strip size='38'>
+          <strip size='37'>
             <card type='title' />
           </strip>
         </edge>
@@ -3065,13 +3058,10 @@
       </viewpoint>
       <simple-id uuid='{D55C1CF2-27DA-41F4-8EC7-E9BCCB2B8F4D}' />
     </window>
-    <window class='dashboard' name='想法節點工作表'>
+    <window class='dashboard' maximized='true' name='想法節點工作表' tab-color='#4f779a'>
       <viewpoints>
         <viewpoint name='想法節點延伸參與度'>
           <zoom type='entire-view' />
-          <highlight field='[federated.1nfi1zc0wq7mmc11rfpjc08c5yro].[cnt:id (node_relations):qk]' type='size'>
-            <bucket-selection />
-          </highlight>
         </viewpoint>
         <viewpoint name='想法節點建立參與度'>
           <zoom type='entire-view' />
@@ -3086,7 +3076,7 @@
       <active id='-1' />
       <simple-id uuid='{7A4E7AF7-DC92-431A-B494-76DFD1C0FB96}' />
     </window>
-    <window class='dashboard' name='排程工作表'>
+    <window class='dashboard' name='排程工作表' tab-color='#f66273'>
       <viewpoints>
         <viewpoint name='排程任務列表'>
           <zoom type='entire-view' />
@@ -3101,7 +3091,7 @@
       <active id='-1' />
       <simple-id uuid='{D04DA0A9-BBAB-4A11-A77A-5F31C7983247}' />
     </window>
-    <window class='dashboard' maximized='true' name='故事 1'>
+    <window class='dashboard' name='故事 1'>
       <viewpoints />
       <active id='-1' />
       <simple-id uuid='{57103418-DE1B-4702-9B65-BDAA88E401EE}' />
@@ -3118,231 +3108,127 @@
     </thumbnail>
     <thumbnail height='192' name='想法節點工作表' width='192'>
       iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAABS3GwHAAAACXBIWXMAABJ0AAASdAHeZh94
-      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
+      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
     </thumbnail>
     <thumbnail height='192' name='想法節點延伸參與度' width='192'>
       iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAABS3GwHAAAACXBIWXMAABJ0AAASdAHeZh94
@@ -3417,81 +3303,17 @@
     </thumbnail>
     <thumbnail height='192' name='想法節點建立參與度' width='192'>
       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
-      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
+      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
+      fBUOM1sAAAAASUVORK5CYII=
     </thumbnail>
     <thumbnail height='192' name='想法節點建立頻率' width='192'>
       iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAABS3GwHAAAACXBIWXMAABJ0AAASdAHeZh94
